@@ -16,7 +16,6 @@
  */
 package com.tomirio.chessengine.chessboard;
 
-import com.rits.cloning.Cloner;
 import com.tomirio.chessengine.chesspieces.*;
 import com.tomirio.chessengine.view.ImageLoader;
 import java.io.ByteArrayInputStream;
@@ -167,8 +166,6 @@ public class ChessBoard extends Observable implements Serializable {
      * @return A deep copy of this instance.
      */
     public ChessBoard deepClone() {
-//        Cloner c = new Cloner();      // This is throwing an classNotFound error
-//        return c.deepClone(this);
         try {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ObjectOutputStream oos = new ObjectOutputStream(baos);
