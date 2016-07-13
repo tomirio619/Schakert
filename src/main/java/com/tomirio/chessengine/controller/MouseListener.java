@@ -28,7 +28,6 @@ import java.util.ArrayList;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 
-
 /**
  *
  * @author Tom Sandmann
@@ -67,10 +66,10 @@ public class MouseListener implements EventHandler<MouseEvent> {
 
     /**
      *
-     * @param log   The log.
-     * @param view  The view.
+     * @param log The log.
+     * @param view The view.
      * @param state The state.
-     * @param game  The game.
+     * @param game The game.
      */
     public MouseListener(Log log, View view, State state, Game game) {
         this.state = state;
@@ -116,8 +115,7 @@ public class MouseListener implements EventHandler<MouseEvent> {
             }
 
         } else // Current tile contains a chess piece
-        {
-            if (possibleMoves.isEmpty()) {
+         if (possibleMoves.isEmpty()) {
                 /*
                 There where no possible moves so no chess piece can be captured.
                 Show the possible moves of the chesspiece in this tile.
@@ -152,7 +150,6 @@ public class MouseListener implements EventHandler<MouseEvent> {
                     showAvailableMoves(possibleMoves);
                 }
             }
-        }
     }
 
     /**

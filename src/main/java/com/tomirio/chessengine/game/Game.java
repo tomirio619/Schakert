@@ -12,7 +12,6 @@ import com.tomirio.chessengine.chessboard.ChessPiece;
 import com.tomirio.chessengine.chessboard.State;
 import java.util.NoSuchElementException;
 
-
 /**
  *
  * @author Tom Sandmann

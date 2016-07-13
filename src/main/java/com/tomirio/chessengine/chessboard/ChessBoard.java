@@ -28,6 +28,8 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Observable;
 import static java.lang.Math.abs;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -50,7 +52,6 @@ public class ChessBoard extends Observable implements Serializable {
      */
     private final ChessPiece[][] board;
 
-   
     /**
      * The log.
      */
@@ -200,6 +201,7 @@ public class ChessBoard extends Observable implements Serializable {
 
     /**
      * Move piece on the chess board and update view.
+     *
      * @param piece The chess piece that needs to be moved.
      * @param newRow The new row of the chess piece.
      * @param newColumn The new column of the chess piece.
@@ -216,9 +218,35 @@ public class ChessBoard extends Observable implements Serializable {
         setChanged();
         notifyObservers(this);
     }
-    
+
     /**
      * Move piece on the chess board and <b>don't</b> update view.
+     *
+     * @param pos The piece position of the chess piece to move.
+     * @param newRow The new row of the chess piece.
+     * @param newColumn The new column of the chess piece.
+     */
+    public void movePiece(PiecePosition pos, int newRow, int newColumn) {
+        if (!isOccupiedPosition(pos)) {
+            System.out.println("The position " + pos + " does not contain a chess piece!");
+            return;
+        }
+        ChessPiece piece = getPiece(pos);
+        log.write(piece + "\t -> \t" + new PiecePosition(newRow, newColumn));
+        checkEnPassantMove(piece, newRow, newColumn);
+        checkCastling(piece, newRow, newColumn);
+        silentMovePiece(piece, newRow, newColumn);
+        updateEnPassantMoves(piece);
+        checkPawnPromotion(piece.getColour());
+        updateKingStatus();
+        state.update(this);
+        setChanged();
+        notifyObservers(this);
+    }
+
+    /**
+     * Move piece on the chess board and <code>don't</code> update view.
+     *
      * @param piece The chess piece that needs to be moved.
      * @param newRow The new row of the chess piece.
      * @param newColumn The new column of the chess piece.
@@ -231,7 +259,7 @@ public class ChessBoard extends Observable implements Serializable {
         checkPawnPromotion(piece.getColour());
         updateKingStatus();
         state.update(this);
-        }
+    }
 
     /**
      * This function checks if an enPassant move took place. This means that a
@@ -651,15 +679,16 @@ public class ChessBoard extends Observable implements Serializable {
         }
         return valid;
     }
-    
+
     /**
      * Check if a given coordinate is within the chess board.
-     * @param row   The row.
-     * @param col   The column.
+     *
+     * @param row The row.
+     * @param col The column.
      * @return <code>True</code> if the coordinate is within the chess board,
      * <code>False</code> otherwise.
      */
-    public boolean isValidCoordinate(int row, int col){
+    public boolean isValidCoordinate(int row, int col) {
         return col >= 0 && col <= 7 && row >= 0 && row <= 7;
     }
 

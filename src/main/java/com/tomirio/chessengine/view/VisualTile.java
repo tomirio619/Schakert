@@ -28,7 +28,6 @@ import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Paint;
 
-
 /**
  *
  * @author Tom Sandmann
@@ -100,9 +99,9 @@ public class VisualTile extends ToggleButton {
     /**
      * This constructor will be used when the game has already begun
      *
-     * @param row        The row.
-     * @param column     The column.
-     * @param piece      The chess piece.
+     * @param row The row.
+     * @param column The column.
+     * @param piece The chess piece.
      * @param chessBoard The chess board.
      */
     public VisualTile(int row, int column, ChessPiece piece, ChessBoard chessBoard) {
@@ -119,10 +118,10 @@ public class VisualTile extends ToggleButton {
 
     /**
      *
-     * @param row           The row.
-     * @param column        The column.
-     * @param piece         The chess piece.
-     * @param currentWidth  The width.
+     * @param row The row.
+     * @param column The column.
+     * @param piece The chess piece.
+     * @param currentWidth The width.
      * @param currentHeight The height.
      */
     public VisualTile(int row, int column, ChessPiece piece, double currentWidth, double currentHeight) {
@@ -173,7 +172,8 @@ public class VisualTile extends ToggleButton {
 
     /**
      * Updates the tile image according to the current value of the chessPiece.
-     * @param newSize   The new size.
+     *
+     * @param newSize The new size.
      */
     public void updateTileImage(double newSize) {
         setGraphic(null);

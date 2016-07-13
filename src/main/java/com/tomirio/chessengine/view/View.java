@@ -38,7 +38,6 @@ import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 
-
 /**
  *
  * @author Tom Sandmann

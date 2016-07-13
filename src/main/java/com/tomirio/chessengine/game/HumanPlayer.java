@@ -9,8 +9,6 @@ import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
 
-
-
 /**
  *
  * @author Tom Sandmann
@@ -19,8 +17,8 @@ public class HumanPlayer extends Player {
 
     /**
      *
-     * @param playerColour  The colour of the player.
-     * @param chessBoard    The chess board.
+     * @param playerColour The colour of the player.
+     * @param chessBoard The chess board.
      */
     public HumanPlayer(ChessColour playerColour, ChessBoard chessBoard) {
         super(playerColour, chessBoard);

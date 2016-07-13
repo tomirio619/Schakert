@@ -62,7 +62,7 @@ public abstract class ChessPiece implements Serializable {
     /**
      * The chessIcon.
      */
-    private transient final ImageView chessIcon;
+    private final transient ImageView chessIcon;
 
     /**
      * This constructor MUST be used when the chessboard is not known when a new

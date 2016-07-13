@@ -72,8 +72,7 @@ public class PiecePosition implements Serializable {
 
     /**
      *
-     * @return <code>True</code> if the position is within the board:      
-     * <pre>
+     * @return <code>True</code> if the position is within the board:      <pre>
      * {@code
      * 0 <= row <= 7  && 0 <= column <= 7
      * }

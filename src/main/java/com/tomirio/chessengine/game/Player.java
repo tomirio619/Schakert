@@ -9,8 +9,6 @@ import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
 
-
-
 /**
  *
  * @author Tom Sandmann
@@ -18,10 +16,10 @@ import com.tomirio.chessengine.chessboard.ChessPiece;
 public abstract class Player {
 
     /**
-     *  The colour of the player.
+     * The colour of the player.
      */
     public ChessColour playerColour;
-    
+
     /**
      * The chess board.
      */
@@ -29,8 +27,8 @@ public abstract class Player {
 
     /**
      *
-     * @param playerColour  The colour.
-     * @param chessBoard    The chess board.
+     * @param playerColour The colour.
+     * @param chessBoard The chess board.
      */
     public Player(ChessColour playerColour, ChessBoard chessBoard) {
         this.playerColour = playerColour;

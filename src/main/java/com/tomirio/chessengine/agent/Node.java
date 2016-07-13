@@ -17,7 +17,8 @@
 package com.tomirio.chessengine.agent;
 
 import com.tomirio.chessengine.chessboard.ChessBoard;
-import java.util.ArrayList;
+import com.tomirio.chessengine.chessboard.ChessPiece;
+import com.tomirio.chessengine.chessboard.PiecePosition;
 
 /**
  *
@@ -28,17 +29,28 @@ public class Node {
     /**
      * The data
      */
-    public ChessBoard chessBoard;
+    public final ChessBoard chessBoard;
 
     /**
      * The parent.
      */
-    public Node parent;
+    public final Node parent;
+
+    /**
+     * The move that took place in the parent node which resulted in the current
+     * chess board.
+     */
+    public final PiecePosition move;
+
+    /**
+     * The piece that was moved.
+     */
+    public final ChessPiece chessPiece;
 
     /**
      * The heuristic value.
      */
-    public int heuristicValue;
+    public final int heuristicValue;
 
     /**
      *
@@ -50,19 +62,23 @@ public class Node {
         this.parent = parent;
         this.chessBoard = chessBoard;
         this.heuristicValue = heuristicValue;
+        chessPiece = null;
+        move = null;
     }
 
     /**
      *
      * @param data The data that this node contains.
      * @param parent The parent of this node.
-     * @param children The children of this node.
      * @param heuristicValue The heuristic value of the board.
+     * @param move The move.
      */
-    public Node(ChessBoard data, Node parent, ArrayList<Node> children, int heuristicValue) {
+    public Node(ChessBoard data, Node parent, int heuristicValue, PiecePosition move, ChessPiece chessPiece) {
         this.chessBoard = data;
         this.parent = parent;
         this.heuristicValue = heuristicValue;
+        this.move = move;
+        this.chessPiece = chessPiece;
     }
 
     /**
@@ -83,7 +99,27 @@ public class Node {
         if (parent == null) {
             return toString();
         } else {
-            return parent.toTrace() + "\n" + toString();
+            return parent.toTrace() + toString();
+        }
+    }
+
+    public PiecePosition getRootMove() {
+        if (parent.parent == null) {
+//            System.out.println("Get root move: de node die null als parent had ziet er als volgt uit:\n");
+//            System.out.println(this);
+//            System.out.println("Het schaastuk in node was " + chessPiece);
+//            System.out.println("De move was " + move);
+            return move;
+        } else {
+            return parent.getRootMove();
+        }
+    }
+
+    public ChessPiece getRootPiece() {
+        if (parent.parent == null) {
+            return chessPiece;
+        } else {
+            return parent.getRootPiece();
         }
     }
 }
