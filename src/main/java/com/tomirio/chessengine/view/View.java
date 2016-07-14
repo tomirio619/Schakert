@@ -106,7 +106,7 @@ public class View implements Observer {
 
     /**
      *
-     * @param primaryStage the primary stage
+     * @param primaryStage The primary stage.
      */
     public View(Stage primaryStage) {
         log = new Log();

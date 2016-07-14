@@ -76,7 +76,6 @@ public class Game {
                 new Thread((Runnable) whitePlayer).start();
                 break;
         }
-        // updatePlayers() // Must be called if the Agent has made a move.
     }
 
     /**

@@ -22,67 +22,67 @@ import javafx.scene.image.Image;
  *
  * @author Tom Sandmann
  */
-public class ImageLoader {
+public final class ImageLoader {
 
     /**
      * black bishop image.
      */
-    public Image blackBishop;
+    public static Image blackBishop;
 
     /**
      * black castle image.
      */
-    public Image blackCastle;
+    public static Image blackCastle;
 
     /**
      * black king image.
      */
-    public Image blackKing;
+    public static Image blackKing;
 
     /**
      * black knight image.
      */
-    public Image blackKnight;
+    public static Image blackKnight;
 
     /**
      * black pawn image.
      */
-    public Image blackPawn;
+    public static Image blackPawn;
 
     /**
      * black queen image.
      */
-    public Image blackQueen;
+    public static Image blackQueen;
 
     /**
      * black bishop image.
      */
-    public Image whiteBishop;
+    public static Image whiteBishop;
 
     /**
      * white castle image.
      */
-    public Image whiteCastle;
+    public static Image whiteCastle;
 
     /**
      * white king image.
      */
-    public Image whiteKing;
+    public static Image whiteKing;
 
     /**
      * white knight image.
      */
-    public Image whiteKnight;
+    public static Image whiteKnight;
 
     /**
      * white pawn image.
      */
-    public Image whitePawn;
+    public static Image whitePawn;
 
     /**
      * white queen image.
      */
-    public Image whiteQueen;
+    public static Image whiteQueen;
 
     /**
      * application icon.
@@ -92,13 +92,12 @@ public class ImageLoader {
     /**
      * Path resources.
      */
-    String path = "PNG";
+    static String path = "PNG";
 
     /**
-     * Constructor of the image loader, will load all the images in the
-     * specified path of the string 'path'.
+     * Initialize
      */
-    public ImageLoader() {
+    public final static void initialize() {
         icon = new Image("Chess_Icon.png");
 
         blackBishop = new Image(path + "/Black/bishop.png");
@@ -115,4 +114,5 @@ public class ImageLoader {
         whitePawn = new Image(path + "/White/pawn.png");
         whiteQueen = new Image(path + "/White/queen.png");
     }
+
 }

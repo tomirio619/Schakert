@@ -16,6 +16,7 @@
  */
 package com.tomirio.chessengine.chesspieces;
 
+import com.tomirio.chessengine.agent.PieceSquareTables;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
 import com.tomirio.chessengine.chessboard.ChessTypes;
@@ -80,13 +81,17 @@ public class Castle extends ChessPiece {
         super.move(row, column);
     }
 
+    @Override
+    public void agentMove(int row, int column) {
+        castlingPossible = false;
+        super.agentMove(row, column);
+    }
+
     /**
-     * Returns the variable castlingPossible
-     *
-     * @return <code>True</code> if castling is possible <code>False</code>
+     * @return <code>True</code> if castling is possible, <code>False</code>
      * otherwise.
      */
-    public boolean getCastlingPossible() {
+    public boolean castlingPossible() {
         return castlingPossible;
     }
 
@@ -122,11 +127,11 @@ public class Castle extends ChessPiece {
         int weight = 0;
         switch (getColour()) {
             case White:
-                weight = pieceSquareTables.castle_table[getPos().getRow()][getPos().getColumn()];
+                weight = PieceSquareTables.CASTLE_TABLE[getPos().getRow()][getPos().getColumn()];
                 break;
             case Black:
                 //mirrored access
-                weight = pieceSquareTables.castle_table[7 - getPos().getRow()][getPos().getColumn()];
+                weight = PieceSquareTables.CASTLE_TABLE[7 - getPos().getRow()][getPos().getColumn()];
                 break;
             default:
                 throw new NoSuchElementException();

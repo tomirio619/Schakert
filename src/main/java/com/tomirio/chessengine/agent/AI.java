@@ -58,17 +58,18 @@ public class AI extends Player implements Runnable {
          */
         if (depth == 0 || (node.chessBoard.getState().getWinner() != null)) {
             int boardValue = node.chessBoard.evaluateBoard(colour);
+            int opponentBoardValue = node.chessBoard.evaluateBoard(colour.getOpposite());
+            boardValue = boardValue - opponentBoardValue;
             double result = (colour == playerColour) ? boardValue : -1 * boardValue;
             return new Pair<>(node, result);
         }
         ArrayList<Node> childNodes = generateChildNodes(node, colour);
         double bestValue = Double.NEGATIVE_INFINITY;
         Node bestNode = node;
-        PiecePosition move = node.move;
         boolean finished = false;
         for (int i = 0; i < childNodes.size() && !finished; i++) {
             Node child = childNodes.get(i);
-            Pair<Node, Double> result = negaMax(child, depth - 1, -beta, -alpha, colour.getOpposite(colour));
+            Pair<Node, Double> result = negaMax(child, depth - 1, -beta, -alpha, colour.getOpposite());
             double v = -1 * result.second;
             if (v >= bestValue) {
                 bestValue = v;
@@ -96,17 +97,10 @@ public class AI extends Player implements Runnable {
         for (ChessPiece piece : pieces) {
             ArrayList<PiecePosition> moves = piece.getPossibleMoves();
             for (PiecePosition move : moves) {
-                /**
-                 * Store the score of the succecors of the root chessboard in a
-                 * hash tabel indexed by (previousHash, move). previousHash is
-                 * the hash of the chessboard on which the move was applied. The
-                 * score belongs to the chessboard that resulted from the
-                 * applied move on the previous chessboard
-                 */
                 ChessBoard chessBoardCopy = node.chessBoard.deepClone();
                 ChessPiece pieceToMove = chessBoardCopy.getPiece(piece.getPos());
                 ChessPiece pieceCopy = SerializationUtils.clone(pieceToMove);
-                chessBoardCopy.movePieceAgent(pieceToMove, move.getRow(), move.getColumn());
+                pieceToMove.agentMove(move.getRow(), move.getColumn());
                 int hash = chessBoardCopy.getHash();
                 if (!visitedNodes.contains(hash)) {
                     visitedNodes.add(hash);
@@ -152,12 +146,18 @@ public class AI extends Player implements Runnable {
         System.out.println("Nodes per second:" + skippedNodes / elapsedTime);
         skippedNodes = 0;
         PiecePosition move = toPlay.first.getRootMove();
-        ChessPiece p = toPlay.first.getRootPiece();
         /*
-        Because the icon field is transient in the chess piece, 
-        we must move the piece based on the piece position.
+        Note that we CANNOT use the chess piece we retrieve below for making
+        the move on the chess board. Because the image in this chess piece is transient,
+        the value is null. Making the move with this chess piece will result in a
+        null pointer exception. We have to retrieve the original chess piece based
+        on the position we get from this new chess piece.
+        TODO: remove the images from the chess pieces, and let the view handle the correct images.
          */
-        Platform.runLater(() -> chessBoard.movePiece(p.getPos(), move.getRow(), move.getColumn()));
+        ChessPiece p = toPlay.first.getRootPiece();
+        visitedNodes.clear();
+        ChessPiece pieceToMove = chessBoard.getPiece(p.getPos());
+        Platform.runLater(() -> pieceToMove.move(move.getRow(), move.getColumn()));
     }
 
     @Override

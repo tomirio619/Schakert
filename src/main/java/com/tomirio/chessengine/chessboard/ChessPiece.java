@@ -16,7 +16,6 @@
  */
 package com.tomirio.chessengine.chessboard;
 
-import com.tomirio.chessengine.agent.PieceSquareTables;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -29,8 +28,6 @@ import javafx.scene.image.ImageView;
  * @author Tom Sandmann
  */
 public abstract class ChessPiece implements Serializable {
-
-    protected final PieceSquareTables pieceSquareTables;
 
     /**
      * The type of the chess piece.
@@ -81,7 +78,6 @@ public abstract class ChessPiece implements Serializable {
         this.pos = pos;
         chessIcon = new ImageView();
         chessIcon.setImage(chessImage);
-        pieceSquareTables = new PieceSquareTables();
     }
 
     /**
@@ -102,7 +98,6 @@ public abstract class ChessPiece implements Serializable {
         this.board = board;
         chessIcon = new ImageView();
         chessIcon.setImage(chessImage);
-        this.pieceSquareTables = new PieceSquareTables();
     }
 
     abstract public int evaluatePosition();
@@ -114,6 +109,15 @@ public abstract class ChessPiece implements Serializable {
      */
     public void setPosition(int newRow, int newColumn) {
         pos.setPosition(newRow, newColumn);
+    }
+
+    /**
+     * The new piecePosition.
+     *
+     * @param pos
+     */
+    public void setPosition(PiecePosition pos) {
+        pos.setPosition(pos.getRow(), pos.getColumn());
     }
 
     /**
@@ -191,6 +195,16 @@ public abstract class ChessPiece implements Serializable {
      */
     public void move(int row, int column) {
         board.movePiece(this, row, column);
+    }
+
+    /**
+     * Make a move on the chess board without updating the GUI.
+     *
+     * @param row The new row of this chess piece.
+     * @param column The new column of this chess piece.
+     */
+    public void agentMove(int row, int column) {
+        board.movePieceAgent(this, row, column);
     }
 
     /**

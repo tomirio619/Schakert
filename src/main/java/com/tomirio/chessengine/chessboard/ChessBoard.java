@@ -28,8 +28,6 @@ import java.util.Arrays;
 import java.util.ArrayList;
 import java.util.Observable;
 import static java.lang.Math.abs;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -63,11 +61,6 @@ public class ChessBoard extends Observable implements Serializable {
     private final State state;
 
     /**
-     * The image loader.
-     */
-    public transient ImageLoader imageLoader;
-
-    /**
      * Constructor.
      *
      * @param log The log.
@@ -77,7 +70,6 @@ public class ChessBoard extends Observable implements Serializable {
         this.state = state;
         this.log = log;
         board = new ChessPiece[ROWS][COLS];
-        imageLoader = new ImageLoader();
         initializeBoard();
         setChessBoardForPieces();
     }
@@ -86,65 +78,67 @@ public class ChessBoard extends Observable implements Serializable {
      * Initializes the chess board with all its pieces.
      */
     private void initializeBoard() {
+        // Image loader
+        ImageLoader.initialize();
         // Black pawns
         for (int col = 0; col < COLS; col++) {
             board[1][col] = new Pawn(ChessTypes.Pawn, ChessColour.Black,
-                    new PiecePosition(1, col), imageLoader.blackPawn);
+                    new PiecePosition(1, col), ImageLoader.blackPawn);
         }
 
         // Black castles
         board[0][0] = new Castle(ChessTypes.Castle, ChessColour.Black,
-                new PiecePosition(0, 0), imageLoader.blackCastle);
+                new PiecePosition(0, 0), ImageLoader.blackCastle);
         board[0][7] = new Castle(ChessTypes.Castle, ChessColour.Black,
-                new PiecePosition(0, 7), imageLoader.blackCastle);
+                new PiecePosition(0, 7), ImageLoader.blackCastle);
 
         // Black knights
         board[0][1] = new Knight(ChessTypes.Knight, ChessColour.Black,
-                new PiecePosition(0, 1), imageLoader.blackKnight);
+                new PiecePosition(0, 1), ImageLoader.blackKnight);
         board[0][6] = new Knight(ChessTypes.Knight, ChessColour.Black,
-                new PiecePosition(0, 6), imageLoader.blackKnight);
+                new PiecePosition(0, 6), ImageLoader.blackKnight);
 
         // Black Rooks
         board[0][2] = new Bishop(ChessTypes.Bishop, ChessColour.Black,
-                new PiecePosition(0, 2), imageLoader.blackBishop);
+                new PiecePosition(0, 2), ImageLoader.blackBishop);
         board[0][5] = new Bishop(ChessTypes.Bishop, ChessColour.Black,
-                new PiecePosition(0, 5), imageLoader.blackBishop);
+                new PiecePosition(0, 5), ImageLoader.blackBishop);
 
         // Black King and Queen
         board[0][3] = new Queen(ChessTypes.Queen, ChessColour.Black,
-                new PiecePosition(0, 3), imageLoader.blackQueen);
+                new PiecePosition(0, 3), ImageLoader.blackQueen);
         board[0][4] = new King(ChessTypes.King, ChessColour.Black,
-                new PiecePosition(0, 4), imageLoader.blackKing);
+                new PiecePosition(0, 4), ImageLoader.blackKing);
 
         // White pawns
         for (int col = 0; col < COLS; col++) {
             board[6][col] = new Pawn(ChessTypes.Pawn, ChessColour.White,
-                    new PiecePosition(6, col), imageLoader.whitePawn);
+                    new PiecePosition(6, col), ImageLoader.whitePawn);
         }
 
         // White castles
         board[7][0] = new Castle(ChessTypes.Castle, ChessColour.White,
-                new PiecePosition(7, 0), imageLoader.whiteCastle);
+                new PiecePosition(7, 0), ImageLoader.whiteCastle);
         board[7][7] = new Castle(ChessTypes.Castle, ChessColour.White,
-                new PiecePosition(7, 7), imageLoader.whiteCastle);
+                new PiecePosition(7, 7), ImageLoader.whiteCastle);
 
         // White knights
         board[7][1] = new Knight(ChessTypes.Knight, ChessColour.White,
-                new PiecePosition(7, 1), imageLoader.whiteKnight);
+                new PiecePosition(7, 1), ImageLoader.whiteKnight);
         board[7][6] = new Knight(ChessTypes.Knight, ChessColour.White,
-                new PiecePosition(7, 6), imageLoader.whiteKnight);
+                new PiecePosition(7, 6), ImageLoader.whiteKnight);
 
         // White Rooks
         board[7][2] = new Bishop(ChessTypes.Bishop, ChessColour.White,
-                new PiecePosition(7, 2), imageLoader.whiteBishop);
+                new PiecePosition(7, 2), ImageLoader.whiteBishop);
         board[7][5] = new Bishop(ChessTypes.Bishop, ChessColour.White,
-                new PiecePosition(7, 5), imageLoader.whiteBishop);
+                new PiecePosition(7, 5), ImageLoader.whiteBishop);
 
         // White King and Queen
         board[7][3] = new Queen(ChessTypes.Queen, ChessColour.White,
-                new PiecePosition(7, 3), imageLoader.whiteQueen);
+                new PiecePosition(7, 3), ImageLoader.whiteQueen);
         board[7][4] = new King(ChessTypes.King, ChessColour.White,
-                new PiecePosition(7, 4), imageLoader.whiteKing);
+                new PiecePosition(7, 4), ImageLoader.whiteKing);
     }
 
     /**
@@ -200,41 +194,16 @@ public class ChessBoard extends Observable implements Serializable {
     }
 
     /**
-     * Move piece on the chess board and update view.
+     * Move piece on the chess board and <b>do</b> update view.
      *
      * @param piece The chess piece that needs to be moved.
      * @param newRow The new row of the chess piece.
      * @param newColumn The new column of the chess piece.
      */
-    public void movePiece(ChessPiece piece, int newRow, int newColumn) {
+    protected void movePiece(ChessPiece piece, int newRow, int newColumn) {
         log.write(piece + "\t -> \t" + new PiecePosition(newRow, newColumn));
         checkEnPassantMove(piece, newRow, newColumn);
-        checkCastling(piece, newRow, newColumn);
-        silentMovePiece(piece, newRow, newColumn);
-        updateEnPassantMoves(piece);
-        checkPawnPromotion(piece.getColour());
-        updateKingStatus();
-        state.update(this);
-        setChanged();
-        notifyObservers(this);
-    }
-
-    /**
-     * Move piece on the chess board and <b>don't</b> update view.
-     *
-     * @param pos The piece position of the chess piece to move.
-     * @param newRow The new row of the chess piece.
-     * @param newColumn The new column of the chess piece.
-     */
-    public void movePiece(PiecePosition pos, int newRow, int newColumn) {
-        if (!isOccupiedPosition(pos)) {
-            System.out.println("The position " + pos + " does not contain a chess piece!");
-            return;
-        }
-        ChessPiece piece = getPiece(pos);
-        log.write(piece + "\t -> \t" + new PiecePosition(newRow, newColumn));
-        checkEnPassantMove(piece, newRow, newColumn);
-        checkCastling(piece, newRow, newColumn);
+        checkCastling(piece, newColumn);
         silentMovePiece(piece, newRow, newColumn);
         updateEnPassantMoves(piece);
         checkPawnPromotion(piece.getColour());
@@ -251,9 +220,9 @@ public class ChessBoard extends Observable implements Serializable {
      * @param newRow The new row of the chess piece.
      * @param newColumn The new column of the chess piece.
      */
-    public void movePieceAgent(ChessPiece piece, int newRow, int newColumn) {
+    protected void movePieceAgent(ChessPiece piece, int newRow, int newColumn) {
         checkEnPassantMove(piece, newRow, newColumn);
-        checkCastling(piece, newRow, newColumn);
+        checkCastling(piece, newColumn);
         silentMovePiece(piece, newRow, newColumn);
         updateEnPassantMoves(piece);
         checkPawnPromotion(piece.getColour());
@@ -306,12 +275,12 @@ public class ChessBoard extends Observable implements Serializable {
      * @param newRow The new row.
      * @param newColumn The new column.
      */
-    private void checkCastling(ChessPiece piece, int newRow, int newColumn) {
+    private void checkCastling(ChessPiece piece, int newColumn) {
         int distMoved = abs(piece.getColumn() - newColumn);
         if (piece instanceof King && distMoved == 2) {
             // A castling move took place
             switch (piece.getColour()) {
-                case Black:
+                case Black: {
                     if (newColumn - piece.getColumn() > 0) {
                         // King is moving to the right, so top right castle will be moved
                         ChessPiece castle = getPiece(0, 7);
@@ -323,7 +292,8 @@ public class ChessBoard extends Observable implements Serializable {
                         silentMovePiece(castle, 0, 3);
                         break;
                     }
-                case White:
+                }
+                case White: {
                     if (newColumn - piece.getColumn() > 0) {
                         // King is moving to the right, so bottom right castle will be moved
                         ChessPiece castle = getPiece(7, 7);
@@ -335,14 +305,16 @@ public class ChessBoard extends Observable implements Serializable {
                         silentMovePiece(castle, 7, 3);
                         break;
                     }
+                }
             }
         }
-
     }
 
     /**
      * If a pawn reaches the other side of the board, if will become a queen.
-     * This is called promotion.
+     * This is called promotion. Because image loader is transient, it will give
+     * a null pointer exception. COnsider making this class static, same with
+     * the class PieceSquareTables
      */
     private void checkPawnPromotion(ChessColour colour) {
         switch (colour) {
@@ -354,8 +326,8 @@ public class ChessBoard extends Observable implements Serializable {
                         if (p instanceof Pawn && p.getColour() == colour) {
                             // Promote the black pawn into a black queen
                             board[row][col] = new Queen(ChessTypes.Queen,
-                                    ChessColour.Black, new PiecePosition(row, col),
-                                    imageLoader.blackQueen,
+                                    colour, new PiecePosition(row, col),
+                                    ImageLoader.blackQueen,
                                     this);
                         }
                     }
@@ -369,10 +341,10 @@ public class ChessBoard extends Observable implements Serializable {
                     if (isOccupiedPosition(row, col)) {
                         ChessPiece p = getPiece(row, col);
                         if (p instanceof Pawn && p.getColour() == colour) {
-                            // Promote the black pawn into a black queen
+                            // Promote the white pawn into a white queen
                             board[row][col] = new Queen(ChessTypes.Queen,
-                                    ChessColour.White, new PiecePosition(row, col),
-                                    imageLoader.whiteQueen,
+                                    colour, new PiecePosition(row, col),
+                                    ImageLoader.whiteQueen,
                                     this);
                         }
                     }
@@ -664,7 +636,6 @@ public class ChessBoard extends Observable implements Serializable {
      * chess piece. <code>False</code> otherwise.
      */
     public boolean isValidMove(ChessPiece piece, int newRow, int newColumn) {
-        // Create new object of the original position
         PiecePosition orgPos = new PiecePosition(piece.getRow(), piece.getColumn());
         ChessPiece possiblyCapturedPiece = null;
         if (isOccupiedPosition(newRow, newColumn)) {

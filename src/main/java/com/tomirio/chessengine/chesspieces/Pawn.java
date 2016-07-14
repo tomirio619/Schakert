@@ -16,6 +16,7 @@
  */
 package com.tomirio.chessengine.chesspieces;
 
+import com.tomirio.chessengine.agent.PieceSquareTables;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
 import com.tomirio.chessengine.chessboard.ChessTypes;
@@ -229,10 +230,10 @@ public class Pawn extends ChessPiece {
         int weight = 0;
         switch (this.getColour()) {
             case White:
-                weight = pieceSquareTables.pawn_table[getPos().getRow()][getPos().getColumn()];
+                weight = PieceSquareTables.PAWN_TABLE[getPos().getRow()][getPos().getColumn()];
                 break;
             case Black:
-                weight = pieceSquareTables.pawn_table[7 - getPos().getRow()][getPos().getColumn()];
+                weight = PieceSquareTables.PAWN_TABLE[7 - getPos().getRow()][getPos().getColumn()];
                 break;
             default:
                 throw new NoSuchElementException();

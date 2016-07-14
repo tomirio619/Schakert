@@ -103,18 +103,26 @@ public class Node {
         }
     }
 
+    /**
+     * Get the move that took place in the original chess board.
+     *
+     * @return The move that took place in the root of the tree, which
+     * eventually led to the chess board of this node.
+     */
     public PiecePosition getRootMove() {
         if (parent.parent == null) {
-//            System.out.println("Get root move: de node die null als parent had ziet er als volgt uit:\n");
-//            System.out.println(this);
-//            System.out.println("Het schaastuk in node was " + chessPiece);
-//            System.out.println("De move was " + move);
             return move;
         } else {
             return parent.getRootMove();
         }
     }
 
+    /**
+     * Get the chess piece that was moved in the original chess board.
+     *
+     * @return The chess piece that was moved in the root of the tree, which
+     * eventually led to the chess board of this node.
+     */
     public ChessPiece getRootPiece() {
         if (parent.parent == null) {
             return chessPiece;

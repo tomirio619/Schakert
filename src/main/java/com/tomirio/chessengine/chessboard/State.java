@@ -127,10 +127,11 @@ public class State implements Serializable {
     }
 
     /**
-     * Return for a given colour if this colour is checkmate.
+     * For a given colour, return if this colour is checkmate.
      *
      * @param colour The colour of the player.
-     * @return The corresponding checkmate value belonging to that colour.
+     * @return <code>True</code> if the player with that colour is checkmate,
+     * <code>False</code> otherwise.
      */
     public boolean isCheckMate(ChessColour colour) {
         switch (colour) {
@@ -143,14 +144,54 @@ public class State implements Serializable {
         }
     }
 
+    /**
+     * For a given colour, return if this colour is in check.
+     *
+     * @param colour The colour of the player.
+     * @return <code>True</code> if the player with that colour is in check,
+     * <code>False</code> otherwise.
+     */
+    public boolean isCheck(ChessColour colour) {
+        switch (colour) {
+            case Black:
+                return blackIsCheck;
+            case White:
+                return whiteIsCheck;
+            default:
+                throw new NoSuchElementException();
+        }
+    }
+
+    /**
+     * For a given player, return the number of games won.
+     *
+     * @param colour The colour of the player.
+     * @return The number of games the player with this colour has won.
+     */
+    public int gamesWon(ChessColour colour) {
+        switch (colour) {
+            case Black:
+                return gamesWonBlack;
+            case White:
+                return gamesWonWhite;
+            default:
+                throw new NoSuchElementException();
+        }
+    }
+
+    /**
+     *
+     * @return <code>True</code> if the current game is in a draw state,
+     * <code>False</code> otherwise.
+     */
     public boolean isDraw() {
         return staleMate;
     }
 
     /**
      *
-     * @return <code> True </code> if there is a winner, otherwise <code> False
-     * </code>.
+     * @return <code> True </code> if there is a winner, <code>False</code>
+     * otherwise.
      */
     public boolean weHaveAWinner() {
         return winner != null;
@@ -165,6 +206,11 @@ public class State implements Serializable {
         return winner;
     }
 
+    /**
+     * Get the colour of tha player tha has turn.
+     *
+     * @return ChessColour of the player that has turn.
+     */
     public ChessColour getTurnColour() {
         return hasTurn;
     }
@@ -172,11 +218,11 @@ public class State implements Serializable {
     /**
      * Updates the status of both kings after a move.
      *
-     * @param board the chessboard
+     * @param chessBoard The chessboard.
      */
-    private void updateKings(ChessBoard board) {
-        blackIsCheck = board.getKing(ChessColour.Black).isCheck();
-        whiteIsCheck = board.getKing(ChessColour.White).isCheck();
+    private void updateKings(ChessBoard chessBoard) {
+        blackIsCheck = chessBoard.getKing(ChessColour.Black).isCheck();
+        whiteIsCheck = chessBoard.getKing(ChessColour.White).isCheck();
         blackIsCheckMate = (winner == ChessColour.Black);
         whiteIsCheckMate = (winner == ChessColour.White);
     }

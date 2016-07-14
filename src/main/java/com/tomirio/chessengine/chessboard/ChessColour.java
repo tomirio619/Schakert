@@ -33,13 +33,18 @@ public enum ChessColour {
      */
     White;
 
-    public ChessColour getOpposite(ChessColour c) {
-        if (c == ChessColour.Black) {
-            return ChessColour.White;
-        } else if (c == ChessColour.White) {
-            return ChessColour.Black;
-        } else {
-            throw new NoSuchElementException();
+    /**
+     *
+     * @return The opposite colour of this chess colour.
+     */
+    public ChessColour getOpposite() {
+        switch (this) {
+            case Black:
+                return ChessColour.White;
+            case White:
+                return ChessColour.Black;
+            default:
+                throw new NoSuchElementException();
         }
     }
 

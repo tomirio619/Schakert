@@ -73,10 +73,9 @@ public class PiecePosition implements Serializable {
     /**
      *
      * @return <code>True</code> if the position is within the board:      <pre>
-     * {@code
-     * 0 <= row <= 7  && 0 <= column <= 7
-     * }
-     * </pre>
+     * {@code 0 <= row <= 7  && 0 <= column <= 7}
+     * </pre>. <code>False</code> otherwise.
+     *
      */
     public boolean isValid() {
         return column >= 0 && column <= 7 && row >= 0 && row <= 7;
@@ -106,7 +105,9 @@ public class PiecePosition implements Serializable {
             case 7:
                 return "(" + "h" + "," + (8 - row) + ")";
             default:
-                throw new IndexOutOfBoundsException();
+                throw new IndexOutOfBoundsException("The position"
+                        + "(" + row + ", " + column + ")"
+                        + " is not within the board!");
         }
     }
 
