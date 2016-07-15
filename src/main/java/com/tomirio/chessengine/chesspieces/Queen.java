@@ -26,7 +26,6 @@ import com.tomirio.chessengine.chessboard.Pair;
 import com.tomirio.chessengine.chessboard.PiecePosition;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
-import javafx.scene.image.Image;
 
 /**
  *
@@ -41,11 +40,11 @@ public class Queen extends ChessPiece {
      * @param type The chesstype.
      * @param colour The colour.
      * @param pos The position.
-     * @param chessImage The image that belongs to this chess piece.
      * @param board The board.
      */
-    public Queen(ChessTypes type, ChessColour colour, PiecePosition pos, Image chessImage, ChessBoard board) {
-        super(type, colour, pos, chessImage, board);
+    public Queen(ChessTypes type, ChessColour colour, PiecePosition pos, ChessBoard board) {
+        super(type, colour, pos, board);
+        pieceValue = 900;
     }
 
     /**
@@ -54,10 +53,9 @@ public class Queen extends ChessPiece {
      * @param type The chesstype.
      * @param colour The colour.
      * @param pos The position.
-     * @param chessImage The image that belongs to this chess piece.
      */
-    public Queen(ChessTypes type, ChessColour colour, PiecePosition pos, Image chessImage) {
-        super(type, colour, pos, chessImage);
+    public Queen(ChessTypes type, ChessColour colour, PiecePosition pos) {
+        super(type, colour, pos);
         pieceValue = 900;
     }
 

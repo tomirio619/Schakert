@@ -42,7 +42,7 @@ import javafx.stage.Stage;
  *
  * @author Tom Sandmann
  */
-public class View implements Observer {
+public final class View implements Observer {
 
     /**
      * the mainWindow.
@@ -118,9 +118,9 @@ public class View implements Observer {
     private void createMainWindow(Stage primaryStage) {
         mainWindow = primaryStage;
         visualBoard = new VisualTile[8][8];
-        chessBoard = new ChessBoard(log, state);
+        chessBoard = new ChessBoard(state);
         game = new Game(state, chessBoard);
-        mouseListener = new MouseListener(log, this, state, game);
+        mouseListener = new MouseListener(this, state, game);
         chessBoard.addObserver(this);
 
         // Root will contain every visual aspect
@@ -158,15 +158,19 @@ public class View implements Observer {
      */
     @Override
     public void update(Observable o, Object arg) {
-        ChessBoard b = (ChessBoard) arg;
-        chessBoard = b;
-        state = chessBoard.getState();
-        if (state.weHaveAWinner()) {
-            System.out.println("The winner is " + state.getWinner());
-        } else if (state.isDraw()) {
-            System.out.println("It is a draw!");
+        if (!(arg instanceof ChessBoard)) {
+            throw new IllegalArgumentException();
+        } else {
+            ChessBoard b = (ChessBoard) arg;
+            chessBoard = b;
+            state = chessBoard.getState();
+            if (state.weHaveAWinner()) {
+                System.out.println("The winner is " + state.getWinner());
+            } else if (state.isDraw()) {
+                System.out.println("It is a draw!");
+            }
+            drawBoard();
         }
-        drawBoard();
     }
 
     /**
@@ -248,9 +252,9 @@ public class View implements Observer {
                 VisualTile t;
                 if (chessBoard.isOccupiedPosition(row, column)) {
                     ChessPiece p = chessBoard.getPiece(row, column);
-                    t = new VisualTile(row, column, p, chessBoard);
+                    t = new VisualTile(row, column, p);
                 } else {
-                    t = new VisualTile(row, column, chessBoard);
+                    t = new VisualTile(row, column);
                 }
                 t.setInitialTileImageAndChessPiece();
                 t.setOnMouseClicked(mouseListener);

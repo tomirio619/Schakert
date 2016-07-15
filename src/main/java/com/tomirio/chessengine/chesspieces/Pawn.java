@@ -24,7 +24,6 @@ import com.tomirio.chessengine.chessboard.Pair;
 import com.tomirio.chessengine.chessboard.PiecePosition;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
-import javafx.scene.image.Image;
 
 /**
  *
@@ -45,10 +44,9 @@ public class Pawn extends ChessPiece {
      * @param type The type of the chess piece.
      * @param colour The colour of the chess piece.
      * @param pos The position of the chess piece.
-     * @param chessImage The image that belongs to this chess piece.
      */
-    public Pawn(ChessTypes type, ChessColour colour, PiecePosition pos, Image chessImage) {
-        super(type, colour, pos, chessImage);
+    public Pawn(ChessTypes type, ChessColour colour, PiecePosition pos) {
+        super(type, colour, pos);
         enPassantPossible = false;
         pieceValue = 100;
 
@@ -66,14 +64,14 @@ public class Pawn extends ChessPiece {
                 if (getRow() == 6) {
                     // White pawn is on its original position
                     PiecePosition p1 = new PiecePosition(getRow() - 1, getColumn());
-                    if (!board.isOccupiedPosition(p1)) {
+                    if (!chessBoard.isOccupiedPosition(p1)) {
                         // Position in front of pawn is free
                         pair.moves.add(p1);
                     }
-                    if (!board.isOccupiedPosition(p1)) {
+                    if (!chessBoard.isOccupiedPosition(p1)) {
                         // Position in front of pawn is free
                         PiecePosition p2 = new PiecePosition(getRow() - 2, getColumn());
-                        if (!board.isOccupiedPosition(p2)) {
+                        if (!chessBoard.isOccupiedPosition(p2)) {
                             // Pawn can move two tiles
                             pair.moves.add(p2);
                         }
@@ -82,11 +80,11 @@ public class Pawn extends ChessPiece {
                 for (int column = getColumn() - 1; column <= getColumn() + 1; column++) {
                     PiecePosition p1 = new PiecePosition(getRow() - 1, column);
                     if (p1.isValid()) {
-                        if (column == getColumn() && !board.isOccupiedPosition(p1)) {
+                        if (column == getColumn() && !chessBoard.isOccupiedPosition(p1)) {
                             pair.moves.add(p1);
-                        } else if (board.isOccupiedPosition(p1) && board.getColour(p1) != getColour() && p1.getColumn() != getColumn()) {
+                        } else if (chessBoard.isOccupiedPosition(p1) && chessBoard.getColour(p1) != getColour() && p1.getColumn() != getColumn()) {
                             pair.moves.add(p1);
-                        } else if (board.isOccupiedPosition(p1) && board.getColour(p1) == getColour() && p1.getColumn() != getColumn()) {
+                        } else if (chessBoard.isOccupiedPosition(p1) && chessBoard.getColour(p1) == getColour() && p1.getColumn() != getColumn()) {
                             pair.covered.add(p1);
                         }
                     }
@@ -95,9 +93,9 @@ public class Pawn extends ChessPiece {
                 for (int column = getColumn() - 1; column <= getColumn() + 1; column++) {
                     PiecePosition p1 = new PiecePosition(getRow(), column);
                     if (p1.isValid()) {
-                        if (board.isOccupiedPosition(p1) && board.getColour(p1) != getColour() && board.getPiece(p1) instanceof Pawn) {
-                            Pawn pawn = (Pawn) board.getPiece(p1);
-                            if (pawn.getEnPassantMovePossible() && p1.getRow() == getRow() && !board.isOccupiedPosition(p1.getRow() - 1, p1.getColumn())) {
+                        if (chessBoard.isOccupiedPosition(p1) && chessBoard.getColour(p1) != getColour() && chessBoard.getPiece(p1) instanceof Pawn) {
+                            Pawn pawn = (Pawn) chessBoard.getPiece(p1);
+                            if (pawn.getEnPassantMovePossible() && p1.getRow() == getRow() && !chessBoard.isOccupiedPosition(p1.getRow() - 1, p1.getColumn())) {
                                 // Both pawns are on the same row and behind the black pawn is a free tile, so we can add this as a possible move
                                 pair.moves.add(new PiecePosition(p1.getRow() - 1, p1.getColumn()));
                             }
@@ -111,12 +109,12 @@ public class Pawn extends ChessPiece {
             case Black: {
                 if (getRow() == 1) {
                     PiecePosition p1 = new PiecePosition(getRow() + 1, getColumn());
-                    if (!board.isOccupiedPosition(p1)) {
+                    if (!chessBoard.isOccupiedPosition(p1)) {
                         pair.moves.add(p1);
                     }
-                    if (!board.isOccupiedPosition(p1)) {
+                    if (!chessBoard.isOccupiedPosition(p1)) {
                         PiecePosition p2 = new PiecePosition(getRow() + 2, getColumn());
-                        if (!board.isOccupiedPosition(p2)) {
+                        if (!chessBoard.isOccupiedPosition(p2)) {
                             pair.moves.add(p2);
                         }
                     }
@@ -124,11 +122,11 @@ public class Pawn extends ChessPiece {
                 for (int column = getColumn() - 1; column <= getColumn() + 1; column++) {
                     PiecePosition p1 = new PiecePosition(getRow() + 1, column);
                     if (p1.isValid()) {
-                        if (column == getColumn() && !board.isOccupiedPosition(p1)) {
+                        if (column == getColumn() && !chessBoard.isOccupiedPosition(p1)) {
                             pair.moves.add(p1);
-                        } else if (board.isOccupiedPosition(p1) && board.getColour(p1) != getColour() && p1.getColumn() != getColumn()) {
+                        } else if (chessBoard.isOccupiedPosition(p1) && chessBoard.getColour(p1) != getColour() && p1.getColumn() != getColumn()) {
                             pair.moves.add(p1);
-                        } else if (board.isOccupiedPosition(p1) && board.getColour(p1) == getColour() && p1.getColumn() != getColumn()) {
+                        } else if (chessBoard.isOccupiedPosition(p1) && chessBoard.getColour(p1) == getColour() && p1.getColumn() != getColumn()) {
                             pair.covered.add(p1);
                         }
                     }
@@ -138,9 +136,9 @@ public class Pawn extends ChessPiece {
                 for (int column = getColumn() - 1; column <= getColumn() + 1; column++) {
                     PiecePosition p1 = new PiecePosition(getRow(), column);
                     if (p1.isValid()) {
-                        if (board.isOccupiedPosition(p1) && board.getColour(p1) != getColour() && board.getPiece(p1) instanceof Pawn) {
-                            Pawn pawn = (Pawn) board.getPiece(p1);
-                            if (pawn.getEnPassantMovePossible() && p1.getRow() == getRow() && !board.isOccupiedPosition(p1.getRow() + 1, p1.getColumn())) {
+                        if (chessBoard.isOccupiedPosition(p1) && chessBoard.getColour(p1) != getColour() && chessBoard.getPiece(p1) instanceof Pawn) {
+                            Pawn pawn = (Pawn) chessBoard.getPiece(p1);
+                            if (pawn.getEnPassantMovePossible() && p1.getRow() == getRow() && !chessBoard.isOccupiedPosition(p1.getRow() + 1, p1.getColumn())) {
                                 // Both pawns are on the same row and behind the white pawn is a free tile, so we can add this as a possible move
                                 pair.moves.add(new PiecePosition(p1.getRow() + 1, p1.getColumn()));
                             }

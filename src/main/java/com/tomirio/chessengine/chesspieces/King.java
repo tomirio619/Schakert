@@ -24,7 +24,6 @@ import com.tomirio.chessengine.chessboard.Pair;
 import com.tomirio.chessengine.chessboard.PiecePosition;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
-import javafx.scene.image.Image;
 
 /**
  *
@@ -44,10 +43,9 @@ public class King extends ChessPiece {
      * @param type The type of the chess piece.
      * @param colour The colour of the chess piece.
      * @param pos The position of the chess piece.
-     * @param chessImage The image that belongs to this chess piece.
      */
-    public King(ChessTypes type, ChessColour colour, PiecePosition pos, Image chessImage) {
-        super(type, colour, pos, chessImage);
+    public King(ChessTypes type, ChessColour colour, PiecePosition pos) {
+        super(type, colour, pos);
         isCheck = false;
         castlingPossible = true;
         pieceValue = 20000;
@@ -81,16 +79,16 @@ public class King extends ChessPiece {
         for (int row = getRow() - 1; row <= getRow() + 1; row++) {
             for (int column = getColumn() - 1; column <= getColumn() + 1; column++) {
                 PiecePosition newPos = new PiecePosition(row, column);
-                if (board.isValidCoordinate(row, column) && newPos.isValid()) {
+                if (chessBoard.isValidCoordinate(row, column) && newPos.isValid()) {
                     if (!(newPos.equals(getPos()))) {
-                        if (!board.isOccupiedPosition(newPos) && isSafePosition(newPos)) {
+                        if (!chessBoard.isOccupiedPosition(newPos) && isSafePosition(newPos)) {
                             pair.moves.add(newPos);
-                        } else if (board.isOccupiedPosition(newPos)
-                                && board.getColour(newPos) != getColour()
+                        } else if (chessBoard.isOccupiedPosition(newPos)
+                                && chessBoard.getColour(newPos) != getColour()
                                 && isSafePosition(newPos)) {
                             pair.moves.add(newPos);
-                        } else if (board.isOccupiedPosition(newPos)
-                                && board.getColour(newPos) == getColour()) {
+                        } else if (chessBoard.isOccupiedPosition(newPos)
+                                && chessBoard.getColour(newPos) == getColour()) {
                             pair.covered.add(newPos);
                         }
                     }
@@ -113,14 +111,14 @@ public class King extends ChessPiece {
 
         switch (getColour()) {
             case Black:
-                ArrayList<Castle> blackCastles = board.getCastles(getColour());
+                ArrayList<Castle> blackCastles = chessBoard.getCastles(getColour());
                 if (blackCastles.isEmpty() || isCheck) {
                     return castlingMoves;
                 } else {
                     while (!blackCastles.isEmpty()) {
                         Castle castle = blackCastles.remove(blackCastles.size() - 1);
                         if (castle.castlingPossible() && castle.getRow() == getRow()) {
-                            if (board.isEmptySubRow(getPos(), castle.getPos())) {
+                            if (chessBoard.isEmptySubRow(getPos(), castle.getPos())) {
                                 if (getColumn() > castle.getColumn()) {
                                     // King is on the right side of the castle
                                     PiecePosition p = new PiecePosition(getRow(), getColumn() - 2);
@@ -143,14 +141,14 @@ public class King extends ChessPiece {
                     return castlingMoves;
                 }
             case White:
-                ArrayList<Castle> whiteCastles = board.getCastles(getColour());
+                ArrayList<Castle> whiteCastles = chessBoard.getCastles(getColour());
                 if (whiteCastles.isEmpty() || isCheck) {
                     return castlingMoves;
                 } else {
                     while (!whiteCastles.isEmpty()) {
                         Castle castle = whiteCastles.remove(whiteCastles.size() - 1);
                         if (castle.castlingPossible() && castle.getRow() == getRow()) {
-                            if (board.isEmptySubRow(getPos(), castle.getPos())) {
+                            if (chessBoard.isEmptySubRow(getPos(), castle.getPos())) {
                                 if (getColumn() > castle.getColumn()) {
                                     // King is on the right side of the castle
                                     PiecePosition p = new PiecePosition(getRow(), getColumn() - 2);
@@ -187,9 +185,9 @@ public class King extends ChessPiece {
     public boolean isSafePosition(PiecePosition pos) {
         for (int row = 0; row < 8; row++) {
             for (int column = 0; column < 8; column++) {
-                if (board.isOccupiedPosition(row, column)
-                        && board.getColour(row, column) != getColour()) {
-                    ChessPiece piece = board.getPiece(row, column);
+                if (chessBoard.isOccupiedPosition(row, column)
+                        && chessBoard.getColour(row, column) != getColour()) {
+                    ChessPiece piece = chessBoard.getPiece(row, column);
                     if (piece.posCanBeCaptured(pos) || piece.posIsCovered(pos)) {
                         return false;
                     }
@@ -221,7 +219,7 @@ public class King extends ChessPiece {
              position of the king.
              */
             return false;
-        } else if (!board.isOccupiedPosition(p)) {
+        } else if (!chessBoard.isOccupiedPosition(p)) {
             // This position is not occupied and within reach (previous if)
             return true;
         } else {
@@ -229,7 +227,7 @@ public class King extends ChessPiece {
              We can only capture a position if the piece on it has a different
              colour than this piece has.
              */
-            return board.getColour(p) != getColour();
+            return chessBoard.getColour(p) != getColour();
         }
     }
 
@@ -277,8 +275,8 @@ public class King extends ChessPiece {
         int[][] king_table;
 
         // Determine if we need to use middle game or endgame tables.
-        if (board.getQueens(ChessColour.White).isEmpty()
-                && board.getQueens(ChessColour.Black).isEmpty()) {
+        if (chessBoard.getQueens(ChessColour.White).isEmpty()
+                && chessBoard.getQueens(ChessColour.Black).isEmpty()) {
             // We are in end game
             king_table = PieceSquareTables.KING_TABLE_END;
         } else {
@@ -295,7 +293,7 @@ public class King extends ChessPiece {
             default:
                 throw new NoSuchElementException();
         }
-        if (board.getState().isCheckMate(getColour())) {
+        if (chessBoard.getState().isCheckMate(getColour())) {
             return 0;
         } else {
             return pieceValue + weight;

@@ -28,9 +28,9 @@ public class Log extends ScrollPane {
     /**
      * The list of the log, contains all of the text
      */
-    private final TextArea list;
+    private static TextArea list;
 
-    private int counter;
+    private static int counter;
 
     /**
      * Constructor of log
@@ -54,7 +54,7 @@ public class Log extends ScrollPane {
      *
      * @param str The string that must be written to the log
      */
-    public void write(String str) {
+    public static void write(String str) {
         list.insertText(list.getLength(), (counter++ + "\t" + str + "\n"));
     }
 

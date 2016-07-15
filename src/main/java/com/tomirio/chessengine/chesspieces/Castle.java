@@ -25,7 +25,6 @@ import com.tomirio.chessengine.chessboard.Pair;
 import com.tomirio.chessengine.chessboard.PiecePosition;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
-import javafx.scene.image.Image;
 
 /**
  *
@@ -43,10 +42,9 @@ public class Castle extends ChessPiece {
      * ChessTypes.Castle
      * @param colour The colour of this chess piece
      * @param pos The position of this chess piece
-     * @param chessImage The image that belongs to this chess piece
      */
-    public Castle(ChessTypes type, ChessColour colour, PiecePosition pos, Image chessImage) {
-        super(type, colour, pos, chessImage);
+    public Castle(ChessTypes type, ChessColour colour, PiecePosition pos) {
+        super(type, colour, pos);
         castlingPossible = true;
         pieceValue = 500;
     }

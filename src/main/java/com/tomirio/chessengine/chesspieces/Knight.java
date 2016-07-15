@@ -24,7 +24,6 @@ import com.tomirio.chessengine.chessboard.Pair;
 import com.tomirio.chessengine.chessboard.PiecePosition;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
-import javafx.scene.image.Image;
 
 /**
  *
@@ -39,10 +38,9 @@ public class Knight extends ChessPiece {
      * @param type The chess type.
      * @param colour The colour.
      * @param pos The position.
-     * @param chessImage The image that belongs to this chess piece.
      */
-    public Knight(ChessTypes type, ChessColour colour, PiecePosition pos, Image chessImage) {
-        super(type, colour, pos, chessImage);
+    public Knight(ChessTypes type, ChessColour colour, PiecePosition pos) {
+        super(type, colour, pos);
         pieceValue = 320;
     }
 
@@ -62,14 +60,14 @@ public class Knight extends ChessPiece {
                  or
                  difference in row is 2 and in column is 1
                  */
-                if (board.isValidCoordinate(r, c)) {
+                if (chessBoard.isValidCoordinate(r, c)) {
                     PiecePosition p = new PiecePosition(r, c);
                     int distRow = Math.abs(orgRow - r);
                     int distCol = Math.abs(orgCol - c);
                     if ((distRow == 1 && distCol == 2) || (distRow == 2 && distCol == 1)) {
-                        if (!board.isOccupiedPosition(p)) {
+                        if (!chessBoard.isOccupiedPosition(p)) {
                             pair.moves.add(p);
-                        } else if (board.getColour(p) != getColour()) {
+                        } else if (chessBoard.getColour(p) != getColour()) {
                             pair.moves.add(p);
                         } else {
                             pair.covered.add(p);

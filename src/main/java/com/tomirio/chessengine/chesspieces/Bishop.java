@@ -25,7 +25,6 @@ import com.tomirio.chessengine.chessboard.Pair;
 import com.tomirio.chessengine.chessboard.PiecePosition;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
-import javafx.scene.image.Image;
 
 /**
  *
@@ -40,11 +39,10 @@ public class Bishop extends ChessPiece {
      * @param type
      * @param colour
      * @param pos
-     * @param chessImage
      */
-    public Bishop(ChessTypes type, ChessColour colour, PiecePosition pos, Image chessImage) {
-        super(type, colour, pos, chessImage);
-        this.pieceValue = 330;
+    public Bishop(ChessTypes type, ChessColour colour, PiecePosition pos) {
+        super(type, colour, pos);
+        pieceValue = 330;
     }
 
     /**

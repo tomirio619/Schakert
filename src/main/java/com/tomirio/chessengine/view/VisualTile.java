@@ -19,9 +19,11 @@ package com.tomirio.chessengine.view;
 import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
+import java.util.NoSuchElementException;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.ToggleButton;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
@@ -39,7 +41,7 @@ public class VisualTile extends ToggleButton {
     /**
      * The chess piece contained in the visual tile
      */
-    public ChessPiece chessPiece;
+    private ChessPiece chessPiece;
 
     /**
      * The row.
@@ -64,26 +66,15 @@ public class VisualTile extends ToggleButton {
     /**
      * The colour of the visual tile.
      */
-    public ChessColour tileColour;
-
-    /**
-     * The imageloader.
-     */
-    public ImageLoader imageLoader;
-
-    /**
-     * The chess board
-     */
-    public ChessBoard chessBoard;
+    public final ChessColour tileColour;
 
     /**
      * This constructor will be used when a new game is started.
      *
      * @param row The row.
      * @param column The column.
-     * @param chessBoard The chess board.
      */
-    public VisualTile(int row, int column, ChessBoard chessBoard) {
+    public VisualTile(int row, int column) {
         super();
         setPadding(Insets.EMPTY);        // Remove button insets
         setMinSize(WIDTH, WIDTH);
@@ -91,9 +82,7 @@ public class VisualTile extends ToggleButton {
         setAlignment(Pos.CENTER);
         this.row = row;
         this.column = column;
-        imageLoader = new ImageLoader();
-        this.chessBoard = chessBoard;
-        setTileColour();
+        tileColour = setAndGetTileColour();
     }
 
     /**
@@ -102,9 +91,8 @@ public class VisualTile extends ToggleButton {
      * @param row The row.
      * @param column The column.
      * @param piece The chess piece.
-     * @param chessBoard The chess board.
      */
-    public VisualTile(int row, int column, ChessPiece piece, ChessBoard chessBoard) {
+    public VisualTile(int row, int column, ChessPiece piece) {
         super();
         setPadding(Insets.EMPTY);
         setMinSize(WIDTH, HEIGHT);
@@ -112,7 +100,7 @@ public class VisualTile extends ToggleButton {
         setAlignment(Pos.CENTER);
         this.row = row;
         this.column = column;
-        setTileColour();
+        tileColour = setAndGetTileColour();
         chessPiece = piece;
     }
 
@@ -132,26 +120,26 @@ public class VisualTile extends ToggleButton {
         setAlignment(Pos.CENTER);
         this.row = row;
         this.column = column;
-        setTileColour();
+        tileColour = setAndGetTileColour();
         chessPiece = piece;
     }
 
     /**
      * Set the colour of the tile.
      */
-    private void setTileColour() {
+    private ChessColour setAndGetTileColour() {
         if ((row + column) % 2 == 0) {
             setBackground(new Background(new BackgroundFill(
                     Paint.valueOf("BURLYWOOD"),
                     CornerRadii.EMPTY,
                     Insets.EMPTY)));
-            tileColour = ChessColour.White;
+            return ChessColour.White;
         } else {
             setBackground(new Background(new BackgroundFill(
                     Paint.valueOf("SADDLEBROWN"),
                     CornerRadii.EMPTY,
                     Insets.EMPTY)));
-            tileColour = ChessColour.Black;
+            return ChessColour.Black;
         }
     }
 
@@ -159,14 +147,49 @@ public class VisualTile extends ToggleButton {
      * Sets the images and the pieces of the tiles for the first launch.
      */
     public void setInitialTileImageAndChessPiece() {
-        for (int row = 0; row < chessBoard.ROWS; row++) {
-            for (int col = 0; col < chessBoard.COLS; col++) {
-                ImageView view = new ImageView();
+        for (int row = 0; row < ChessBoard.ROWS; row++) {
+            for (int col = 0; col < ChessBoard.COLS; col++) {
                 if (chessPiece != null) {
-                    view.setImage(chessPiece.getIcon().getImage());
-                    setGraphic(view);
+                    setGraphic(new ImageView(getChessIcon(chessPiece)));
                 }
             }
+        }
+    }
+
+    private Image getChessIcon(ChessPiece p) {
+        switch (p.getColour()) {
+            case Black:
+                switch (p.getType()) {
+                    case Bishop:
+                        return ImageLoader.blackBishop;
+                    case Castle:
+                        return ImageLoader.blackCastle;
+                    case King:
+                        return ImageLoader.blackKing;
+                    case Knight:
+                        return ImageLoader.blackKnight;
+                    case Pawn:
+                        return ImageLoader.blackPawn;
+                    case Queen:
+                        return ImageLoader.blackQueen;
+                }
+            case White:
+                switch (p.getType()) {
+                    case Bishop:
+                        return ImageLoader.whiteBishop;
+                    case Castle:
+                        return ImageLoader.whiteCastle;
+                    case King:
+                        return ImageLoader.whiteKing;
+                    case Knight:
+                        return ImageLoader.whiteKnight;
+                    case Pawn:
+                        return ImageLoader.whitePawn;
+                    case Queen:
+                        return ImageLoader.whiteQueen;
+                }
+            default:
+                throw new NoSuchElementException();
         }
     }
 
@@ -178,12 +201,20 @@ public class VisualTile extends ToggleButton {
     public void updateTileImage(double newSize) {
         setGraphic(null);
         if (chessPiece != null) {
-            setGraphic(chessPiece.getIcon());
+            setGraphic(new ImageView(getChessIcon(chessPiece)));
             setMinSize(WIDTH, HEIGHT);
             setPrefSize(newSize, newSize);
         }
         setPrefSize(newSize, newSize);
         setMinSize(WIDTH, HEIGHT);
+    }
+
+    /**
+     *
+     * @return The chess piece.
+     */
+    public ChessPiece getChessPiece() {
+        return chessPiece;
     }
 
     @Override

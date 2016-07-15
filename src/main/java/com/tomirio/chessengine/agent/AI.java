@@ -42,7 +42,8 @@ public class AI extends Player implements Runnable {
     }
 
     /**
-     * Perform NegaMax search .
+     * Perform NegaMax search with alpha beta pruning See
+     * https://en.wikipedia.org/wiki/Negamax
      *
      * @param node The node we currently check.
      * @param depth The depth.
@@ -52,16 +53,9 @@ public class AI extends Player implements Runnable {
      * @return The best value possible
      */
     public Pair<Node, Double> negaMax(Node node, int depth, double alpha, double beta, ChessColour colour) {
-        /*
-        Negamax with alpha beta pruning.
-        https://en.wikipedia.org/wiki/Negamax
-         */
-        if (depth == 0 || (node.chessBoard.getState().getWinner() != null)) {
-            int boardValue = node.chessBoard.evaluateBoard(colour);
-            int opponentBoardValue = node.chessBoard.evaluateBoard(colour.getOpposite());
-            boardValue = boardValue - opponentBoardValue;
-            double result = (colour == playerColour) ? boardValue : -1 * boardValue;
-            return new Pair<>(node, result);
+        if (depth == 0 || (node.chessBoard.getState().weHaveAWinner())) {
+            double evaluationScore = evaluate(node.chessBoard, colour);
+            return new Pair<>(node, evaluationScore);
         }
         ArrayList<Node> childNodes = generateChildNodes(node, colour);
         double bestValue = Double.NEGATIVE_INFINITY;
@@ -70,12 +64,11 @@ public class AI extends Player implements Runnable {
         for (int i = 0; i < childNodes.size() && !finished; i++) {
             Node child = childNodes.get(i);
             Pair<Node, Double> result = negaMax(child, depth - 1, -beta, -alpha, colour.getOpposite());
-            double v = -1 * result.second;
+            double v = -result.second;
             if (v >= bestValue) {
                 bestValue = v;
                 bestNode = result.first;
             }
-            bestValue = Math.max(bestValue, v);
             alpha = Math.max(alpha, v);
             if (alpha >= beta) {
                 finished = true;
@@ -114,6 +107,11 @@ public class AI extends Player implements Runnable {
         return childNodes;
     }
 
+    public double evaluate(ChessBoard board, ChessColour colour) {
+        int boardValue = chessBoard.evaluateBoard(colour);
+        return (colour == playerColour) ? boardValue : -boardValue;
+    }
+
     /**
      * Techniques to add: - Null Move Pruning - Check Extension - Late Move
      * Reduction - NegaMax search - Quiescence search - Move Ordering
@@ -144,18 +142,12 @@ public class AI extends Player implements Runnable {
         System.out.println("Skipped nodes:" + skippedNodes);
         System.out.println("Elapsed time:" + elapsedTime);
         System.out.println("Nodes per second:" + skippedNodes / elapsedTime);
-        skippedNodes = 0;
-        PiecePosition move = toPlay.first.getRootMove();
-        /*
-        Note that we CANNOT use the chess piece we retrieve below for making
-        the move on the chess board. Because the image in this chess piece is transient,
-        the value is null. Making the move with this chess piece will result in a
-        null pointer exception. We have to retrieve the original chess piece based
-        on the position we get from this new chess piece.
-        TODO: remove the images from the chess pieces, and let the view handle the correct images.
-         */
-        ChessPiece p = toPlay.first.getRootPiece();
         visitedNodes.clear();
+        skippedNodes = 0;
+
+        PiecePosition move = toPlay.first.getRootMove();
+        // This chess piece lost his observer, we need to move based on the original position
+        ChessPiece p = toPlay.first.getRootPiece();
         ChessPiece pieceToMove = chessBoard.getPiece(p.getPos());
         Platform.runLater(() -> pieceToMove.move(move.getRow(), move.getColumn()));
     }

@@ -71,10 +71,9 @@ public class MouseListener implements EventHandler<MouseEvent> {
      * @param state The state.
      * @param game The game.
      */
-    public MouseListener(Log log, View view, State state, Game game) {
+    public MouseListener(View view, State state, Game game) {
         this.state = state;
         this.view = view;
-        this.log = log;
         this.game = game;
         previousSelected = null;
         possibleMoves = new ArrayList<>();
@@ -89,7 +88,7 @@ public class MouseListener implements EventHandler<MouseEvent> {
             previousSelected.removeHighlightTile();
         }
 
-        if (t.chessPiece == null) {
+        if (t.getChessPiece() == null) {
             // A tile was selected that contained no chess piece
             if (possibleMoves.isEmpty()) {
                 /*
@@ -104,7 +103,7 @@ public class MouseListener implements EventHandler<MouseEvent> {
                 Make the move, remove the previous possibleMoves on the screen
                 and empty the list of possible moves.
                  */
-                game.humanPlay(previousSelected.chessPiece, t.row, t.column);
+                game.humanPlay(previousSelected.getChessPiece(), t.row, t.column);
                 removeAvailableMoves(possibleMoves);
                 possibleMoves.clear();
             } else {
@@ -115,18 +114,17 @@ public class MouseListener implements EventHandler<MouseEvent> {
             }
 
         } else // Current tile contains a chess piece
-        {
-            if (possibleMoves.isEmpty()) {
+         if (possibleMoves.isEmpty()) {
                 /*
                 There where no possible moves so no chess piece can be captured.
                 Show the possible moves of the chesspiece in this tile.
                 Only do this when the player is human
                  */
-                ChessColour playerColour = t.chessPiece.getColour();
+                ChessColour playerColour = t.getChessPiece().getColour();
                 if (playerColour == state.getTurnColour()
                         && !state.weHaveAWinner()
                         && !(game.getPlayer(playerColour) instanceof AI)) {
-                    possibleMoves = t.chessPiece.getPossibleMoves();
+                    possibleMoves = t.getChessPiece().getPossibleMoves();
                     previousSelected = t;
                     t.highLightTile();
                     showAvailableMoves(possibleMoves);
@@ -137,7 +135,7 @@ public class MouseListener implements EventHandler<MouseEvent> {
                 Make the move, remove the possible moves on the screen and
                 empty the list of possible moves.
                  */
-                game.humanPlay(previousSelected.chessPiece, t.row, t.column);
+                game.humanPlay(previousSelected.getChessPiece(), t.row, t.column);
                 previousSelected = null;
                 removeAvailableMoves(possibleMoves);
                 possibleMoves.clear();
@@ -145,13 +143,12 @@ public class MouseListener implements EventHandler<MouseEvent> {
                 // There were some possible moves, but the chess piece was not in those
                 removeAvailableMoves(possibleMoves);
                 previousSelected = t;
-                if (t.chessPiece.getColour() == state.getTurnColour() && !state.weHaveAWinner()) {
+                if (t.getChessPiece().getColour() == state.getTurnColour() && !state.weHaveAWinner()) {
                     t.highLightTile();
-                    possibleMoves = t.chessPiece.getPossibleMoves();
+                    possibleMoves = t.getChessPiece().getPossibleMoves();
                     showAvailableMoves(possibleMoves);
                 }
             }
-        }
     }
 
     /**

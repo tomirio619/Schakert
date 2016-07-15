@@ -20,8 +20,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
 import java.util.Objects;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 
 /**
  *
@@ -48,18 +46,13 @@ public abstract class ChessPiece implements Serializable {
      * The board, if a new chess piece is created, this board must be set with
      * the setBoard function, otherwise the value is null!
      */
-    public ChessBoard board;
+    protected ChessBoard chessBoard;
 
     /**
      * The value of this piece. This value will be used in the evaluation
      * function.
      */
     public int pieceValue;
-
-    /**
-     * The chessIcon.
-     */
-    private final transient ImageView chessIcon;
 
     /**
      * This constructor MUST be used when the chessboard is not known when a new
@@ -69,15 +62,11 @@ public abstract class ChessPiece implements Serializable {
      * @param type The type of the chess piece.
      * @param colour The colour of the chess piece.
      * @param pos The position of the chess piece.
-     * @param chessImage The image that belongs to this chess piece.
      */
-    public ChessPiece(ChessTypes type, ChessColour colour, PiecePosition pos,
-            Image chessImage) {
+    public ChessPiece(ChessTypes type, ChessColour colour, PiecePosition pos) {
         this.type = type;
         this.colour = colour;
         this.pos = pos;
-        chessIcon = new ImageView();
-        chessIcon.setImage(chessImage);
     }
 
     /**
@@ -87,17 +76,14 @@ public abstract class ChessPiece implements Serializable {
      * @param type The chess type.
      * @param colour The colour.
      * @param pos The position.
-     * @param chessImage The image that belongs to this chess piece.
      * @param board The board.
      */
     public ChessPiece(ChessTypes type, ChessColour colour, PiecePosition pos,
-            Image chessImage, ChessBoard board) {
+            ChessBoard board) {
         this.type = type;
         this.colour = colour;
         this.pos = pos;
-        this.board = board;
-        chessIcon = new ImageView();
-        chessIcon.setImage(chessImage);
+        this.chessBoard = board;
     }
 
     abstract public int evaluatePosition();
@@ -154,14 +140,6 @@ public abstract class ChessPiece implements Serializable {
 
     /**
      *
-     * @return The icon of this chess piece.
-     */
-    public ImageView getIcon() {
-        return chessIcon;
-    }
-
-    /**
-     *
      * @return The colour of this chess piece.
      */
     public ChessColour getColour() {
@@ -170,12 +148,13 @@ public abstract class ChessPiece implements Serializable {
 
     /**
      *
-     * @param board The board containing all of the chess pieces, <b>MUST</b>
+     * @param chessBoard The board containing all of the chess pieces,
+     * <b>MUST</b>
      * be called when a new chess piece is created, otherwise the current value
      * of board will be <code>null</code>!
      */
-    public void setBoard(ChessBoard board) {
-        this.board = board;
+    public void setChessBoard(ChessBoard chessBoard) {
+        this.chessBoard = chessBoard;
     }
 
     /**
@@ -194,7 +173,7 @@ public abstract class ChessPiece implements Serializable {
      * @param column The new column of this chess piece.
      */
     public void move(int row, int column) {
-        board.movePiece(this, row, column);
+        chessBoard.movePiece(this, row, column);
     }
 
     /**
@@ -204,7 +183,7 @@ public abstract class ChessPiece implements Serializable {
      * @param column The new column of this chess piece.
      */
     public void agentMove(int row, int column) {
-        board.movePieceAgent(this, row, column);
+        chessBoard.movePieceAgent(this, row, column);
     }
 
     /**
@@ -218,7 +197,7 @@ public abstract class ChessPiece implements Serializable {
         ArrayList<PiecePosition> validMoves = new ArrayList<>();
         while (!moves.isEmpty()) {
             PiecePosition move = moves.remove(moves.size() - 1);
-            if (board.isValidMove(this, move.getRow(), move.getColumn())) {
+            if (chessBoard.isValidMove(this, move.getRow(), move.getColumn())) {
                 validMoves.add(move);
             }
         }
@@ -276,12 +255,12 @@ public abstract class ChessPiece implements Serializable {
                     newPos = new PiecePosition(newPos.getRow() - 1, newPos.getColumn());
                     if (newPos.getRow() < 0) {
                         condition = false;
-                    } else if (board.isOccupiedPosition(newPos)
-                            && board.getColour(newPos) != colour) {
+                    } else if (chessBoard.isOccupiedPosition(newPos)
+                            && chessBoard.getColour(newPos) != colour) {
                         pair.moves.add(newPos);
                         condition = false;
-                    } else if (board.isOccupiedPosition(newPos)
-                            && board.getColour(newPos) == colour) {
+                    } else if (chessBoard.isOccupiedPosition(newPos)
+                            && chessBoard.getColour(newPos) == colour) {
                         condition = false;
                         pair.covered.add(newPos);
                     } else {
@@ -297,12 +276,12 @@ public abstract class ChessPiece implements Serializable {
                     newPos = new PiecePosition(newPos.getRow() + 1, newPos.getColumn());
                     if (!newPos.isValid()) {
                         condition = false;
-                    } else if (board.isOccupiedPosition(newPos)
-                            && board.getColour(newPos) != colour) {
+                    } else if (chessBoard.isOccupiedPosition(newPos)
+                            && chessBoard.getColour(newPos) != colour) {
                         pair.moves.add(newPos);
                         condition = false;
-                    } else if (board.isOccupiedPosition(newPos)
-                            && board.getColour(newPos) == colour) {
+                    } else if (chessBoard.isOccupiedPosition(newPos)
+                            && chessBoard.getColour(newPos) == colour) {
                         condition = false;
                         pair.covered.add(newPos);
                     } else {
@@ -318,12 +297,12 @@ public abstract class ChessPiece implements Serializable {
                     newPos = new PiecePosition(newPos.getRow(), newPos.getColumn() - 1);
                     if (!newPos.isValid()) {
                         condition = false;
-                    } else if (board.isOccupiedPosition(newPos)
-                            && board.getColour(newPos) != colour) {
+                    } else if (chessBoard.isOccupiedPosition(newPos)
+                            && chessBoard.getColour(newPos) != colour) {
                         pair.moves.add(newPos);
                         condition = false;
-                    } else if (board.isOccupiedPosition(newPos)
-                            && board.getColour(newPos) == colour) {
+                    } else if (chessBoard.isOccupiedPosition(newPos)
+                            && chessBoard.getColour(newPos) == colour) {
                         condition = false;
                         pair.covered.add(newPos);
                     } else {
@@ -339,12 +318,12 @@ public abstract class ChessPiece implements Serializable {
                     newPos = new PiecePosition(newPos.getRow(), newPos.getColumn() + 1);
                     if (!newPos.isValid()) {
                         condition = false;
-                    } else if (board.isOccupiedPosition(newPos)
-                            && board.getColour(newPos) != colour) {
+                    } else if (chessBoard.isOccupiedPosition(newPos)
+                            && chessBoard.getColour(newPos) != colour) {
                         pair.moves.add(newPos);
                         condition = false;
-                    } else if (board.isOccupiedPosition(newPos)
-                            && board.getColour(newPos) == colour) {
+                    } else if (chessBoard.isOccupiedPosition(newPos)
+                            && chessBoard.getColour(newPos) == colour) {
                         condition = false;
                         pair.covered.add(newPos);
                     } else {
@@ -360,12 +339,12 @@ public abstract class ChessPiece implements Serializable {
                     newPos = new PiecePosition(newPos.getRow() - 1, newPos.getColumn() - 1);
                     if (!newPos.isValid()) {
                         condition = false;
-                    } else if (board.isOccupiedPosition(newPos)
-                            && board.getColour(newPos) != colour) {
+                    } else if (chessBoard.isOccupiedPosition(newPos)
+                            && chessBoard.getColour(newPos) != colour) {
                         pair.moves.add(newPos);
                         condition = false;
-                    } else if (board.isOccupiedPosition(newPos)
-                            && board.getColour(newPos) == colour) {
+                    } else if (chessBoard.isOccupiedPosition(newPos)
+                            && chessBoard.getColour(newPos) == colour) {
                         condition = false;
                         pair.covered.add(newPos);
                     } else {
@@ -381,12 +360,12 @@ public abstract class ChessPiece implements Serializable {
                     newPos = new PiecePosition(newPos.getRow() - 1, newPos.getColumn() + 1);
                     if (!newPos.isValid()) {
                         condition = false;
-                    } else if (board.isOccupiedPosition(newPos)
-                            && board.getColour(newPos) != colour) {
+                    } else if (chessBoard.isOccupiedPosition(newPos)
+                            && chessBoard.getColour(newPos) != colour) {
                         pair.moves.add(newPos);
                         condition = false;
-                    } else if (board.isOccupiedPosition(newPos)
-                            && board.getColour(newPos) == colour) {
+                    } else if (chessBoard.isOccupiedPosition(newPos)
+                            && chessBoard.getColour(newPos) == colour) {
                         condition = false;
                         pair.covered.add(newPos);
                     } else {
@@ -402,12 +381,12 @@ public abstract class ChessPiece implements Serializable {
                     newPos = new PiecePosition(newPos.getRow() + 1, newPos.getColumn() - 1);
                     if (!newPos.isValid()) {
                         condition = false;
-                    } else if (board.isOccupiedPosition(newPos)
-                            && board.getColour(newPos) != colour) {
+                    } else if (chessBoard.isOccupiedPosition(newPos)
+                            && chessBoard.getColour(newPos) != colour) {
                         pair.moves.add(newPos);
                         condition = false;
-                    } else if (board.isOccupiedPosition(newPos)
-                            && board.getColour(newPos) == colour) {
+                    } else if (chessBoard.isOccupiedPosition(newPos)
+                            && chessBoard.getColour(newPos) == colour) {
                         condition = false;
                         pair.covered.add(newPos);
                     } else {
@@ -423,12 +402,12 @@ public abstract class ChessPiece implements Serializable {
                     newPos = new PiecePosition(newPos.getRow() + 1, newPos.getColumn() + 1);
                     if (!newPos.isValid()) {
                         condition = false;
-                    } else if (board.isOccupiedPosition(newPos)
-                            && board.getColour(newPos) != colour) {
+                    } else if (chessBoard.isOccupiedPosition(newPos)
+                            && chessBoard.getColour(newPos) != colour) {
                         pair.moves.add(newPos);
                         condition = false;
-                    } else if (board.isOccupiedPosition(newPos)
-                            && board.getColour(newPos) == colour) {
+                    } else if (chessBoard.isOccupiedPosition(newPos)
+                            && chessBoard.getColour(newPos) == colour) {
                         condition = false;
                         pair.covered.add(newPos);
                     } else {
@@ -440,6 +419,14 @@ public abstract class ChessPiece implements Serializable {
             default:
                 throw new NoSuchElementException(dir.toString());
         }
+    }
+
+    /**
+     *
+     * @return The chess board.
+     */
+    public ChessBoard getChessBoard() {
+        return chessBoard;
     }
 
     /**
