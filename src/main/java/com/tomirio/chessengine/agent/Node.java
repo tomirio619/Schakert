@@ -48,20 +48,13 @@ public class Node {
     public final ChessPiece chessPiece;
 
     /**
-     * The heuristic value.
-     */
-    public final int heuristicValue;
-
-    /**
      *
      * @param chessBoard The chess board of this node.
      * @param parent The parent of this node.
-     * @param heuristicValue The heuristic value of the board.
      */
-    public Node(ChessBoard chessBoard, Node parent, int heuristicValue) {
+    public Node(ChessBoard chessBoard, Node parent) {
         this.parent = parent;
         this.chessBoard = chessBoard;
-        this.heuristicValue = heuristicValue;
         chessPiece = null;
         move = null;
     }
@@ -70,13 +63,11 @@ public class Node {
      *
      * @param data The data that this node contains.
      * @param parent The parent of this node.
-     * @param heuristicValue The heuristic value of the board.
      * @param move The move.
      */
-    public Node(ChessBoard data, Node parent, int heuristicValue, PiecePosition move, ChessPiece chessPiece) {
+    public Node(ChessBoard data, Node parent, PiecePosition move, ChessPiece chessPiece) {
         this.chessBoard = data;
         this.parent = parent;
-        this.heuristicValue = heuristicValue;
         this.move = move;
         this.chessPiece = chessPiece;
     }
@@ -97,7 +88,8 @@ public class Node {
      */
     public String toTrace() {
         if (parent == null) {
-            return toString();
+            return toString() + "\n In dit schaakbord is " + chessBoard.getState().getTurnColour() + " aan zet.\n"
+                    + "Het chesspiece was " + chessPiece + "\n De move was " + move;
         } else {
             return parent.toTrace() + toString();
         }
@@ -110,7 +102,9 @@ public class Node {
      * eventually led to the chess board of this node.
      */
     public PiecePosition getRootMove() {
+        toTrace();
         if (parent.parent == null) {
+            System.out.println("De move was " + move);
             return move;
         } else {
             return parent.getRootMove();
@@ -125,6 +119,7 @@ public class Node {
      */
     public ChessPiece getRootPiece() {
         if (parent.parent == null) {
+            System.out.println("Het stuk was " + chessPiece);
             return chessPiece;
         } else {
             return parent.getRootPiece();

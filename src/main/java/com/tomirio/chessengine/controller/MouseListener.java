@@ -114,7 +114,8 @@ public class MouseListener implements EventHandler<MouseEvent> {
             }
 
         } else // Current tile contains a chess piece
-         if (possibleMoves.isEmpty()) {
+        {
+            if (possibleMoves.isEmpty()) {
                 /*
                 There where no possible moves so no chess piece can be captured.
                 Show the possible moves of the chesspiece in this tile.
@@ -149,6 +150,7 @@ public class MouseListener implements EventHandler<MouseEvent> {
                     showAvailableMoves(possibleMoves);
                 }
             }
+        }
     }
 
     /**

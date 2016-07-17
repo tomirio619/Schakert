@@ -16,15 +16,13 @@
  */
 package com.tomirio.chessengine.chesspieces;
 
-import com.tomirio.chessengine.agent.PieceSquareTables;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
 import com.tomirio.chessengine.chessboard.ChessTypes;
 import com.tomirio.chessengine.chessboard.Direction;
-import com.tomirio.chessengine.chessboard.Pair;
+import com.tomirio.chessengine.chessboard.MoveDetails;
 import com.tomirio.chessengine.chessboard.PiecePosition;
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
 
 /**
  *
@@ -42,20 +40,19 @@ public class Bishop extends ChessPiece {
      */
     public Bishop(ChessTypes type, ChessColour colour, PiecePosition pos) {
         super(type, colour, pos);
-        pieceValue = 330;
     }
 
     /**
      *
      * @return All the possible moves for the bishop.
      */
-    public Pair getBishopPositions() {
-        Pair pair = new Pair();
-        pair.add(getPositionsInDirection(Direction.NE));
-        pair.add(getPositionsInDirection(Direction.SE));
-        pair.add(getPositionsInDirection(Direction.SW));
-        pair.add(getPositionsInDirection(Direction.NW));
-        return pair;
+    public MoveDetails getBishopPositions() {
+        MoveDetails moveDetails = new MoveDetails();
+        moveDetails.add(getPositionsInDirection(Direction.NE));
+        moveDetails.add(getPositionsInDirection(Direction.SE));
+        moveDetails.add(getPositionsInDirection(Direction.SW));
+        moveDetails.add(getPositionsInDirection(Direction.NW));
+        return moveDetails;
     }
 
     @Override
@@ -70,24 +67,7 @@ public class Bishop extends ChessPiece {
 
     @Override
     public boolean posIsCovered(PiecePosition p) {
-        return getBishopPositions().covered.contains(p);
-    }
-
-    @Override
-    public int evaluatePosition() {
-        int weight = 0;
-        switch (this.getColour()) {
-            case White:
-                weight = PieceSquareTables.BISHOP_TABLE[getPos().getRow()][getPos().getColumn()];
-                break;
-            case Black:
-                //mirrored access
-                weight = PieceSquareTables.BISHOP_TABLE[7 - getPos().getRow()][getPos().getColumn()];
-                break;
-            default:
-                throw new NoSuchElementException();
-        }
-        return pieceValue + weight;
+        return getBishopPositions().coveredFriendlyPieces.contains(p);
     }
 
 }

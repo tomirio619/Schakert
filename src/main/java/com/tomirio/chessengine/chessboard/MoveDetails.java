@@ -22,7 +22,7 @@ import java.util.ArrayList;
  *
  * @author Tom Sandmann
  */
-public class Pair {
+public class MoveDetails {
 
     /**
      * The moves
@@ -31,24 +31,47 @@ public class Pair {
     /**
      * The covered positions
      */
-    public ArrayList<PiecePosition> covered;
+    public ArrayList<PiecePosition> coveredFriendlyPieces;
 
     /**
      * initializes both lists
      */
-    public Pair() {
+    public MoveDetails() {
         moves = new ArrayList<>();
-        covered = new ArrayList<>();
+        coveredFriendlyPieces = new ArrayList<>();
+    }
+
+    public MoveDetails(ArrayList<PiecePosition> moves, ArrayList<PiecePosition> coveredFriendlyPieces) {
+        this.moves = moves;
+        this.coveredFriendlyPieces = coveredFriendlyPieces;
+    }
+
+    /**
+     * Add new possible moves.
+     *
+     * @param newMoves List of possible moves.
+     */
+    public void addMoves(ArrayList<PiecePosition> newMoves) {
+        moves.addAll(newMoves);
+    }
+
+    /**
+     * Add new covered pieces
+     *
+     * @param newCoveredFriendlyPieces List of covered friendly pieces.
+     */
+    public void addCoveredPieces(ArrayList<PiecePosition> newCoveredFriendlyPieces) {
+        coveredFriendlyPieces.addAll(coveredFriendlyPieces);
     }
 
     /**
      * Add the result of the specified pair to this pair.
      *
-     * @param p The pair
+     * @param moveDetails The pair
      */
-    public void add(Pair p) {
-        moves.addAll(p.moves);
-        covered.addAll(p.covered);
+    public void add(MoveDetails moveDetails) {
+        moves.addAll(moveDetails.moves);
+        coveredFriendlyPieces.addAll(moveDetails.coveredFriendlyPieces);
     }
 
 }

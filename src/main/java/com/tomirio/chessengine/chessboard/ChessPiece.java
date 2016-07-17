@@ -49,12 +49,6 @@ public abstract class ChessPiece implements Serializable {
     protected ChessBoard chessBoard;
 
     /**
-     * The value of this piece. This value will be used in the evaluation
-     * function.
-     */
-    public int pieceValue;
-
-    /**
      * This constructor MUST be used when the chessboard is not known when a new
      * chess piece is made. The chessboard MUST be set later on with setBoard()
      * It is called with a PiecePosition.
@@ -86,8 +80,6 @@ public abstract class ChessPiece implements Serializable {
         this.chessBoard = board;
     }
 
-    abstract public int evaluatePosition();
-
     /**
      *
      * @param newRow The new row.
@@ -100,10 +92,10 @@ public abstract class ChessPiece implements Serializable {
     /**
      * The new piecePosition.
      *
-     * @param pos
+     * @param p The new PiecePosition
      */
-    public void setPosition(PiecePosition pos) {
-        pos.setPosition(pos.getRow(), pos.getColumn());
+    public void setPosition(PiecePosition p) {
+        pos.setPosition(p.getRow(), p.getColumn());
     }
 
     /**
@@ -238,187 +230,72 @@ public abstract class ChessPiece implements Serializable {
      * @param dir The direction for which you want all the possible moves.
      * @return All the possible moves in a specified direction. When the path
      * becomes blocked by either a friendly or a enemy piece, the functions
-     * returns the currently found set of moves. The positions of the moves must
-     * lie on the board. This means:      <pre>
-     * {@code
-     * 0 < = row <= 7  && 0 <= column <= 7
-     * }
-     * </pre>
+     * returns the currently found set of moves.
      */
-    public Pair getPositionsInDirection(Direction dir) {
-        Pair pair = new Pair();
-        PiecePosition newPos = pos;
-        switch (dir) {
-            case N: {
-                Boolean condition = true;
-                while (condition) {
-                    newPos = new PiecePosition(newPos.getRow() - 1, newPos.getColumn());
-                    if (newPos.getRow() < 0) {
-                        condition = false;
-                    } else if (chessBoard.isOccupiedPosition(newPos)
-                            && chessBoard.getColour(newPos) != colour) {
-                        pair.moves.add(newPos);
-                        condition = false;
-                    } else if (chessBoard.isOccupiedPosition(newPos)
-                            && chessBoard.getColour(newPos) == colour) {
-                        condition = false;
-                        pair.covered.add(newPos);
-                    } else {
-                        pair.moves.add(newPos);
-                    }
-                }
-                return pair;
-            }
+    protected MoveDetails getPositionsInDirection(Direction dir) {
+        return allPosInDir(new ArrayList<>(), new ArrayList<>(), this.pos, dir);
+    }
 
-            case S: {
-                Boolean condition = true;
-                while (condition) {
-                    newPos = new PiecePosition(newPos.getRow() + 1, newPos.getColumn());
-                    if (!newPos.isValid()) {
-                        condition = false;
-                    } else if (chessBoard.isOccupiedPosition(newPos)
-                            && chessBoard.getColour(newPos) != colour) {
-                        pair.moves.add(newPos);
-                        condition = false;
-                    } else if (chessBoard.isOccupiedPosition(newPos)
-                            && chessBoard.getColour(newPos) == colour) {
-                        condition = false;
-                        pair.covered.add(newPos);
-                    } else {
-                        pair.moves.add(newPos);
-                    }
-                }
-                return pair;
-            }
+    private MoveDetails allPosInDir(ArrayList<PiecePosition> moves, ArrayList<PiecePosition> friendlyCoveredPieces, PiecePosition curPos, Direction dir) {
+        if (!curPos.isValid()) {
+            // position not valid, return
+            return new MoveDetails(moves, friendlyCoveredPieces);
+        } else if (curPos.equals(pos)) {
+            // Same as current position of chess piece
+            PiecePosition newPos = getNextPos(dir, curPos);
+            return allPosInDir(moves, friendlyCoveredPieces, newPos, dir);
 
-            case W: {
-                Boolean condition = true;
-                while (condition) {
-                    newPos = new PiecePosition(newPos.getRow(), newPos.getColumn() - 1);
-                    if (!newPos.isValid()) {
-                        condition = false;
-                    } else if (chessBoard.isOccupiedPosition(newPos)
-                            && chessBoard.getColour(newPos) != colour) {
-                        pair.moves.add(newPos);
-                        condition = false;
-                    } else if (chessBoard.isOccupiedPosition(newPos)
-                            && chessBoard.getColour(newPos) == colour) {
-                        condition = false;
-                        pair.covered.add(newPos);
-                    } else {
-                        pair.moves.add(newPos);
-                    }
-                }
-                return pair;
+        } else if (chessBoard.isOccupiedPosition(curPos)) {
+            if (chessBoard.getColour(curPos) == this.colour) {
+                // Friendly piece, add it to covered list.
+                friendlyCoveredPieces.add(curPos);
+                return new MoveDetails(moves, friendlyCoveredPieces);
+            } else {
+                // Enemy piece, add it to moves list.
+                moves.add(curPos);
+                return new MoveDetails(moves, friendlyCoveredPieces);
             }
-
-            case E: {
-                Boolean condition = true;
-                while (condition) {
-                    newPos = new PiecePosition(newPos.getRow(), newPos.getColumn() + 1);
-                    if (!newPos.isValid()) {
-                        condition = false;
-                    } else if (chessBoard.isOccupiedPosition(newPos)
-                            && chessBoard.getColour(newPos) != colour) {
-                        pair.moves.add(newPos);
-                        condition = false;
-                    } else if (chessBoard.isOccupiedPosition(newPos)
-                            && chessBoard.getColour(newPos) == colour) {
-                        condition = false;
-                        pair.covered.add(newPos);
-                    } else {
-                        pair.moves.add(newPos);
-                    }
-                }
-                return pair;
-            }
-
-            case NW: {
-                Boolean condition = true;
-                while (condition) {
-                    newPos = new PiecePosition(newPos.getRow() - 1, newPos.getColumn() - 1);
-                    if (!newPos.isValid()) {
-                        condition = false;
-                    } else if (chessBoard.isOccupiedPosition(newPos)
-                            && chessBoard.getColour(newPos) != colour) {
-                        pair.moves.add(newPos);
-                        condition = false;
-                    } else if (chessBoard.isOccupiedPosition(newPos)
-                            && chessBoard.getColour(newPos) == colour) {
-                        condition = false;
-                        pair.covered.add(newPos);
-                    } else {
-                        pair.moves.add(newPos);
-                    }
-                }
-                return pair;
-            }
-
-            case NE: {
-                Boolean condition = true;
-                while (condition) {
-                    newPos = new PiecePosition(newPos.getRow() - 1, newPos.getColumn() + 1);
-                    if (!newPos.isValid()) {
-                        condition = false;
-                    } else if (chessBoard.isOccupiedPosition(newPos)
-                            && chessBoard.getColour(newPos) != colour) {
-                        pair.moves.add(newPos);
-                        condition = false;
-                    } else if (chessBoard.isOccupiedPosition(newPos)
-                            && chessBoard.getColour(newPos) == colour) {
-                        condition = false;
-                        pair.covered.add(newPos);
-                    } else {
-                        pair.moves.add(newPos);
-                    }
-                }
-                return pair;
-            }
-
-            case SW: {
-                Boolean condition = true;
-                while (condition) {
-                    newPos = new PiecePosition(newPos.getRow() + 1, newPos.getColumn() - 1);
-                    if (!newPos.isValid()) {
-                        condition = false;
-                    } else if (chessBoard.isOccupiedPosition(newPos)
-                            && chessBoard.getColour(newPos) != colour) {
-                        pair.moves.add(newPos);
-                        condition = false;
-                    } else if (chessBoard.isOccupiedPosition(newPos)
-                            && chessBoard.getColour(newPos) == colour) {
-                        condition = false;
-                        pair.covered.add(newPos);
-                    } else {
-                        pair.moves.add(newPos);
-                    }
-                }
-                return pair;
-            }
-
-            case SE: {
-                Boolean condition = true;
-                while (condition) {
-                    newPos = new PiecePosition(newPos.getRow() + 1, newPos.getColumn() + 1);
-                    if (!newPos.isValid()) {
-                        condition = false;
-                    } else if (chessBoard.isOccupiedPosition(newPos)
-                            && chessBoard.getColour(newPos) != colour) {
-                        pair.moves.add(newPos);
-                        condition = false;
-                    } else if (chessBoard.isOccupiedPosition(newPos)
-                            && chessBoard.getColour(newPos) == colour) {
-                        condition = false;
-                        pair.covered.add(newPos);
-                    } else {
-                        pair.moves.add(newPos);
-                    }
-                }
-                return pair;
-            }
-            default:
-                throw new NoSuchElementException(dir.toString());
+        } else {
+            // position not occupied, add it to move list
+            moves.add(curPos);
+            // get next position
+            PiecePosition newPos = this.getNextPos(dir, curPos);
+            return allPosInDir(moves, friendlyCoveredPieces, newPos, dir);
         }
+    }
+
+    private PiecePosition getNextPos(Direction dir, PiecePosition curPos) {
+        PiecePosition newPos;
+        switch (dir) {
+            case N:
+                newPos = new PiecePosition(curPos.getRow() - 1, curPos.getColumn());
+                break;
+            case S:
+                newPos = new PiecePosition(curPos.getRow() + 1, curPos.getColumn());
+                break;
+            case W:
+                newPos = new PiecePosition(curPos.getRow(), curPos.getColumn() - 1);
+                break;
+            case E:
+                newPos = new PiecePosition(curPos.getRow(), curPos.getColumn() + 1);
+                break;
+            case NW:
+                newPos = new PiecePosition(curPos.getRow() - 1, curPos.getColumn() - 1);
+                break;
+            case NE:
+                newPos = new PiecePosition(curPos.getRow() - 1, curPos.getColumn() + 1);
+                break;
+            case SW:
+                newPos = new PiecePosition(curPos.getRow() + 1, curPos.getColumn() - 1);
+                break;
+            case SE:
+                newPos = new PiecePosition(curPos.getRow() + 1, curPos.getColumn() + 1);
+                break;
+            default:
+                throw new NoSuchElementException();
+
+        }
+        return newPos;
     }
 
     /**
@@ -432,8 +309,8 @@ public abstract class ChessPiece implements Serializable {
     /**
      *
      * @param otherObject The object this chess piece will be compared to.
-     * @return <code>True</code> if this object equals this instance of chess
-     * piece. <code>False</code> otherwise.
+     * @return <code>True</code> if the given object equals is qual to this
+     * chess piece. <code>False</code> otherwise.
      */
     @Override
     public boolean equals(Object otherObject) {

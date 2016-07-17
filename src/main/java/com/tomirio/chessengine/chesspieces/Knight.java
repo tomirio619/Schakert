@@ -16,14 +16,12 @@
  */
 package com.tomirio.chessengine.chesspieces;
 
-import com.tomirio.chessengine.agent.PieceSquareTables;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
 import com.tomirio.chessengine.chessboard.ChessTypes;
-import com.tomirio.chessengine.chessboard.Pair;
+import com.tomirio.chessengine.chessboard.MoveDetails;
 import com.tomirio.chessengine.chessboard.PiecePosition;
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
 
 /**
  *
@@ -41,7 +39,6 @@ public class Knight extends ChessPiece {
      */
     public Knight(ChessTypes type, ChessColour colour, PiecePosition pos) {
         super(type, colour, pos);
-        pieceValue = 320;
     }
 
     /**
@@ -49,8 +46,8 @@ public class Knight extends ChessPiece {
      * @return A pair containing all of the possible moves and all of the
      * covered positions.
      */
-    public Pair getKnightPositions() {
-        Pair pair = new Pair();
+    private MoveDetails getKnightPositions() {
+        MoveDetails moveDetails = new MoveDetails();
         int orgRow = getRow();
         int orgCol = getColumn();
         for (int r = orgRow - 2; r <= orgRow + 2; r++) {
@@ -66,17 +63,17 @@ public class Knight extends ChessPiece {
                     int distCol = Math.abs(orgCol - c);
                     if ((distRow == 1 && distCol == 2) || (distRow == 2 && distCol == 1)) {
                         if (!chessBoard.isOccupiedPosition(p)) {
-                            pair.moves.add(p);
+                            moveDetails.moves.add(p);
                         } else if (chessBoard.getColour(p) != getColour()) {
-                            pair.moves.add(p);
+                            moveDetails.moves.add(p);
                         } else {
-                            pair.covered.add(p);
+                            moveDetails.coveredFriendlyPieces.add(p);
                         }
                     }
                 }
             }
         }
-        return pair;
+        return moveDetails;
     }
 
     @Override
@@ -86,28 +83,11 @@ public class Knight extends ChessPiece {
 
     @Override
     public boolean posIsCovered(PiecePosition p) {
-        return getKnightPositions().covered.contains(p);
+        return getKnightPositions().coveredFriendlyPieces.contains(p);
     }
 
     @Override
     public ArrayList<PiecePosition> getPossibleMoves() {
         return filterMoves(getKnightPositions().moves);
-    }
-
-    @Override
-    public int evaluatePosition() {
-        int weight = 0;
-        switch (this.getColour()) {
-            case White:
-                weight = PieceSquareTables.KNIGHT_TABLE[getPos().getRow()][getPos().getColumn()];
-                break;
-            case Black:
-                //mirrored access
-                weight = PieceSquareTables.KNIGHT_TABLE[7 - getPos().getRow()][getPos().getColumn()];
-                break;
-            default:
-                throw new NoSuchElementException();
-        }
-        return pieceValue + weight;
     }
 }

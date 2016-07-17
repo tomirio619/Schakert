@@ -16,16 +16,14 @@
  */
 package com.tomirio.chessengine.chesspieces;
 
-import com.tomirio.chessengine.agent.PieceSquareTables;
 import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
 import com.tomirio.chessengine.chessboard.ChessTypes;
 import com.tomirio.chessengine.chessboard.Direction;
-import com.tomirio.chessengine.chessboard.Pair;
+import com.tomirio.chessengine.chessboard.MoveDetails;
 import com.tomirio.chessengine.chessboard.PiecePosition;
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
 
 /**
  *
@@ -44,7 +42,6 @@ public class Queen extends ChessPiece {
      */
     public Queen(ChessTypes type, ChessColour colour, PiecePosition pos, ChessBoard board) {
         super(type, colour, pos, board);
-        pieceValue = 900;
     }
 
     /**
@@ -56,7 +53,6 @@ public class Queen extends ChessPiece {
      */
     public Queen(ChessTypes type, ChessColour colour, PiecePosition pos) {
         super(type, colour, pos);
-        pieceValue = 900;
     }
 
     @Override
@@ -77,33 +73,16 @@ public class Queen extends ChessPiece {
 
     @Override
     public boolean posIsCovered(PiecePosition p) {
-        Pair pair = new Pair();
+        MoveDetails moveDetails = new MoveDetails();
         for (Direction d : Direction.values()) {
-            pair.add(getPositionsInDirection(d));
+            moveDetails.add(getPositionsInDirection(d));
         }
-        return pair.covered.contains(p);
+        return moveDetails.coveredFriendlyPieces.contains(p);
     }
 
     @Override
     public ArrayList<PiecePosition> getPossibleMoves() {
         return filterMoves(getQueenMoves());
-    }
-
-    @Override
-    public int evaluatePosition() {
-        int weight = 0;
-        switch (this.getColour()) {
-            case White:
-                weight = PieceSquareTables.QUEEN_TABLE[getPos().getRow()][getPos().getColumn()];
-                break;
-            case Black:
-                //mirrored access
-                weight = PieceSquareTables.QUEEN_TABLE[7 - getPos().getRow()][getPos().getColumn()];
-                break;
-            default:
-                throw new NoSuchElementException();
-        }
-        return pieceValue + weight;
     }
 
 }

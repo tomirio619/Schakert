@@ -217,9 +217,9 @@ public final class View implements Observer {
     public void drawBoard() {
         removeChessboard();
         double currentSize = visualBoard[0][0].getPrefWidth();
-        visualBoard = new VisualTile[8][8];
-        for (int row = 0; row < 8; row++) {
-            for (int column = 0; column < 8; column++) {
+        visualBoard = new VisualTile[ChessBoard.ROWS][ChessBoard.COLS];
+        for (int row = 0; row < ChessBoard.ROWS; row++) {
+            for (int column = 0; column < ChessBoard.COLS; column++) {
                 VisualTile t = new VisualTile(row, column,
                         chessBoard.getPiece(row, column), currentSize, currentSize);
                 t.updateTileImage(currentSize);
@@ -247,8 +247,8 @@ public final class View implements Observer {
      * Create the visual tiles. Also add the mouse listener to the visual tile.
      */
     private void createVisualTiles() {
-        for (int row = 0; row < 8; row++) {
-            for (int column = 0; column < 8; column++) {
+        for (int row = 0; row < ChessBoard.ROWS; row++) {
+            for (int column = 0; column < ChessBoard.COLS; column++) {
                 VisualTile t;
                 if (chessBoard.isOccupiedPosition(row, column)) {
                     ChessPiece p = chessBoard.getPiece(row, column);
@@ -280,7 +280,7 @@ public final class View implements Observer {
         chessboardGrid.add(tmp, 0, 0);
 
         // Adding the labels on the rows
-        for (int column = 0; column < 8; column++) {
+        for (int column = 0; column < ChessBoard.COLS; column++) {
             char c = Character.toChars(97 + column)[0];
             Label l = new Label(String.valueOf(c));
             l.setContentDisplay(ContentDisplay.TEXT_ONLY);
@@ -295,7 +295,7 @@ public final class View implements Observer {
         }
 
         // Adding the labels on the columns
-        for (int row = 0; row < 8; row++) {
+        for (int row = 0; row < ChessBoard.ROWS; row++) {
             Label l = new Label(Integer.toString(8 - row));
             l.setContentDisplay(ContentDisplay.TEXT_ONLY);
             l.setAlignment(Pos.CENTER);

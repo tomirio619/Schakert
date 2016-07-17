@@ -16,11 +16,10 @@
  */
 package com.tomirio.chessengine.chesspieces;
 
-import com.tomirio.chessengine.agent.PieceSquareTables;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
 import com.tomirio.chessengine.chessboard.ChessTypes;
-import com.tomirio.chessengine.chessboard.Pair;
+import com.tomirio.chessengine.chessboard.MoveDetails;
 import com.tomirio.chessengine.chessboard.PiecePosition;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -48,7 +47,6 @@ public class Pawn extends ChessPiece {
     public Pawn(ChessTypes type, ChessColour colour, PiecePosition pos) {
         super(type, colour, pos);
         enPassantPossible = false;
-        pieceValue = 100;
 
     }
 
@@ -57,8 +55,8 @@ public class Pawn extends ChessPiece {
         return filterMoves(getPawnPositions().moves);
     }
 
-    private Pair getPawnPositions() {
-        Pair pair = new Pair();
+    private MoveDetails getPawnPositions() {
+        MoveDetails pair = new MoveDetails();
         switch (getColour()) {
             case White: {
                 if (getRow() == 6) {
@@ -67,9 +65,6 @@ public class Pawn extends ChessPiece {
                     if (!chessBoard.isOccupiedPosition(p1)) {
                         // Position in front of pawn is free
                         pair.moves.add(p1);
-                    }
-                    if (!chessBoard.isOccupiedPosition(p1)) {
-                        // Position in front of pawn is free
                         PiecePosition p2 = new PiecePosition(getRow() - 2, getColumn());
                         if (!chessBoard.isOccupiedPosition(p2)) {
                             // Pawn can move two tiles
@@ -85,7 +80,7 @@ public class Pawn extends ChessPiece {
                         } else if (chessBoard.isOccupiedPosition(p1) && chessBoard.getColour(p1) != getColour() && p1.getColumn() != getColumn()) {
                             pair.moves.add(p1);
                         } else if (chessBoard.isOccupiedPosition(p1) && chessBoard.getColour(p1) == getColour() && p1.getColumn() != getColumn()) {
-                            pair.covered.add(p1);
+                            pair.coveredFriendlyPieces.add(p1);
                         }
                     }
                 }
@@ -111,8 +106,6 @@ public class Pawn extends ChessPiece {
                     PiecePosition p1 = new PiecePosition(getRow() + 1, getColumn());
                     if (!chessBoard.isOccupiedPosition(p1)) {
                         pair.moves.add(p1);
-                    }
-                    if (!chessBoard.isOccupiedPosition(p1)) {
                         PiecePosition p2 = new PiecePosition(getRow() + 2, getColumn());
                         if (!chessBoard.isOccupiedPosition(p2)) {
                             pair.moves.add(p2);
@@ -127,7 +120,7 @@ public class Pawn extends ChessPiece {
                         } else if (chessBoard.isOccupiedPosition(p1) && chessBoard.getColour(p1) != getColour() && p1.getColumn() != getColumn()) {
                             pair.moves.add(p1);
                         } else if (chessBoard.isOccupiedPosition(p1) && chessBoard.getColour(p1) == getColour() && p1.getColumn() != getColumn()) {
-                            pair.covered.add(p1);
+                            pair.coveredFriendlyPieces.add(p1);
                         }
                     }
                 }
@@ -162,7 +155,7 @@ public class Pawn extends ChessPiece {
 
     @Override
     public boolean posIsCovered(PiecePosition pos) {
-        return getPawnPositions().covered.contains(pos);
+        return getPawnPositions().coveredFriendlyPieces.contains(pos);
     }
 
     /**
@@ -177,7 +170,7 @@ public class Pawn extends ChessPiece {
              */
             enPassantPossible = false;
         } else {
-            //The pawn just moved 2 tiles, this indicaties that the enPassant move is possible
+            // The pawn just moved 2 tiles, this indicaties that the enPassant move is possible
             enPassantPossible = Math.abs(newRow - getRow()) == 2;
         }
     }
@@ -218,25 +211,8 @@ public class Pawn extends ChessPiece {
                 }
                 default:
                     throw new NoSuchElementException(getColour().toString());
-
             }
         }
-    }
-
-    @Override
-    public int evaluatePosition() {
-        int weight = 0;
-        switch (this.getColour()) {
-            case White:
-                weight = PieceSquareTables.PAWN_TABLE[getPos().getRow()][getPos().getColumn()];
-                break;
-            case Black:
-                weight = PieceSquareTables.PAWN_TABLE[7 - getPos().getRow()][getPos().getColumn()];
-                break;
-            default:
-                throw new NoSuchElementException();
-        }
-        return pieceValue + weight;
     }
 
     @Override

@@ -183,7 +183,9 @@ public class ChessBoard extends Observable implements Serializable {
      * @return The chess piece that is on the specified position.
      */
     public ChessPiece getPiece(PiecePosition p) {
-        return board[p.getRow()][p.getColumn()];
+        ChessPiece piece = board[p.getRow()][p.getColumn()];
+        assert piece != null;
+        return piece;
     }
 
     /**
@@ -403,8 +405,8 @@ public class ChessBoard extends Observable implements Serializable {
      * <code>setEnPassantMove(false)</code> to all the other pieces.
      */
     private void updateEnPassantMoves(ChessPiece piece) {
-        for (int r = 0; r < 8; r++) {
-            for (int c = 0; c < 8; c++) {
+        for (int r = 0; r < ROWS; r++) {
+            for (int c = 0; c < COLS; c++) {
                 if (isOccupiedPosition(r, c) && getPiece(r, c) instanceof Pawn) {
                     Pawn p = (Pawn) getPiece(r, c);
                     if (!getPiece(r, c).equals(piece)) {
@@ -563,8 +565,8 @@ public class ChessBoard extends Observable implements Serializable {
      * make a legal move. <code>False</code> otherwise.
      */
     public boolean canMakeAMove(ChessColour colour) {
-        for (int r = 0; r < 8; r++) {
-            for (int c = 0; c < 8; c++) {
+        for (int r = 0; r < ROWS; r++) {
+            for (int c = 0; c < COLS; c++) {
                 if (isOccupiedPosition(r, c)) {
                     ChessPiece piece = getPiece(r, c);
                     if (piece.getColour() == colour && !piece.getPossibleMoves().isEmpty()) {
@@ -585,22 +587,15 @@ public class ChessBoard extends Observable implements Serializable {
      * @param newColumn The new column of the chess piece.
      */
     public void silentMovePiece(ChessPiece piece, int newRow, int newColumn) {
-        board[piece.getRow()][piece.getColumn()] = null;
-        piece.setPosition(newRow, newColumn);
-        board[newRow][newColumn] = piece;
-    }
+        PiecePosition oldPos = new PiecePosition(piece.getPos().getRow(), piece.getPos().getColumn());
+        PiecePosition newPos = new PiecePosition(newRow, newColumn);
+        assert newPos != oldPos;
 
-    /**
-     * Restores the chess piece to the specified row and column
-     *
-     * @param piece The chess piece.
-     * @param orgRow The original row.
-     * @param orgColumn The original column.
-     */
-    public void silentRestorePiece(ChessPiece piece, int orgRow, int orgColumn) {
         board[piece.getRow()][piece.getColumn()] = null;
-        piece.setPosition(orgRow, orgColumn);
-        board[orgRow][orgColumn] = piece;
+        piece.setPosition(newPos);
+        board[newRow][newColumn] = piece;
+
+        assert !isOccupiedPosition(oldPos) && isOccupiedPosition(newPos);
     }
 
     /**
@@ -627,15 +622,21 @@ public class ChessBoard extends Observable implements Serializable {
      * chess piece. <code>False</code> otherwise.
      */
     public boolean isValidMove(ChessPiece piece, int newRow, int newColumn) {
-        PiecePosition orgPos = new PiecePosition(piece.getRow(), piece.getColumn());
+        PiecePosition orgPos = piece.getPos().deepClone();
+
         ChessPiece possiblyCapturedPiece = null;
         if (isOccupiedPosition(newRow, newColumn)) {
             possiblyCapturedPiece = getPiece(newRow, newColumn);
         }
+        // do move
         silentMovePiece(piece, newRow, newColumn);
+
         King k = getKing(piece.getColour());
         boolean valid = k.isSafePosition(k.getPos());
-        silentRestorePiece(piece, orgPos.getRow(), orgPos.getColumn());
+
+        // undo move
+        silentMovePiece(piece, orgPos.getRow(), orgPos.getColumn());
+
         if (possiblyCapturedPiece != null) {
             board[newRow][newColumn] = possiblyCapturedPiece;
         }
@@ -651,29 +652,7 @@ public class ChessBoard extends Observable implements Serializable {
      * <code>False</code> otherwise.
      */
     public boolean isValidCoordinate(int row, int col) {
-        return col >= 0 && col <= 7 && row >= 0 && row <= 7;
-    }
-
-    /**
-     * Evaluates the chessboard based on the given colour.
-     *
-     * @param colour The colour of the pieces used in the evaluation
-     * @return An approximation of the relative score of the position of the
-     * pieces for the player with the given colour.
-     */
-    public int evaluateBoard(ChessColour colour) {
-        int sum = 0;
-        for (int row = 0; row < ROWS; row++) {
-            for (int col = 0; col < COLS; col++) {
-                if (board[row][col] != null) {
-                    ChessPiece p = getPiece(row, col);
-                    if (p.getColour() == colour) {
-                        sum += p.evaluatePosition();
-                    }
-                }
-            }
-        }
-        return sum;
+        return col >= 0 && col < COLS && row >= 0 && row < ROWS;
     }
 
     /**
@@ -700,8 +679,8 @@ public class ChessBoard extends Observable implements Serializable {
     @Override
     public String toString() {
         StringBuilder bld = new StringBuilder();
-        for (int r = 0; r < 8; r++) {
-            for (int c = 0; c < 8; c++) {
+        for (int r = 0; r < ROWS; r++) {
+            for (int c = 0; c < COLS; c++) {
                 if (!isOccupiedPosition(r, c)) {
                     bld.append(" - ");
                 } else {

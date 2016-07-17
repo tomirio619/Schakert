@@ -16,15 +16,13 @@
  */
 package com.tomirio.chessengine.chesspieces;
 
-import com.tomirio.chessengine.agent.PieceSquareTables;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
 import com.tomirio.chessengine.chessboard.ChessTypes;
 import com.tomirio.chessengine.chessboard.Direction;
-import com.tomirio.chessengine.chessboard.Pair;
+import com.tomirio.chessengine.chessboard.MoveDetails;
 import com.tomirio.chessengine.chessboard.PiecePosition;
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
 
 /**
  *
@@ -46,7 +44,6 @@ public class Castle extends ChessPiece {
     public Castle(ChessTypes type, ChessColour colour, PiecePosition pos) {
         super(type, colour, pos);
         castlingPossible = true;
-        pieceValue = 500;
     }
 
     @Override
@@ -65,12 +62,12 @@ public class Castle extends ChessPiece {
 
     @Override
     public boolean posIsCovered(PiecePosition p) {
-        Pair pair = new Pair();
-        pair.covered.addAll(getPositionsInDirection(Direction.N).covered);
-        pair.covered.addAll(getPositionsInDirection(Direction.E).covered);
-        pair.covered.addAll(getPositionsInDirection(Direction.S).covered);
-        pair.covered.addAll(getPositionsInDirection(Direction.W).covered);
-        return pair.covered.contains(p);
+        MoveDetails moveDetails = new MoveDetails();
+        moveDetails.coveredFriendlyPieces.addAll(getPositionsInDirection(Direction.N).coveredFriendlyPieces);
+        moveDetails.coveredFriendlyPieces.addAll(getPositionsInDirection(Direction.E).coveredFriendlyPieces);
+        moveDetails.coveredFriendlyPieces.addAll(getPositionsInDirection(Direction.S).coveredFriendlyPieces);
+        moveDetails.coveredFriendlyPieces.addAll(getPositionsInDirection(Direction.W).coveredFriendlyPieces);
+        return moveDetails.coveredFriendlyPieces.contains(p);
     }
 
     @Override
@@ -119,22 +116,4 @@ public class Castle extends ChessPiece {
     public boolean posCanBeCaptured(PiecePosition pos) {
         return getCastlePositions().contains(pos);
     }
-
-    @Override
-    public int evaluatePosition() {
-        int weight = 0;
-        switch (getColour()) {
-            case White:
-                weight = PieceSquareTables.CASTLE_TABLE[getPos().getRow()][getPos().getColumn()];
-                break;
-            case Black:
-                //mirrored access
-                weight = PieceSquareTables.CASTLE_TABLE[7 - getPos().getRow()][getPos().getColumn()];
-                break;
-            default:
-                throw new NoSuchElementException();
-        }
-        return pieceValue + weight;
-    }
-
 }

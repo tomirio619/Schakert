@@ -20,6 +20,7 @@ import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
 import com.tomirio.chessengine.chessboard.PiecePosition;
+import com.tomirio.chessengine.chessboard.State;
 import com.tomirio.chessengine.game.Player;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -34,36 +35,59 @@ public class AI extends Player implements Runnable {
 
     public static int skippedNodes = 0;
 
+    /**
+     * The search depth
+     */
+    public int depth;
+
+    public final Evaluation eval;
+
     private final HashSet<Integer> visitedNodes;
 
     public AI(ChessColour playerColour, ChessBoard chessBoard) {
         super(playerColour, chessBoard);
         visitedNodes = new HashSet();
+        depth = 4;
+        eval = new Evaluation();
     }
 
     /**
+     * NOTE: With a search depth of 2, the AI makes some decent moves.
+     * Increasing the depth to 3 will make the AI not capture any pieces. This
+     * needs to be figured out!!! Also see
+     * http://stackoverflow.com/questions/17334335/the-negamax-algorithm-whats-wrong
+     * This states that iteratieve deepening should be performed from the root
+     * node. Also see
+     * http://www.gamedev.net/topic/586896-starting-call-to-negamax/
+     */
+    /**
+     * NegaMax kiest nu moves die soms beter zouden kunnen. Denk aan het moment
+     * wanneer de queen van de tegenstander kan worden geslagen zonder enig stuk
+     * te verliezen. Hier moet nog naar gekeken worden!
+     */
+    /**
      * Perform NegaMax search with alpha beta pruning See
-     * https://en.wikipedia.org/wiki/Negamax
+     * https://en.wikipedia.org/wiki/Negamax "Negamax always searches for the
+     * maximum value for all its nodes"
      *
      * @param node The node we currently check.
      * @param depth The depth.
      * @param alpha Alpha used in alpha-beta pruning.
      * @param beta Beta used in alpha-beta pruning.
-     * @param colour The color of the player that can make a move.
      * @return The best value possible
      */
-    public Pair<Node, Double> negaMax(Node node, int depth, double alpha, double beta, ChessColour colour) {
-        if (depth == 0 || (node.chessBoard.getState().weHaveAWinner())) {
-            double evaluationScore = evaluate(node.chessBoard, colour);
-            return new Pair<>(node, evaluationScore);
+    public Pair<Node, Double> negaMax(Node node, int depth, double alpha, double beta) {
+        assert depth >= 0;
+        State currentState = node.chessBoard.getState();
+        if (depth == 0 || (currentState.weHaveAWinner()) || (currentState.isDraw())) {
+            assert currentState.getTurnColour() == ((depth % 2 == 0) ? playerColour : playerColour.getOpposite());
+            return new Pair<>(node, eval.evaluate(node.chessBoard, playerColour));
         }
-        ArrayList<Node> childNodes = generateChildNodes(node, colour);
+        ArrayList<Node> childNodes = generateChildNodes(node);
         double bestValue = Double.NEGATIVE_INFINITY;
         Node bestNode = node;
-        boolean finished = false;
-        for (int i = 0; i < childNodes.size() && !finished; i++) {
-            Node child = childNodes.get(i);
-            Pair<Node, Double> result = negaMax(child, depth - 1, -beta, -alpha, colour.getOpposite());
+        for (Node child : childNodes) {
+            Pair<Node, Double> result = negaMax(child, depth - 1, -beta, -alpha);
             double v = -result.second;
             if (v >= bestValue) {
                 bestValue = v;
@@ -71,7 +95,7 @@ public class AI extends Player implements Runnable {
             }
             alpha = Math.max(alpha, v);
             if (alpha >= beta) {
-                finished = true;
+                return new Pair<>(bestNode, bestValue);
             }
         }
         return new Pair<>(bestNode, bestValue);
@@ -84,9 +108,11 @@ public class AI extends Player implements Runnable {
      * @param colour The colour for which the moves have to generated.
      * @return ArrayList containing all the future chess boards.
      */
-    private ArrayList<Node> generateChildNodes(Node node, ChessColour colour) {
+    private ArrayList<Node> generateChildNodes(Node node) {
         ArrayList<Node> childNodes = new ArrayList<>();
-        ArrayList<ChessPiece> pieces = node.chessBoard.getPieces(colour);
+        State currentState = node.chessBoard.getState();
+        ChessColour hasTurn = currentState.getTurnColour();
+        ArrayList<ChessPiece> pieces = node.chessBoard.getPieces(hasTurn);
         for (ChessPiece piece : pieces) {
             ArrayList<PiecePosition> moves = piece.getPossibleMoves();
             for (PiecePosition move : moves) {
@@ -97,7 +123,7 @@ public class AI extends Player implements Runnable {
                 int hash = chessBoardCopy.getHash();
                 if (!visitedNodes.contains(hash)) {
                     visitedNodes.add(hash);
-                    Node childNode = new Node(chessBoardCopy, node, chessBoardCopy.evaluateBoard(colour), move, pieceCopy);
+                    Node childNode = new Node(chessBoardCopy, node, move, pieceCopy);
                     childNodes.add(childNode);
                 } else {
                     skippedNodes++;
@@ -105,11 +131,6 @@ public class AI extends Player implements Runnable {
             }
         }
         return childNodes;
-    }
-
-    public double evaluate(ChessBoard board, ChessColour colour) {
-        int boardValue = chessBoard.evaluateBoard(colour);
-        return (colour == playerColour) ? boardValue : -boardValue;
     }
 
     /**
@@ -133,18 +154,20 @@ public class AI extends Player implements Runnable {
     @Override
     public void play() {
         long startTime = System.nanoTime();
-        Node rootNode = new Node(chessBoard, null, chessBoard.evaluateBoard(playerColour));
-        Pair<Node, Double> toPlay = negaMax(rootNode, 3, Double.NEGATIVE_INFINITY,
-                Double.POSITIVE_INFINITY, playerColour);
+        Node rootNode = new Node(chessBoard, null);
+        Pair<Node, Double> toPlay = negaMax(rootNode, depth, Double.NEGATIVE_INFINITY,
+                Double.POSITIVE_INFINITY);
         long endTime = System.nanoTime();
         double elapsedTime = (endTime - startTime) / Math.pow(10, 9);
         System.out.println("Searched nodes:" + visitedNodes.size());
         System.out.println("Skipped nodes:" + skippedNodes);
         System.out.println("Elapsed time:" + elapsedTime);
-        System.out.println("Nodes per second:" + skippedNodes / elapsedTime);
+        System.out.println("Nodes per second:" + skippedNodes / elapsedTime + "\n");
         visitedNodes.clear();
         skippedNodes = 0;
-
+        if (toPlay.first == null) {
+            System.out.println("toPlay was null");
+        }
         PiecePosition move = toPlay.first.getRootMove();
         // This chess piece lost his observer, we need to move based on the original position
         ChessPiece p = toPlay.first.getRootPiece();

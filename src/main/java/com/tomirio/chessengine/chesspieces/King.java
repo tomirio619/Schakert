@@ -16,14 +16,13 @@
  */
 package com.tomirio.chessengine.chesspieces;
 
-import com.tomirio.chessengine.agent.PieceSquareTables;
+import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
 import com.tomirio.chessengine.chessboard.ChessTypes;
-import com.tomirio.chessengine.chessboard.Pair;
+import com.tomirio.chessengine.chessboard.MoveDetails;
 import com.tomirio.chessengine.chessboard.PiecePosition;
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
 
 /**
  *
@@ -48,7 +47,6 @@ public class King extends ChessPiece {
         super(type, colour, pos);
         isCheck = false;
         castlingPossible = true;
-        pieceValue = 20000;
     }
 
     @Override
@@ -74,28 +72,28 @@ public class King extends ChessPiece {
      *
      * @return All the possible moves for the king.
      */
-    private Pair getKingPositions() {
-        Pair pair = new Pair();
+    private MoveDetails getKingPositions() {
+        MoveDetails moveDetails = new MoveDetails();
         for (int row = getRow() - 1; row <= getRow() + 1; row++) {
             for (int column = getColumn() - 1; column <= getColumn() + 1; column++) {
                 PiecePosition newPos = new PiecePosition(row, column);
                 if (chessBoard.isValidCoordinate(row, column) && newPos.isValid()) {
                     if (!(newPos.equals(getPos()))) {
                         if (!chessBoard.isOccupiedPosition(newPos) && isSafePosition(newPos)) {
-                            pair.moves.add(newPos);
+                            moveDetails.moves.add(newPos);
                         } else if (chessBoard.isOccupiedPosition(newPos)
                                 && chessBoard.getColour(newPos) != getColour()
                                 && isSafePosition(newPos)) {
-                            pair.moves.add(newPos);
+                            moveDetails.moves.add(newPos);
                         } else if (chessBoard.isOccupiedPosition(newPos)
                                 && chessBoard.getColour(newPos) == getColour()) {
-                            pair.covered.add(newPos);
+                            moveDetails.coveredFriendlyPieces.add(newPos);
                         }
                     }
                 }
             }
         }
-        return pair;
+        return moveDetails;
     }
 
     /**
@@ -183,8 +181,8 @@ public class King extends ChessPiece {
      * chess after moving to this position. <code>False</code> otherwise.
      */
     public boolean isSafePosition(PiecePosition pos) {
-        for (int row = 0; row < 8; row++) {
-            for (int column = 0; column < 8; column++) {
+        for (int row = 0; row < ChessBoard.ROWS; row++) {
+            for (int column = 0; column < ChessBoard.COLS; column++) {
                 if (chessBoard.isOccupiedPosition(row, column)
                         && chessBoard.getColour(row, column) != getColour()) {
                     ChessPiece piece = chessBoard.getPiece(row, column);
@@ -267,37 +265,6 @@ public class King extends ChessPiece {
      */
     public void setCheck(boolean value) {
         isCheck = value;
-    }
-
-    @Override
-    public int evaluatePosition() {
-        int weight = 0;
-        int[][] king_table;
-
-        // Determine if we need to use middle game or endgame tables.
-        if (chessBoard.getQueens(ChessColour.White).isEmpty()
-                && chessBoard.getQueens(ChessColour.Black).isEmpty()) {
-            // We are in end game
-            king_table = PieceSquareTables.KING_TABLE_END;
-        } else {
-            king_table = PieceSquareTables.KING_TABLE_MIDDLE;
-        }
-        switch (this.getColour()) {
-            case White:
-
-                weight = king_table[getPos().getRow()][getPos().getColumn()];
-                break;
-            case Black:
-                weight = king_table[7 - getPos().getRow()][getPos().getColumn()];
-                break;
-            default:
-                throw new NoSuchElementException();
-        }
-        if (chessBoard.getState().isCheckMate(getColour())) {
-            return 0;
-        } else {
-            return pieceValue + weight;
-        }
     }
 
     @Override

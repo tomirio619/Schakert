@@ -83,6 +83,14 @@ public class PiecePosition implements Serializable {
 
     /**
      *
+     * @return Deep clone of this PiecePosition.
+     */
+    public PiecePosition deepClone() {
+        return new PiecePosition(row, column);
+    }
+
+    /**
+     *
      * @return String representation of this PiecePosition
      */
     @Override
