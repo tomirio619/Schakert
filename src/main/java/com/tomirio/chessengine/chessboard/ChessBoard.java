@@ -24,10 +24,10 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import static java.lang.Math.abs;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Observable;
+import static java.lang.Math.abs;
 
 /**
  *
@@ -75,63 +75,45 @@ public class ChessBoard extends Observable implements Serializable {
         ImageLoader.initialize();
         // Black pawns
         for (int col = 0; col < COLS; col++) {
-            board[1][col] = new Pawn(ChessTypes.Pawn, ChessColour.Black,
-                    new PiecePosition(1, col));
+            board[1][col] = new Pawn(ChessColour.Black, new PiecePosition(1, col));
         }
 
-        // Black castles
-        board[0][0] = new Castle(ChessTypes.Castle, ChessColour.Black,
-                new PiecePosition(0, 0));
-        board[0][7] = new Castle(ChessTypes.Castle, ChessColour.Black,
-                new PiecePosition(0, 7));
+        // Black rooks
+        board[0][0] = new Rook(ChessColour.Black, new PiecePosition(0, 0));
+        board[0][7] = new Rook(ChessColour.Black, new PiecePosition(0, 7));
 
         // Black knights
-        board[0][1] = new Knight(ChessTypes.Knight, ChessColour.Black,
-                new PiecePosition(0, 1));
-        board[0][6] = new Knight(ChessTypes.Knight, ChessColour.Black,
-                new PiecePosition(0, 6));
+        board[0][1] = new Knight(ChessColour.Black, new PiecePosition(0, 1));
+        board[0][6] = new Knight(ChessColour.Black, new PiecePosition(0, 6));
 
-        // Black Rooks
-        board[0][2] = new Bishop(ChessTypes.Bishop, ChessColour.Black,
-                new PiecePosition(0, 2));
-        board[0][5] = new Bishop(ChessTypes.Bishop, ChessColour.Black,
-                new PiecePosition(0, 5));
+        // Black bishops
+        board[0][2] = new Bishop(ChessColour.Black, new PiecePosition(0, 2));
+        board[0][5] = new Bishop(ChessColour.Black, new PiecePosition(0, 5));
 
         // Black King and Queen
-        board[0][3] = new Queen(ChessTypes.Queen, ChessColour.Black,
-                new PiecePosition(0, 3));
-        board[0][4] = new King(ChessTypes.King, ChessColour.Black,
-                new PiecePosition(0, 4));
+        board[0][3] = new Queen(ChessColour.Black, new PiecePosition(0, 3));
+        board[0][4] = new King(ChessColour.Black,  new PiecePosition(0, 4));
 
         // White pawns
         for (int col = 0; col < COLS; col++) {
-            board[6][col] = new Pawn(ChessTypes.Pawn, ChessColour.White,
-                    new PiecePosition(6, col));
+            board[6][col] = new Pawn(ChessColour.White, new PiecePosition(6, col));
         }
 
-        // White castles
-        board[7][0] = new Castle(ChessTypes.Castle, ChessColour.White,
-                new PiecePosition(7, 0));
-        board[7][7] = new Castle(ChessTypes.Castle, ChessColour.White,
-                new PiecePosition(7, 7));
+        // White rooks
+        board[7][0] = new Rook(ChessColour.White, new PiecePosition(7, 0));
+        board[7][7] = new Rook(ChessColour.White, new PiecePosition(7, 7));
 
         // White knights
-        board[7][1] = new Knight(ChessTypes.Knight, ChessColour.White,
-                new PiecePosition(7, 1));
-        board[7][6] = new Knight(ChessTypes.Knight, ChessColour.White,
-                new PiecePosition(7, 6));
+        board[7][1] = new Knight(ChessColour.White, new PiecePosition(7, 1));
+        board[7][6] = new Knight(ChessColour.White, new PiecePosition(7, 6));
 
-        // White Rooks
-        board[7][2] = new Bishop(ChessTypes.Bishop, ChessColour.White,
-                new PiecePosition(7, 2));
-        board[7][5] = new Bishop(ChessTypes.Bishop, ChessColour.White,
-                new PiecePosition(7, 5));
+        // White bishops
+        board[7][2] = new Bishop(ChessColour.White, new PiecePosition(7, 2));
+        board[7][5] = new Bishop(ChessColour.White, new PiecePosition(7, 5));
 
         // White King and Queen
-        board[7][3] = new Queen(ChessTypes.Queen, ChessColour.White,
-                new PiecePosition(7, 3));
-        board[7][4] = new King(ChessTypes.King, ChessColour.White,
-                new PiecePosition(7, 4));
+        board[7][3] = new Queen(ChessColour.White,  new PiecePosition(7, 3));
+        board[7][4] = new King(ChessColour.White,   new PiecePosition(7, 4));
     }
 
     /**
@@ -239,7 +221,7 @@ public class ChessBoard extends Observable implements Serializable {
         int distRow = abs(newRow - piece.getRow());
         int distCol = abs(newColumn - piece.getColumn());
         if (!isOccupiedPosition(newRow, newColumn) && distRow == 1
-                && distCol == 1 && piece.getType() == ChessTypes.Pawn) {
+                && distCol == 1 && piece.getType() == PieceType.Pawn) {
             // Determine by colour which piece will be captured
             switch (piece.getColour()) {
                 case White: {
@@ -264,7 +246,7 @@ public class ChessBoard extends Observable implements Serializable {
 
     /**
      * Castling is done when a king suddenly moves two squares. We detect if
-     * this is the case and set the right position for the castle involved.
+     * this is the case and set the right position for the rook involved.
      *
      * @param piece The piece.
      * @param newRow The new row.
@@ -277,27 +259,27 @@ public class ChessBoard extends Observable implements Serializable {
             switch (piece.getColour()) {
                 case Black: {
                     if (newColumn - piece.getColumn() > 0) {
-                        // King is moving to the right, so top right castle will be moved
-                        ChessPiece castle = getPiece(0, 7);
-                        silentMovePiece(castle, 0, 5);
+                        // King is moving to the right, so top right rook will be moved
+                        ChessPiece rook = getPiece(0, 7);
+                        silentMovePiece(rook, 0, 5);
                         break;
                     } else {
-                        // King is moving to the left, so top left castle is involved
-                        ChessPiece castle = getPiece(0, 0);
-                        silentMovePiece(castle, 0, 3);
+                        // King is moving to the left, so top left rook is involved
+                        ChessPiece rook = getPiece(0, 0);
+                        silentMovePiece(rook, 0, 3);
                         break;
                     }
                 }
                 case White: {
                     if (newColumn - piece.getColumn() > 0) {
-                        // King is moving to the right, so bottom right castle will be moved
-                        ChessPiece castle = getPiece(7, 7);
-                        silentMovePiece(castle, 7, 5);
+                        // King is moving to the right, so bottom right rook will be moved
+                        ChessPiece rook = getPiece(7, 7);
+                        silentMovePiece(rook, 7, 5);
                         break;
                     } else {
-                        // King is moving to the left, so bottom left castle is involved
-                        ChessPiece castle = getPiece(7, 0);
-                        silentMovePiece(castle, 7, 3);
+                        // King is moving to the left, so bottom left rook is involved
+                        ChessPiece rook = getPiece(7, 0);
+                        silentMovePiece(rook, 7, 3);
                         break;
                     }
                 }
@@ -320,9 +302,8 @@ public class ChessBoard extends Observable implements Serializable {
                         ChessPiece p = getPiece(row, col);
                         if (p instanceof Pawn && p.getColour() == colour) {
                             // Promote the black pawn into a black queen
-                            board[row][col] = new Queen(ChessTypes.Queen,
-                                    colour, new PiecePosition(row, col),
-                                    this);
+                            board[row][col] = new Queen(colour, 
+                                    new PiecePosition(row, col), this);
                         }
                     }
                 }
@@ -336,9 +317,8 @@ public class ChessBoard extends Observable implements Serializable {
                         ChessPiece p = getPiece(row, col);
                         if (p instanceof Pawn && p.getColour() == colour) {
                             // Promote the white pawn into a white queen
-                            board[row][col] = new Queen(ChessTypes.Queen,
-                                    colour, new PiecePosition(row, col),
-                                    this);
+                            board[row][col] = new Queen(colour, 
+                                    new PiecePosition(row, col), this);
                         }
                     }
                 }
@@ -438,24 +418,24 @@ public class ChessBoard extends Observable implements Serializable {
     }
 
     /**
-     * Get all the castles of a specific colour.
+     * Get all the rooks of a specific colour.
      *
-     * @param colour The colour of castles.
-     * @return All whiteKing castles on the current board.
+     * @param colour The colour of rooks to get.
+     * @return All rooks on the current board.
      */
-    public ArrayList<Castle> getCastles(ChessColour colour) {
-        ArrayList<Castle> castles = new ArrayList<>();
+    public ArrayList<Rook> getRooks(ChessColour colour) {
+        ArrayList<Rook> rooks = new ArrayList<>();
         for (int r = 0; r < ROWS; r++) {
             for (int c = 0; c < COLS; c++) {
-                if (isOccupiedPosition(r, c) && getPiece(r, c) instanceof Castle) {
-                    Castle castle = (Castle) getPiece(r, c);
-                    if (castle.getColour() == colour) {
-                        castles.add(castle);
+                if (isOccupiedPosition(r, c) && getPiece(r, c) instanceof Rook) {
+                    Rook rook = (Rook) getPiece(r, c);
+                    if (rook.getColour() == colour) {
+                        rooks.add(rook);
                     }
                 }
             }
         }
-        return castles;
+        return rooks;
     }
 
     /**

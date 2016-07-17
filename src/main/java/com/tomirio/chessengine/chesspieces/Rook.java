@@ -18,7 +18,7 @@ package com.tomirio.chessengine.chesspieces;
 
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
-import com.tomirio.chessengine.chessboard.ChessTypes;
+import com.tomirio.chessengine.chessboard.PieceType;
 import com.tomirio.chessengine.chessboard.Direction;
 import com.tomirio.chessengine.chessboard.MoveDetails;
 import com.tomirio.chessengine.chessboard.PiecePosition;
@@ -28,30 +28,28 @@ import java.util.ArrayList;
  *
  * @author Tom Sandmann
  */
-public class Castle extends ChessPiece {
+public class Rook extends ChessPiece {
 
     private boolean castlingPossible;
 
     /**
-     * Constructor for new castle, use when the board is known at this moment.
+     * Constructor for new rook, use when the board is known at this moment.
      * The board MUST be manually set using the setBoard method.
-     *
-     * @param type The type of this chess piece, must always be
-     * ChessTypes.Castle
-     * @param colour The colour of this chess piece
+
+* @param colour The colour of this chess piece
      * @param pos The position of this chess piece
      */
-    public Castle(ChessTypes type, ChessColour colour, PiecePosition pos) {
-        super(type, colour, pos);
+    public Rook(ChessColour colour, PiecePosition pos) {
+        super(PieceType.Rook, colour, pos);
         castlingPossible = true;
     }
 
     @Override
     public ArrayList<PiecePosition> getPossibleMoves() {
-        return filterMoves(getCastlePositions());
+        return filterMoves(getRookPositions());
     }
 
-    private ArrayList<PiecePosition> getCastlePositions() {
+    private ArrayList<PiecePosition> getRookPositions() {
         ArrayList<PiecePosition> moves = new ArrayList<>();
         moves.addAll(getPositionsInDirection(Direction.N).moves);
         moves.addAll(getPositionsInDirection(Direction.E).moves);
@@ -114,6 +112,6 @@ public class Castle extends ChessPiece {
 
     @Override
     public boolean posCanBeCaptured(PiecePosition pos) {
-        return getCastlePositions().contains(pos);
+        return getRookPositions().contains(pos);
     }
 }

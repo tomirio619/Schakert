@@ -19,7 +19,7 @@ package com.tomirio.chessengine.chesspieces;
 import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
-import com.tomirio.chessengine.chessboard.ChessTypes;
+import com.tomirio.chessengine.chessboard.PieceType;
 import com.tomirio.chessengine.chessboard.MoveDetails;
 import com.tomirio.chessengine.chessboard.PiecePosition;
 import java.util.ArrayList;
@@ -39,12 +39,11 @@ public class King extends ChessPiece {
      * chess piece is made. The chessboard must be set later on with
      * <code>setBoard()</code>.
      *
-     * @param type The type of the chess piece.
      * @param colour The colour of the chess piece.
      * @param pos The position of the chess piece.
      */
-    public King(ChessTypes type, ChessColour colour, PiecePosition pos) {
-        super(type, colour, pos);
+    public King(ChessColour colour, PiecePosition pos) {
+        super(PieceType.King, colour, pos);
         isCheck = false;
         castlingPossible = true;
     }
@@ -109,23 +108,23 @@ public class King extends ChessPiece {
 
         switch (getColour()) {
             case Black:
-                ArrayList<Castle> blackCastles = chessBoard.getCastles(getColour());
-                if (blackCastles.isEmpty() || isCheck) {
+                ArrayList<Rook> blackRooks = chessBoard.getRooks(getColour());
+                if (blackRooks.isEmpty() || isCheck) {
                     return castlingMoves;
                 } else {
-                    while (!blackCastles.isEmpty()) {
-                        Castle castle = blackCastles.remove(blackCastles.size() - 1);
-                        if (castle.castlingPossible() && castle.getRow() == getRow()) {
-                            if (chessBoard.isEmptySubRow(getPos(), castle.getPos())) {
-                                if (getColumn() > castle.getColumn()) {
-                                    // King is on the right side of the castle
+                    while (!blackRooks.isEmpty()) {
+                        Rook rook = blackRooks.remove(blackRooks.size() - 1);
+                        if (rook.castlingPossible() && rook.getRow() == getRow()) {
+                            if (chessBoard.isEmptySubRow(getPos(), rook.getPos())) {
+                                if (getColumn() > rook.getColumn()) {
+                                    // King is on the right side of the rook
                                     PiecePosition p = new PiecePosition(getRow(), getColumn() - 2);
                                     if (isSafePosition(p)
                                             && isSafePosition(new PiecePosition(getRow(), getColumn() - 1))) {
                                         castlingMoves.add(p);
                                     }
                                 } else {
-                                    // King is on the left side of the castle
+                                    // King is on the left side of the rook
                                     PiecePosition p = new PiecePosition(getRow(), getColumn() + 2);
                                     if (isSafePosition(p)
                                             && isSafePosition(new PiecePosition(getRow(), getColumn() + 1))) {
@@ -139,23 +138,23 @@ public class King extends ChessPiece {
                     return castlingMoves;
                 }
             case White:
-                ArrayList<Castle> whiteCastles = chessBoard.getCastles(getColour());
-                if (whiteCastles.isEmpty() || isCheck) {
+                ArrayList<Rook> whiteRooks = chessBoard.getRooks(getColour());
+                if (whiteRooks.isEmpty() || isCheck) {
                     return castlingMoves;
                 } else {
-                    while (!whiteCastles.isEmpty()) {
-                        Castle castle = whiteCastles.remove(whiteCastles.size() - 1);
-                        if (castle.castlingPossible() && castle.getRow() == getRow()) {
-                            if (chessBoard.isEmptySubRow(getPos(), castle.getPos())) {
-                                if (getColumn() > castle.getColumn()) {
-                                    // King is on the right side of the castle
+                    while (!whiteRooks.isEmpty()) {
+                        Rook rook = whiteRooks.remove(whiteRooks.size() - 1);
+                        if (rook.castlingPossible() && rook.getRow() == getRow()) {
+                            if (chessBoard.isEmptySubRow(getPos(), rook.getPos())) {
+                                if (getColumn() > rook.getColumn()) {
+                                    // King is on the right side of the rook
                                     PiecePosition p = new PiecePosition(getRow(), getColumn() - 2);
                                     if (isSafePosition(p)
                                             && isSafePosition(new PiecePosition(getRow(), getColumn() - 1))) {
                                         castlingMoves.add(p);
                                     }
                                 } else {
-                                    // King is on the left side of the castle
+                                    // King is on the left side of the rook
                                     PiecePosition p = new PiecePosition(getRow(), getColumn() + 2);
                                     if (isSafePosition(p)
                                             && isSafePosition(new PiecePosition(getRow(), getColumn() + 1))) {

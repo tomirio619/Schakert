@@ -18,7 +18,7 @@ package com.tomirio.chessengine.chesspieces;
 
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
-import com.tomirio.chessengine.chessboard.ChessTypes;
+import com.tomirio.chessengine.chessboard.PieceType;
 import com.tomirio.chessengine.chessboard.MoveDetails;
 import com.tomirio.chessengine.chessboard.PiecePosition;
 import java.util.ArrayList;
@@ -40,12 +40,11 @@ public class Pawn extends ChessPiece {
      * when a new chess piece is made. The chessboard must be set later on with
      * <code>setBoard()</code>. It is called with a <code>PiecePosition</code>.
      *
-     * @param type The type of the chess piece.
      * @param colour The colour of the chess piece.
      * @param pos The position of the chess piece.
      */
-    public Pawn(ChessTypes type, ChessColour colour, PiecePosition pos) {
-        super(type, colour, pos);
+    public Pawn(ChessColour colour, PiecePosition pos) {
+        super(PieceType.Pawn, colour, pos);
         enPassantPossible = false;
 
     }

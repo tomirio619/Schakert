@@ -45,7 +45,7 @@ public final class PieceSquareTables {
         {-10, 5, 0, 0, 0, 0, 5, -10},
         {-20, -10, -10, -10, -10, -10, -10, -20}
     };
-    public final static int[][] CASTLE_TABLE = {
+    public final static int[][] ROOK_TABLE = {
         {0, 0, 0, 0, 0, 0, 0, 0},
         {5, 10, 10, 10, 10, 10, 10, 5},
         {-5, 0, 0, 0, 0, 0, 0, -5},
@@ -73,7 +73,7 @@ public final class PieceSquareTables {
      *
      * The 4 pieces (queen, rook, bishop, knight) are divided into major (or
      * heavy) and minor pieces. The major (or heavy) pieces are the queen and
-     * castles. The minor pieces are the bishops and knights.
+     * rooks. The minor pieces are the bishops and knights.
      */
     public final static int[][] KING_TABLE_MIDDLE = {
         {-30, -40, -40, -50, -50, -40, -40, -30},

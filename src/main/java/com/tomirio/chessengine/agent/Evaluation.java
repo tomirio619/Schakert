@@ -41,9 +41,9 @@ public class Evaluation {
     private final int K;
 
     /**
-     * Castle piece value.
+     * Rook piece value.
      */
-    private final int C;
+    private final int R;
 
     /**
      * Bishop piece value.
@@ -55,7 +55,7 @@ public class Evaluation {
         Q = 900;
         P = 100;
         K = 20000;
-        C = 500;
+        R = 500;
         B = 330;
     }
 
@@ -83,8 +83,8 @@ public class Evaluation {
         switch (piece.getType()) {
             case Bishop:
                 return B + getBishopBonus(piece.getColour(), piece.getPos());
-            case Castle:
-                return C + getCastleBonus(piece.getColour(), piece.getPos());
+            case Rook:
+                return R + getRookBonus(piece.getColour(), piece.getPos());
             case King:
                 return K + getKingBonus(piece.getColour(), piece.getPos(), chessBoard);
             case Knight:
@@ -142,15 +142,15 @@ public class Evaluation {
 
     }
 
-    private int getCastleBonus(ChessColour colour, PiecePosition pos) {
+    private int getRookBonus(ChessColour colour, PiecePosition pos) {
         int weight = 0;
         switch (colour) {
             case White:
-                weight = PieceSquareTables.CASTLE_TABLE[pos.getRow()][pos.getColumn()];
+                weight = PieceSquareTables.ROOK_TABLE[pos.getRow()][pos.getColumn()];
                 break;
             case Black:
                 // Mirrored access
-                weight = PieceSquareTables.CASTLE_TABLE[7 - pos.getRow()][pos.getColumn()];
+                weight = PieceSquareTables.ROOK_TABLE[7 - pos.getRow()][pos.getColumn()];
                 break;
             default:
                 throw new NoSuchElementException();

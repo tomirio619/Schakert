@@ -42,7 +42,7 @@ public class Game {
     public Game(State state, ChessBoard chessBoard) {
         this.state = state;
         whitePlayer = new HumanPlayer(ChessColour.White, chessBoard);
-        blackPlayer = new AI(ChessColour.Black, chessBoard);
+        blackPlayer = new HumanPlayer(ChessColour.Black, chessBoard);
     }
 
     /**

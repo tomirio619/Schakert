@@ -30,9 +30,9 @@ public final class ImageLoader {
     public static Image blackBishop;
 
     /**
-     * black castle image.
+     * black rook image.
      */
-    public static Image blackCastle;
+    public static Image blackRook;
 
     /**
      * black king image.
@@ -60,9 +60,9 @@ public final class ImageLoader {
     public static Image whiteBishop;
 
     /**
-     * white castle image.
+     * white rook image.
      */
-    public static Image whiteCastle;
+    public static Image whiteRook;
 
     /**
      * white king image.
@@ -101,14 +101,14 @@ public final class ImageLoader {
         icon = new Image("Chess_Icon.png");
 
         blackBishop = new Image(path + "/Black/bishop.png");
-        blackCastle = new Image(path + "/Black/castle.png");
+        blackRook = new Image(path + "/Black/rook.png");
         blackKing = new Image(path + "/Black/king.png");
         blackKnight = new Image(path + "/Black/knight.png");
         blackPawn = new Image(path + "/Black/pawn.png");
         blackQueen = new Image(path + "/Black/queen.png");
 
         whiteBishop = new Image(path + "/White/bishop.png");
-        whiteCastle = new Image(path + "/White/castle.png");
+        whiteRook = new Image(path + "/White/rook.png");
         whiteKing = new Image(path + "/White/king.png");
         whiteKnight = new Image(path + "/White/knight.png");
         whitePawn = new Image(path + "/White/pawn.png");

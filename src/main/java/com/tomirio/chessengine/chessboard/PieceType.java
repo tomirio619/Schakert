@@ -22,9 +22,11 @@ import java.util.NoSuchElementException;
  *
  * @author Tom Sandmann
  */
-public enum ChessTypes {
+public enum PieceType {
 
     /**
+     * King
+     *//**
      * King
      */
     King,
@@ -33,9 +35,9 @@ public enum ChessTypes {
      */
     Queen,
     /**
-     * Castle
+     * Rook
      */
-    Castle,
+    Rook,
     /**
      * Bishop
      */
@@ -60,8 +62,8 @@ public enum ChessTypes {
                 return "King";
             case Queen:
                 return "Queen";
-            case Castle:
-                return "Castle";
+            case Rook:
+                return "Rook";
             case Bishop:
                 return "Bishop";
             case Knight:
@@ -79,8 +81,8 @@ public enum ChessTypes {
                 return "K";
             case Queen:
                 return "Q";
-            case Castle:
-                return "C";
+            case Rook:
+                return "R";
             case Bishop:
                 return "B";
             case Knight:

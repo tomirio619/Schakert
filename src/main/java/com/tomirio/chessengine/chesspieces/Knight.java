@@ -18,7 +18,7 @@ package com.tomirio.chessengine.chesspieces;
 
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
-import com.tomirio.chessengine.chessboard.ChessTypes;
+import com.tomirio.chessengine.chessboard.PieceType;
 import com.tomirio.chessengine.chessboard.MoveDetails;
 import com.tomirio.chessengine.chessboard.PiecePosition;
 import java.util.ArrayList;
@@ -33,12 +33,11 @@ public class Knight extends ChessPiece {
      * Constructor for new knight, use when the board is known at this moment.
      * The board MUST be manually set using the setBoard method.
      *
-     * @param type The chess type.
      * @param colour The colour.
      * @param pos The position.
      */
-    public Knight(ChessTypes type, ChessColour colour, PiecePosition pos) {
-        super(type, colour, pos);
+    public Knight(ChessColour colour, PiecePosition pos) {
+        super(PieceType.Knight, colour, pos);
     }
 
     /**

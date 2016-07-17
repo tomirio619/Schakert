@@ -30,7 +30,7 @@ public abstract class ChessPiece implements Serializable {
     /**
      * The type of the chess piece.
      */
-    private final ChessTypes type;
+    private final PieceType type;
 
     /**
      * The colour of the chess piece.
@@ -57,7 +57,7 @@ public abstract class ChessPiece implements Serializable {
      * @param colour The colour of the chess piece.
      * @param pos The position of the chess piece.
      */
-    public ChessPiece(ChessTypes type, ChessColour colour, PiecePosition pos) {
+    public ChessPiece(PieceType type, ChessColour colour, PiecePosition pos) {
         this.type = type;
         this.colour = colour;
         this.pos = pos;
@@ -72,7 +72,7 @@ public abstract class ChessPiece implements Serializable {
      * @param pos The position.
      * @param board The board.
      */
-    public ChessPiece(ChessTypes type, ChessColour colour, PiecePosition pos,
+    public ChessPiece(PieceType type, ChessColour colour, PiecePosition pos,
             ChessBoard board) {
         this.type = type;
         this.colour = colour;
@@ -110,7 +110,7 @@ public abstract class ChessPiece implements Serializable {
      *
      * @return The type of this chess piece.
      */
-    public ChessTypes getType() {
+    public PieceType getType() {
         return type;
     }
 

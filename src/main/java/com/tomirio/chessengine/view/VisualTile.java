@@ -162,8 +162,8 @@ public class VisualTile extends ToggleButton {
                 switch (p.getType()) {
                     case Bishop:
                         return ImageLoader.blackBishop;
-                    case Castle:
-                        return ImageLoader.blackCastle;
+                    case Rook:
+                        return ImageLoader.blackRook;
                     case King:
                         return ImageLoader.blackKing;
                     case Knight:
@@ -177,8 +177,8 @@ public class VisualTile extends ToggleButton {
                 switch (p.getType()) {
                     case Bishop:
                         return ImageLoader.whiteBishop;
-                    case Castle:
-                        return ImageLoader.whiteCastle;
+                    case Rook:
+                        return ImageLoader.whiteRook;
                     case King:
                         return ImageLoader.whiteKing;
                     case Knight:

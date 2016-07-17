@@ -19,7 +19,7 @@ package com.tomirio.chessengine.chesspieces;
 import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
-import com.tomirio.chessengine.chessboard.ChessTypes;
+import com.tomirio.chessengine.chessboard.PieceType;
 import com.tomirio.chessengine.chessboard.Direction;
 import com.tomirio.chessengine.chessboard.MoveDetails;
 import com.tomirio.chessengine.chessboard.PiecePosition;
@@ -35,24 +35,22 @@ public class Queen extends ChessPiece {
      * Constructor for new queen, use when the board is known at this moment.
      * The board MUST be manually set using the setBoard method.
      *
-     * @param type The chesstype.
      * @param colour The colour.
      * @param pos The position.
      * @param board The board.
      */
-    public Queen(ChessTypes type, ChessColour colour, PiecePosition pos, ChessBoard board) {
-        super(type, colour, pos, board);
+    public Queen(ChessColour colour, PiecePosition pos, ChessBoard board) {
+        super(PieceType.Queen, colour, pos, board);
     }
 
     /**
      * Constructor for new queen, use when the board is at this moment.
      *
-     * @param type The chesstype.
      * @param colour The colour.
      * @param pos The position.
      */
-    public Queen(ChessTypes type, ChessColour colour, PiecePosition pos) {
-        super(type, colour, pos);
+    public Queen(ChessColour colour, PiecePosition pos) {
+        super(PieceType.Queen, colour, pos);
     }
 
     @Override

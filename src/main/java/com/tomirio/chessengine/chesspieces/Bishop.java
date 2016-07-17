@@ -18,7 +18,7 @@ package com.tomirio.chessengine.chesspieces;
 
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
-import com.tomirio.chessengine.chessboard.ChessTypes;
+import com.tomirio.chessengine.chessboard.PieceType;
 import com.tomirio.chessengine.chessboard.Direction;
 import com.tomirio.chessengine.chessboard.MoveDetails;
 import com.tomirio.chessengine.chessboard.PiecePosition;
@@ -34,12 +34,11 @@ public class Bishop extends ChessPiece {
      * Constructor for new bishop, use when the board is not known. The board
      * MUST be manually set using the setBoard method.
      *
-     * @param type
      * @param colour
      * @param pos
      */
-    public Bishop(ChessTypes type, ChessColour colour, PiecePosition pos) {
-        super(type, colour, pos);
+    public Bishop(ChessColour colour, PiecePosition pos) {
+        super(PieceType.Bishop, colour, pos);
     }
 
     /**
