@@ -27,6 +27,15 @@ import java.util.NoSuchElementException;
 public class State implements Serializable {
 
     /**
+     * Indicates if player black is currently in check.
+     */
+    private boolean blackIsCheck;
+    /**
+     * Indicates if player black is checkmate.
+     */
+    private boolean blackIsCheckMate;
+
+    /**
      * The number of games won by player black.
      */
     private int gamesWonBlack;
@@ -35,11 +44,14 @@ public class State implements Serializable {
      * The number of games won by player white.
      */
     private int gamesWonWhite;
-
     /**
-     * Indicates if player black is currently in check.
+     * The colour that has turn.
      */
-    private boolean blackIsCheck;
+    private ChessColour hasTurn;
+    /**
+     * Indicates if it is stalemate.
+     */
+    private boolean staleMate; // ofwel pat
 
     /**
      * Indicates if player white is currently in check.
@@ -47,29 +59,14 @@ public class State implements Serializable {
     private boolean whiteIsCheck;
 
     /**
-     * Indicates if player black is checkmate.
-     */
-    private boolean blackIsCheckMate;
-
-    /**
      * Indicates if player white is checkmate.
      */
     private boolean whiteIsCheckMate;
 
     /**
-     * Indicates if it is stalemate.
-     */
-    private boolean staleMate; // ofwel pat
-
-    /**
      * The winner.
      */
     private ChessColour winner;
-
-    /**
-     * The colour that has turn.
-     */
-    private ChessColour hasTurn;
 
     /**
      * Constructor of State.
@@ -84,6 +81,86 @@ public class State implements Serializable {
         staleMate = false;
         winner = null;
         hasTurn = ChessColour.White;
+    }
+
+    /**
+     * For a given player, return the number of games won.
+     *
+     * @param colour The colour of the player.
+     * @return The number of games the player with this colour has won.
+     */
+    public int gamesWon(ChessColour colour) {
+        switch (colour) {
+            case Black:
+                return gamesWonBlack;
+            case White:
+                return gamesWonWhite;
+            default:
+                throw new NoSuchElementException();
+        }
+    }
+
+    /**
+     * Get the colour of tha player tha has turn.
+     *
+     * @return ChessColour of the player that has turn.
+     */
+    public ChessColour getTurnColour() {
+        return hasTurn;
+    }
+
+    /**
+     *
+     * @return The value of the variable winner. This value is <code>null</code>
+     * if there is no winner at this specific moment.
+     */
+    public ChessColour getWinner() {
+        return winner;
+    }
+
+    /**
+     * For a given colour, return if this colour is in check.
+     *
+     * @param colour The colour of the player.
+     * @return <code>True</code> if the player with that colour is in check,
+     * <code>False</code> otherwise.
+     */
+    public boolean isCheck(ChessColour colour) {
+        switch (colour) {
+            case Black:
+                return blackIsCheck;
+            case White:
+                return whiteIsCheck;
+            default:
+                throw new NoSuchElementException();
+        }
+    }
+
+    /**
+     * For a given colour, return if this colour is checkmate.
+     *
+     * @param colour The colour of the player.
+     * @return <code>True</code> if the player with that colour is checkmate,
+     * <code>False</code> otherwise.
+     */
+    public boolean isCheckMate(ChessColour colour) {
+        switch (colour) {
+            case Black:
+                return blackIsCheckMate;
+            case White:
+                return whiteIsCheckMate;
+            default:
+                throw new NoSuchElementException();
+        }
+    }
+
+    /**
+     *
+     * @return <code>True</code> if the current game is in a draw state,
+     * <code>False</code> otherwise.
+     */
+    public boolean isDraw() {
+        return staleMate;
     }
 
     /**
@@ -120,102 +197,6 @@ public class State implements Serializable {
     }
 
     /**
-     * Update the turn.
-     */
-    public void updateTurn() {
-        hasTurn = (hasTurn == ChessColour.White) ? ChessColour.Black : ChessColour.White;
-    }
-
-    /**
-     * For a given colour, return if this colour is checkmate.
-     *
-     * @param colour The colour of the player.
-     * @return <code>True</code> if the player with that colour is checkmate,
-     * <code>False</code> otherwise.
-     */
-    public boolean isCheckMate(ChessColour colour) {
-        switch (colour) {
-            case Black:
-                return blackIsCheckMate;
-            case White:
-                return whiteIsCheckMate;
-            default:
-                throw new NoSuchElementException();
-        }
-    }
-
-    /**
-     * For a given colour, return if this colour is in check.
-     *
-     * @param colour The colour of the player.
-     * @return <code>True</code> if the player with that colour is in check,
-     * <code>False</code> otherwise.
-     */
-    public boolean isCheck(ChessColour colour) {
-        switch (colour) {
-            case Black:
-                return blackIsCheck;
-            case White:
-                return whiteIsCheck;
-            default:
-                throw new NoSuchElementException();
-        }
-    }
-
-    /**
-     * For a given player, return the number of games won.
-     *
-     * @param colour The colour of the player.
-     * @return The number of games the player with this colour has won.
-     */
-    public int gamesWon(ChessColour colour) {
-        switch (colour) {
-            case Black:
-                return gamesWonBlack;
-            case White:
-                return gamesWonWhite;
-            default:
-                throw new NoSuchElementException();
-        }
-    }
-
-    /**
-     *
-     * @return <code>True</code> if the current game is in a draw state,
-     * <code>False</code> otherwise.
-     */
-    public boolean isDraw() {
-        return staleMate;
-    }
-
-    /**
-     *
-     * @return <code> True </code> if there is a winner, <code>False</code>
-     * otherwise.
-     */
-    public boolean weHaveAWinner() {
-        return winner != null;
-    }
-
-    /**
-     *
-     * @return The value of the variable winner. This value is <code>null</code>
-     * if there is no winner at this specific moment.
-     */
-    public ChessColour getWinner() {
-        return winner;
-    }
-
-    /**
-     * Get the colour of tha player tha has turn.
-     *
-     * @return ChessColour of the player that has turn.
-     */
-    public ChessColour getTurnColour() {
-        return hasTurn;
-    }
-
-    /**
      * Updates the status of both kings after a move.
      *
      * @param chessBoard The chessboard.
@@ -239,6 +220,22 @@ public class State implements Serializable {
                 gamesWonWhite++;
                 break;
         }
+    }
+
+    /**
+     * Update the turn.
+     */
+    public void updateTurn() {
+        hasTurn = (hasTurn == ChessColour.White) ? ChessColour.Black : ChessColour.White;
+    }
+
+    /**
+     *
+     * @return <code> True </code> if there is a winner, <code>False</code>
+     * otherwise.
+     */
+    public boolean weHaveAWinner() {
+        return winner != null;
     }
 
 }

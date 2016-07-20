@@ -18,10 +18,11 @@ package com.tomirio.chessengine.chesspieces;
 
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
-import com.tomirio.chessengine.chessboard.PieceType;
 import com.tomirio.chessengine.chessboard.Direction;
 import com.tomirio.chessengine.chessboard.MoveDetails;
-import com.tomirio.chessengine.chessboard.PiecePosition;
+import com.tomirio.chessengine.chessboard.PieceType;
+import com.tomirio.chessengine.chessboard.Position;
+import com.tomirio.chessengine.moves.Move;
 import java.util.ArrayList;
 
 /**
@@ -37,7 +38,7 @@ public class Bishop extends ChessPiece {
      * @param colour
      * @param pos
      */
-    public Bishop(ChessColour colour, PiecePosition pos) {
+    public Bishop(ChessColour colour, Position pos) {
         super(PieceType.Bishop, colour, pos);
     }
 
@@ -45,7 +46,7 @@ public class Bishop extends ChessPiece {
      *
      * @return All the possible moves for the bishop.
      */
-    public MoveDetails getBishopPositions() {
+    public MoveDetails getBishopMoves() {
         MoveDetails moveDetails = new MoveDetails();
         moveDetails.add(getPositionsInDirection(Direction.NE));
         moveDetails.add(getPositionsInDirection(Direction.SE));
@@ -55,18 +56,23 @@ public class Bishop extends ChessPiece {
     }
 
     @Override
-    public boolean posCanBeCaptured(PiecePosition p) {
-        return getBishopPositions().moves.contains(p);
+    public ArrayList<Position> getCoveredPositions() {
+        return getBishopMoves().coveredFriendlyPieces;
     }
 
     @Override
-    public ArrayList<PiecePosition> getPossibleMoves() {
-        return filterMoves(getBishopPositions().moves);
+    public ArrayList<Move> getPossibleMoves() {
+        return filterMoves(getBishopMoves().moves);
     }
 
     @Override
-    public boolean posIsCovered(PiecePosition p) {
-        return getBishopPositions().coveredFriendlyPieces.contains(p);
+    public ArrayList<Move> getRawPossibleMoves() {
+        return getBishopMoves().moves;
+    }
+
+    @Override
+    public boolean posIsCovered(Position p) {
+        return getCoveredPositions().contains(p);
     }
 
 }

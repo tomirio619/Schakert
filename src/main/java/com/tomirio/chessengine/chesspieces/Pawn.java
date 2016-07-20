@@ -16,24 +16,23 @@
  */
 package com.tomirio.chessengine.chesspieces;
 
+import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
-import com.tomirio.chessengine.chessboard.PieceType;
 import com.tomirio.chessengine.chessboard.MoveDetails;
-import com.tomirio.chessengine.chessboard.PiecePosition;
+import com.tomirio.chessengine.chessboard.PieceType;
+import com.tomirio.chessengine.chessboard.Position;
+import com.tomirio.chessengine.moves.CaptureMove;
+import com.tomirio.chessengine.moves.Move;
+import com.tomirio.chessengine.moves.NormalMove;
+import com.tomirio.chessengine.moves.PromotionMove;
 import java.util.ArrayList;
-import java.util.NoSuchElementException;
 
 /**
  *
  * @author Tom Sandmann
  */
 public class Pawn extends ChessPiece {
-
-    /**
-     * For the pawn only, indicates if an enPassant can be done on this pawn.
-     */
-    protected boolean enPassantPossible;
 
     /**
      * This constructor <b>MUST</b> be used when the chessboard is not known
@@ -43,175 +42,18 @@ public class Pawn extends ChessPiece {
      * @param colour The colour of the chess piece.
      * @param pos The position of the chess piece.
      */
-    public Pawn(ChessColour colour, PiecePosition pos) {
+    public Pawn(ChessColour colour, Position pos) {
         super(PieceType.Pawn, colour, pos);
-        enPassantPossible = false;
-
-    }
-
-    @Override
-    public ArrayList<PiecePosition> getPossibleMoves() {
-        return filterMoves(getPawnPositions().moves);
-    }
-
-    private MoveDetails getPawnPositions() {
-        MoveDetails pair = new MoveDetails();
-        switch (getColour()) {
-            case White: {
-                if (getRow() == 6) {
-                    // White pawn is on its original position
-                    PiecePosition p1 = new PiecePosition(getRow() - 1, getColumn());
-                    if (!chessBoard.isOccupiedPosition(p1)) {
-                        // Position in front of pawn is free
-                        pair.moves.add(p1);
-                        PiecePosition p2 = new PiecePosition(getRow() - 2, getColumn());
-                        if (!chessBoard.isOccupiedPosition(p2)) {
-                            // Pawn can move two tiles
-                            pair.moves.add(p2);
-                        }
-                    }
-                }
-                for (int column = getColumn() - 1; column <= getColumn() + 1; column++) {
-                    PiecePosition p1 = new PiecePosition(getRow() - 1, column);
-                    if (p1.isValid()) {
-                        if (column == getColumn() && !chessBoard.isOccupiedPosition(p1)) {
-                            pair.moves.add(p1);
-                        } else if (chessBoard.isOccupiedPosition(p1) && chessBoard.getColour(p1) != getColour() && p1.getColumn() != getColumn()) {
-                            pair.moves.add(p1);
-                        } else if (chessBoard.isOccupiedPosition(p1) && chessBoard.getColour(p1) == getColour() && p1.getColumn() != getColumn()) {
-                            pair.coveredFriendlyPieces.add(p1);
-                        }
-                    }
-                }
-                // Determine if enPassant move is possible
-                for (int column = getColumn() - 1; column <= getColumn() + 1; column++) {
-                    PiecePosition p1 = new PiecePosition(getRow(), column);
-                    if (p1.isValid()) {
-                        if (chessBoard.isOccupiedPosition(p1) && chessBoard.getColour(p1) != getColour() && chessBoard.getPiece(p1) instanceof Pawn) {
-                            Pawn pawn = (Pawn) chessBoard.getPiece(p1);
-                            if (pawn.getEnPassantMovePossible() && p1.getRow() == getRow() && !chessBoard.isOccupiedPosition(p1.getRow() - 1, p1.getColumn())) {
-                                // Both pawns are on the same row and behind the black pawn is a free tile, so we can add this as a possible move
-                                pair.moves.add(new PiecePosition(p1.getRow() - 1, p1.getColumn()));
-                            }
-                        }
-                    }
-
-                }
-                return pair;
-            }
-
-            case Black: {
-                if (getRow() == 1) {
-                    PiecePosition p1 = new PiecePosition(getRow() + 1, getColumn());
-                    if (!chessBoard.isOccupiedPosition(p1)) {
-                        pair.moves.add(p1);
-                        PiecePosition p2 = new PiecePosition(getRow() + 2, getColumn());
-                        if (!chessBoard.isOccupiedPosition(p2)) {
-                            pair.moves.add(p2);
-                        }
-                    }
-                }
-                for (int column = getColumn() - 1; column <= getColumn() + 1; column++) {
-                    PiecePosition p1 = new PiecePosition(getRow() + 1, column);
-                    if (p1.isValid()) {
-                        if (column == getColumn() && !chessBoard.isOccupiedPosition(p1)) {
-                            pair.moves.add(p1);
-                        } else if (chessBoard.isOccupiedPosition(p1) && chessBoard.getColour(p1) != getColour() && p1.getColumn() != getColumn()) {
-                            pair.moves.add(p1);
-                        } else if (chessBoard.isOccupiedPosition(p1) && chessBoard.getColour(p1) == getColour() && p1.getColumn() != getColumn()) {
-                            pair.coveredFriendlyPieces.add(p1);
-                        }
-                    }
-                }
-
-                // Determine if enPassant move is possible
-                for (int column = getColumn() - 1; column <= getColumn() + 1; column++) {
-                    PiecePosition p1 = new PiecePosition(getRow(), column);
-                    if (p1.isValid()) {
-                        if (chessBoard.isOccupiedPosition(p1) && chessBoard.getColour(p1) != getColour() && chessBoard.getPiece(p1) instanceof Pawn) {
-                            Pawn pawn = (Pawn) chessBoard.getPiece(p1);
-                            if (pawn.getEnPassantMovePossible() && p1.getRow() == getRow() && !chessBoard.isOccupiedPosition(p1.getRow() + 1, p1.getColumn())) {
-                                // Both pawns are on the same row and behind the white pawn is a free tile, so we can add this as a possible move
-                                pair.moves.add(new PiecePosition(p1.getRow() + 1, p1.getColumn()));
-                            }
-                        }
-                    }
-                }
-                return pair;
-            }
-            default:
-                throw new NoSuchElementException(getColour().toString());
-        }
     }
 
     /**
      *
-     * @return The value of enPassantPossible
+     * @param colour The colour of the piece.
+     * @param pos The positon on the board.
+     * @param chessBoard The chess board.
      */
-    public boolean getEnPassantMovePossible() {
-        return enPassantPossible;
-    }
-
-    @Override
-    public boolean posIsCovered(PiecePosition pos) {
-        return getPawnPositions().coveredFriendlyPieces.contains(pos);
-    }
-
-    /**
-     *
-     * @param newRow The new row of the piece
-     */
-    public void determineEnPasant(int newRow) {
-        if (enPassantPossible) {
-            /*
-             enPassant move was possible and now the pawn is moving, so the enPassant
-             move is not possible anymore for this pawn
-             */
-            enPassantPossible = false;
-        } else {
-            // The pawn just moved 2 tiles, this indicaties that the enPassant move is possible
-            enPassantPossible = Math.abs(newRow - getRow()) == 2;
-        }
-    }
-
-    /**
-     *
-     * @param row The row of the new position of the piece.
-     * @param column The column of the new position of the piece.
-     */
-    @Override
-    public void move(int row, int column) {
-        determineEnPasant(row);
-        super.move(row, column);
-    }
-
-    /**
-     * Setter for the enPassantPossible value.
-     *
-     * @param value
-     */
-    public void setEnPassantMove(boolean value) {
-        this.enPassantPossible = value;
-    }
-
-    @Override
-    public boolean posCanBeCaptured(PiecePosition pos) {
-        int distRow = Math.abs(pos.getRow() - getRow());
-        int distCol = Math.abs(pos.getColumn() - getColumn());
-        if (distRow > 1 || distCol > 1 || pos.getRow() == getRow() || pos.getColumn() == getColumn()) {
-            return false;
-        } else {
-            switch (getColour()) {
-                case Black: {
-                    return (pos.getRow() > getRow());
-                }
-                case White: {
-                    return (pos.getRow() < getRow());
-                }
-                default:
-                    throw new NoSuchElementException(getColour().toString());
-            }
-        }
+    public Pawn(ChessColour colour, Position pos, ChessBoard chessBoard) {
+        super(PieceType.Pawn, colour, pos, chessBoard);
     }
 
     @Override
@@ -219,11 +61,170 @@ public class Pawn extends ChessPiece {
         return super.equals(o);
     }
 
+    /**
+     * Get the capture moves
+     *
+     * @return
+     */
+    private MoveDetails getCaptureMoves() {
+        MoveDetails moveDetails = new MoveDetails();
+        int direction = (getColour() == ChessColour.Black) ? 1 : -1;
+        Position left = new Position(getRow() + direction * 1, getColumn() - 1);
+        Position right = new Position(getRow() + direction * 1, getColumn() + 1);
+
+        ArrayList<Position> positions = new ArrayList();
+        positions.add(left);
+        positions.add(right);
+
+        for (Position pos : positions) {
+            if (pos.isValid()) {
+                if (chessBoard.isOccupiedPosition(pos)) {
+                    if (chessBoard.getColour(pos) == getColour()) {
+                        // Friendly piece is covered
+                        moveDetails.coveredFriendlyPieces.add(pos);
+                    } else {
+                        // Enemy piece
+                        switch (getColour()) {
+                            case Black:
+                                if (pos.getRow() == 7) {
+                                    // Black pawn promotes
+                                    PromotionMove promotionMove = new PromotionMove(this, pos);
+                                    moveDetails.moves.add(promotionMove);
+                                } else {
+                                    // A capture move without promotion
+                                    CaptureMove captureMove = new CaptureMove(this, pos);
+                                    moveDetails.moves.add(captureMove);
+                                }
+                            case White:
+                                if (pos.getRow() == 0) {
+                                    // White pawn promotes
+                                    PromotionMove promotionMove = new PromotionMove(this, pos);
+                                    moveDetails.moves.add(promotionMove);
+                                } else {
+                                    // A capture move without promotion
+                                    CaptureMove captureMove = new CaptureMove(this, pos);
+                                    moveDetails.moves.add(captureMove);
+                                }
+                        }
+                    }
+                }
+            }
+        }
+        return moveDetails;
+    }
+
+    @Override
+    public ArrayList<Position> getCoveredPositions() {
+        return getPawnMoves().coveredFriendlyPieces;
+    }
+
+    /**
+     * Get the intial non capture moves.
+     *
+     * @return
+     */
+    private ArrayList<Move> getInitialNonCaptureMoves() {
+        ArrayList<Move> initialMoves = new ArrayList();
+        int direction = (getColour() == ChessColour.Black) ? 1 : -1;
+        Position singleStep = new Position(getRow() + direction * 1, getColumn());
+        if (chessBoard.isOccupiedPosition(singleStep)) {
+            return initialMoves;
+        } else {
+            NormalMove singleStepMove = new NormalMove(this, singleStep);
+            initialMoves.add(singleStepMove);
+
+            Position doubleStep = new Position(getRow() + direction * 2, getColumn());
+            if (chessBoard.isOccupiedPosition(doubleStep)) {
+                return initialMoves;
+            } else {
+                NormalMove doubleStepMove = new NormalMove(this, doubleStep);
+                initialMoves.add(doubleStepMove);
+                return initialMoves;
+            }
+        }
+    }
+
+    /**
+     * Get the non capture moves.
+     *
+     * @return
+     */
+    private ArrayList<Move> getNonCaptureMoves() {
+        ArrayList<Move> initialMoves = new ArrayList();
+        int direction = (getColour() == ChessColour.Black) ? 1 : -1;
+        Position singleStep = new Position(getRow() + direction * 1, getColumn());
+
+        if (chessBoard.isOccupiedPosition(singleStep)) {
+            // Position in front of pawn is occupied
+            return initialMoves;
+        } else {
+            // Position in front of pawn is free
+
+            switch (getColour()) {
+                case Black:
+                    if (singleStep.getRow() == 7) {
+                        // A black pawn promotes
+                        PromotionMove blackPromotionMove = new PromotionMove(this, singleStep);
+                        initialMoves.add(blackPromotionMove);
+                    } else {
+                        // Normal move black pawn
+                        NormalMove normalMove = new NormalMove(this, singleStep);
+                        initialMoves.add(normalMove);
+                    }
+                    return initialMoves;
+                case White:
+                    if (singleStep.getRow() == 0) {
+                        // A white pawn promotes
+                        PromotionMove whitePromotionMove = new PromotionMove(this, singleStep);
+                        initialMoves.add(whitePromotionMove);
+                    } else {
+                        // Normal move white pawn
+                        NormalMove normalMove = new NormalMove(this, singleStep);
+                        initialMoves.add(normalMove);
+                    }
+                default:
+                    return initialMoves;
+            }
+        }
+
+    }
+
+    /**
+     * Get the pawn moves.
+     *
+     * @return
+     */
+    private MoveDetails getPawnMoves() {
+        MoveDetails moveDetails = new MoveDetails();
+        moveDetails.add(getCaptureMoves());
+        if (getPos().getRow() == 1 || getPos().getRow() == 6) {
+            moveDetails.moves.addAll(getInitialNonCaptureMoves());
+            return moveDetails;
+        } else {
+            moveDetails.moves.addAll(getNonCaptureMoves());
+            return moveDetails;
+        }
+    }
+
+    @Override
+    public ArrayList<Move> getPossibleMoves() {
+        return filterMoves(getPawnMoves().moves);
+    }
+
+    @Override
+    public ArrayList<Move> getRawPossibleMoves() {
+        return getPawnMoves().moves;
+    }
+
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 97 * hash + (this.enPassantPossible ? 1 : 0);
         return hash;
+    }
+
+    @Override
+    public boolean posIsCovered(Position pos) {
+        return getPawnMoves().coveredFriendlyPieces.contains(pos);
     }
 
 }

@@ -1,7 +1,18 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2016 Tom Sandmann
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.tomirio.chessengine.agent;
 
@@ -10,7 +21,7 @@ import static com.tomirio.chessengine.chessboard.ChessBoard.COLS;
 import static com.tomirio.chessengine.chessboard.ChessBoard.ROWS;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
-import com.tomirio.chessengine.chessboard.PiecePosition;
+import com.tomirio.chessengine.chessboard.Position;
 import com.tomirio.chessengine.chessboard.State;
 import java.util.NoSuchElementException;
 
@@ -21,9 +32,13 @@ import java.util.NoSuchElementException;
 public class Evaluation {
 
     /**
-     * Queen piece value.
+     * Bishop piece value.
      */
-    private final int Q;
+    private final int B;
+    /**
+     * King piece value.
+     */
+    private final int K;
 
     /**
      * Knight piece value.
@@ -34,11 +49,10 @@ public class Evaluation {
      * Pawn piece value.
      */
     private final int P;
-
     /**
-     * King piece value.
+     * Queen piece value.
      */
-    private final int K;
+    private final int Q;
 
     /**
      * Rook piece value.
@@ -46,10 +60,8 @@ public class Evaluation {
     private final int R;
 
     /**
-     * Bishop piece value.
+     * Constructor.
      */
-    private final int B;
-
     public Evaluation() {
         N = 300;
         Q = 900;
@@ -71,31 +83,12 @@ public class Evaluation {
      * given colour.
      */
     public double evaluate(ChessBoard chessBoard, ChessColour playerColour) {
-        State currentState = chessBoard.getState();
+        State currentState = null;
         ChessColour hasTurn = currentState.getTurnColour();
         double evaluationScore = evaluateBoard(chessBoard, hasTurn);
         double enemyEvaluationScore = evaluateBoard(chessBoard, hasTurn.getOpposite());
         double heuristicValue = evaluationScore - enemyEvaluationScore;
         return (playerColour == hasTurn) ? heuristicValue : -heuristicValue;
-    }
-
-    public int getPieceValue(ChessPiece piece, ChessBoard chessBoard) {
-        switch (piece.getType()) {
-            case Bishop:
-                return B + getBishopBonus(piece.getColour(), piece.getPos());
-            case Rook:
-                return R + getRookBonus(piece.getColour(), piece.getPos());
-            case King:
-                return K + getKingBonus(piece.getColour(), piece.getPos(), chessBoard);
-            case Knight:
-                return N + getKnightBonus(piece.getColour(), piece.getPos());
-            case Pawn:
-                return P + getPawnBonus(piece.getColour(), piece.getPos());
-            case Queen:
-                return Q + getQueenBonus(piece.getColour(), piece.getPos());
-            default:
-                throw new NoSuchElementException();
-        }
     }
 
     /**
@@ -125,7 +118,7 @@ public class Evaluation {
      * Methods for looking up the bonus for specific chess types based on the
      * position on a given chess board.
      */
-    private int getBishopBonus(ChessColour colour, PiecePosition pos) {
+    private int getBishopBonus(ChessColour colour, Position pos) {
         int weight = 0;
         switch (colour) {
             case White:
@@ -142,23 +135,7 @@ public class Evaluation {
 
     }
 
-    private int getRookBonus(ChessColour colour, PiecePosition pos) {
-        int weight = 0;
-        switch (colour) {
-            case White:
-                weight = PieceSquareTables.ROOK_TABLE[pos.getRow()][pos.getColumn()];
-                break;
-            case Black:
-                // Mirrored access
-                weight = PieceSquareTables.ROOK_TABLE[7 - pos.getRow()][pos.getColumn()];
-                break;
-            default:
-                throw new NoSuchElementException();
-        }
-        return weight;
-    }
-
-    private int getKingBonus(ChessColour colour, PiecePosition pos, ChessBoard chessBoard) {
+    private int getKingBonus(ChessColour colour, Position pos, ChessBoard chessBoard) {
         int weight = 0;
         int[][] king_table;
 
@@ -182,14 +159,15 @@ public class Evaluation {
             default:
                 throw new NoSuchElementException();
         }
-        if (chessBoard.getState().isCheckMate(colour)) {
-            return 0;
-        } else {
-            return weight;
-        }
+//        if (chessBoard.getState().isCheckMate(colour)) {
+//            return 0;
+//        } else {
+//            return weight;
+//        }
+        return weight;
     }
 
-    private int getKnightBonus(ChessColour colour, PiecePosition pos) {
+    private int getKnightBonus(ChessColour colour, Position pos) {
         int weight = 0;
         switch (colour) {
             case White:
@@ -205,7 +183,7 @@ public class Evaluation {
         return weight;
     }
 
-    private int getPawnBonus(ChessColour colour, PiecePosition pos) {
+    private int getPawnBonus(ChessColour colour, Position pos) {
         int weight = 0;
         switch (colour) {
             case White:
@@ -220,7 +198,33 @@ public class Evaluation {
         return weight;
     }
 
-    private int getQueenBonus(ChessColour colour, PiecePosition pos) {
+    /**
+     * Get the piece value.
+     *
+     * @param piece The chess piece.
+     * @param chessBoard The chess board.
+     * @return
+     */
+    public int getPieceValue(ChessPiece piece, ChessBoard chessBoard) {
+        switch (piece.getType()) {
+            case Bishop:
+                return B + getBishopBonus(piece.getColour(), piece.getPos());
+            case Rook:
+                return R + getRookBonus(piece.getColour(), piece.getPos());
+            case King:
+                return K + getKingBonus(piece.getColour(), piece.getPos(), chessBoard);
+            case Knight:
+                return N + getKnightBonus(piece.getColour(), piece.getPos());
+            case Pawn:
+                return P + getPawnBonus(piece.getColour(), piece.getPos());
+            case Queen:
+                return Q + getQueenBonus(piece.getColour(), piece.getPos());
+            default:
+                throw new NoSuchElementException();
+        }
+    }
+
+    private int getQueenBonus(ChessColour colour, Position pos) {
         int weight = 0;
         switch (colour) {
             case White:
@@ -229,6 +233,22 @@ public class Evaluation {
             case Black:
                 // Mirrored access
                 weight = PieceSquareTables.QUEEN_TABLE[7 - pos.getRow()][pos.getColumn()];
+                break;
+            default:
+                throw new NoSuchElementException();
+        }
+        return weight;
+    }
+
+    private int getRookBonus(ChessColour colour, Position pos) {
+        int weight = 0;
+        switch (colour) {
+            case White:
+                weight = PieceSquareTables.ROOK_TABLE[pos.getRow()][pos.getColumn()];
+                break;
+            case Black:
+                // Mirrored access
+                weight = PieceSquareTables.ROOK_TABLE[7 - pos.getRow()][pos.getColumn()];
                 break;
             default:
                 throw new NoSuchElementException();

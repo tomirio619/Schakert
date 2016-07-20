@@ -16,7 +16,6 @@
  */
 package com.tomirio.chessengine;
 
-import com.tomirio.chessengine.chessboard.Log;
 import com.tomirio.chessengine.view.View;
 import javafx.application.Application;
 import javafx.stage.Stage;
@@ -27,17 +26,16 @@ import javafx.stage.Stage;
  */
 public class ChessEngine extends Application {
 
-    @Override
-    public void start(Stage primaryStage) {
-        Log log = new Log();
-        View view = new View(primaryStage);
-    }
-
     /**
      * @param args the command line arguments
      */
     public static void main(String[] args) {
         launch(args);
+    }
+
+    @Override
+    public void start(Stage primaryStage) {
+        View view = new View(primaryStage);
     }
 
 }

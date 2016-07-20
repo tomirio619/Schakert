@@ -19,9 +19,9 @@ package com.tomirio.chessengine.controller;
 import com.tomirio.chessengine.agent.AI;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.Log;
-import com.tomirio.chessengine.chessboard.PiecePosition;
-import com.tomirio.chessengine.chessboard.State;
+import com.tomirio.chessengine.chessboard.Position;
 import com.tomirio.chessengine.game.Game;
+import com.tomirio.chessengine.moves.Move;
 import com.tomirio.chessengine.view.View;
 import com.tomirio.chessengine.view.VisualTile;
 import java.util.ArrayList;
@@ -35,19 +35,27 @@ import javafx.scene.input.MouseEvent;
 public class MouseListener implements EventHandler<MouseEvent> {
 
     /**
+     * Currently selected visual tile.
+     */
+    private VisualTile currentlySelectedVisualTile;
+    /**
+     * The game.
+     */
+    public Game game;
+
+    /**
      * The log.
      */
     public Log log;
 
     /**
-     * The previous selected visual tile, initially null.
-     */
-    public VisualTile previousSelected;
-
-    /**
      * The possibleMoves of the currently selected visual tile, initially null.
      */
-    public ArrayList<PiecePosition> possibleMoves;
+    public ArrayList<Move> possibleMoves;
+    /**
+     * The previous selected visual tile, initially null.
+     */
+    private VisualTile previousSelectedVisualTile;
 
     /**
      * The view.
@@ -55,101 +63,124 @@ public class MouseListener implements EventHandler<MouseEvent> {
     public View view;
 
     /**
-     * The state.
-     */
-    public State state;
-
-    /**
-     * The game.
-     */
-    public Game game;
-
-    /**
      *
-     * @param log The log.
      * @param view The view.
-     * @param state The state.
      * @param game The game.
      */
-    public MouseListener(View view, State state, Game game) {
-        this.state = state;
+    public MouseListener(View view, Game game) {
         this.view = view;
         this.game = game;
-        previousSelected = null;
+        previousSelectedVisualTile = null;
         possibleMoves = new ArrayList<>();
     }
 
-    @Override
-    public void handle(MouseEvent event) {
-        VisualTile t = (VisualTile) event.getSource();
+    public void checkCaptureMove() {
 
-        // Remove the highlight of the previous tile if this tile is not null
-        if (previousSelected != null) {
-            previousSelected.removeHighlightTile();
-        }
+    }
 
-        if (t.getChessPiece() == null) {
-            // A tile was selected that contained no chess piece
-            if (possibleMoves.isEmpty()) {
-                /*
-                There were no possible moves, so the selected tile is not 
-                a possible move for the previous selected chess piece
-                 */
-                previousSelected = t;
-                t.highLightTile();
-            } else if (possibleMoves.contains(new PiecePosition(t.row, t.column))) {
+    public void checkNonCaptureMove() {
+
+        // A tile was selected that contained no chess piece
+        if (possibleMoves.isEmpty()) {
+            /*
+            There were no possible moves, so the selected tile is not
+            a possible move for the previous selected chess piece
+             */
+            previousSelectedVisualTile = currentlySelectedVisualTile;
+            currentlySelectedVisualTile.highLightTile();
+        } else {
+            Move move = getMove(new Position(currentlySelectedVisualTile.row, currentlySelectedVisualTile.column));
+            if (move != null) {
+                // Move found.
                 /*
                 The tile is a possible move of the previous selected chess piece.
                 Make the move, remove the previous possibleMoves on the screen
                 and empty the list of possible moves.
                  */
-                game.humanPlay(previousSelected.getChessPiece(), t.row, t.column);
+                game.humanPlay(move);
                 removeAvailableMoves(possibleMoves);
                 possibleMoves.clear();
             } else {
+
                 removeAvailableMoves(possibleMoves);
-                t.highLightTile();
+                currentlySelectedVisualTile.highLightTile();
                 possibleMoves.clear();
-                previousSelected = t;
+                previousSelectedVisualTile = currentlySelectedVisualTile;
+            }
+        }
+
+    }
+
+    /**
+     * See if a position is the newPos of a move.
+     *
+     * @param newPos
+     * @return
+     */
+    public Move getMove(Position newPos) {
+        for (Move move : possibleMoves) {
+            if (move.getNewPos().equals(newPos)) {
+                return move;
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public void handle(MouseEvent event) {
+        currentlySelectedVisualTile = (VisualTile) event.getSource();
+
+        removePreviousHighlight();
+
+        if (currentlySelectedVisualTile.getChessPiece() == null) {
+            // The move is not a capture move
+            checkNonCaptureMove();
+        } else // The move could be a capture move
+         if (possibleMoves.isEmpty()) {
+                // The move is not a capture move
+                showNewPossibleMoves();
+            } else {
+                // The move could still be a capture move
+                Move move = getMove(new Position(currentlySelectedVisualTile.row, currentlySelectedVisualTile.column));
+                if (move != null) {
+                    game.humanPlay(move);
+                    previousSelectedVisualTile = null;
+                    removeAvailableMoves(possibleMoves);
+                    possibleMoves.clear();
+
+                } else {
+                    // There were some possible moves, but the chess piece was not in those
+                    removeAvailableMoves(possibleMoves);
+                    previousSelectedVisualTile = currentlySelectedVisualTile;
+                    if (currentlySelectedVisualTile.getChessPiece().getColour() == game.getTurnColour() //&& !state.weHaveAWinner()
+                            ) {
+
+                        currentlySelectedVisualTile.highLightTile();
+                        possibleMoves = currentlySelectedVisualTile.getChessPiece().getPossibleMoves();
+                        showAvailableMoves(possibleMoves);
+                    }
+                }
             }
 
-        } else // Current tile contains a chess piece
-        {
-            if (possibleMoves.isEmpty()) {
-                /*
-                There where no possible moves so no chess piece can be captured.
-                Show the possible moves of the chesspiece in this tile.
-                Only do this when the player is human
-                 */
-                ChessColour playerColour = t.getChessPiece().getColour();
-                if (playerColour == state.getTurnColour()
-                        && !state.weHaveAWinner()
-                        && !(game.getPlayer(playerColour) instanceof AI)) {
-                    possibleMoves = t.getChessPiece().getPossibleMoves();
-                    previousSelected = t;
-                    t.highLightTile();
-                    showAvailableMoves(possibleMoves);
-                }
-            } else if (possibleMoves.contains(new PiecePosition(t.row, t.column))) {
-                /*
-                A piece is being captured.
-                Make the move, remove the possible moves on the screen and
-                empty the list of possible moves.
-                 */
-                game.humanPlay(previousSelected.getChessPiece(), t.row, t.column);
-                previousSelected = null;
-                removeAvailableMoves(possibleMoves);
-                possibleMoves.clear();
-            } else {
-                // There were some possible moves, but the chess piece was not in those
-                removeAvailableMoves(possibleMoves);
-                previousSelected = t;
-                if (t.getChessPiece().getColour() == state.getTurnColour() && !state.weHaveAWinner()) {
-                    t.highLightTile();
-                    possibleMoves = t.getChessPiece().getPossibleMoves();
-                    showAvailableMoves(possibleMoves);
-                }
-            }
+    }
+
+    /**
+     * Removes all the shown possible moves for the previously selected chess
+     * piece.
+     *
+     * @param possibleMoves The positions of the previously visual tiles
+     * currently shown as possible moves.
+     */
+    public void removeAvailableMoves(ArrayList<Move> possibleMoves) {
+        if (possibleMoves != null) {
+            view.removeTilesAsMoves(possibleMoves);
+        }
+    }
+
+    public void removePreviousHighlight() {
+        // Remove the highlight of the previous tile if this tile is not null
+        if (previousSelectedVisualTile != null) {
+            previousSelectedVisualTile.removeHighlightTile();
         }
     }
 
@@ -161,22 +192,27 @@ public class MouseListener implements EventHandler<MouseEvent> {
      * moves for the selected piece.
      *
      */
-    public void showAvailableMoves(ArrayList<PiecePosition> possibleMoves) {
+    public void showAvailableMoves(ArrayList<Move> possibleMoves) {
         if (possibleMoves != null) {
             view.showTilesAsMoves(possibleMoves);
         }
     }
 
-    /**
-     * Removes all the shown possible moves for the previously selected chess
-     * piece.
-     *
-     * @param possibleMoves The positions of the previously visual tiles
-     * currently shown as possible moves.
-     */
-    public void removeAvailableMoves(ArrayList<PiecePosition> possibleMoves) {
-        if (possibleMoves != null) {
-            view.removeTilesAsMoves(possibleMoves);
+    public void showNewPossibleMoves() {
+        /*
+        There where no possible moves so no chess piece can be captured.
+        Show the possible moves of the chesspiece in this tile.
+        Only do this when the player is human
+         */
+        ChessColour playerColour = currentlySelectedVisualTile.getChessPiece().getColour();
+        if (playerColour == game.getTurnColour()
+                //&& !state.weHaveAWinner()
+                && !(game.getPlayer(playerColour) instanceof AI)) {
+            possibleMoves = currentlySelectedVisualTile.getChessPiece().getPossibleMoves();
+            previousSelectedVisualTile = currentlySelectedVisualTile;
+            currentlySelectedVisualTile.highLightTile();
+            showAvailableMoves(possibleMoves);
         }
     }
+
 }

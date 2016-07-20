@@ -7,7 +7,7 @@ package com.tomirio.chessengine.game;
 
 import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessColour;
-import com.tomirio.chessengine.chessboard.ChessPiece;
+import com.tomirio.chessengine.moves.Move;
 
 /**
  *
@@ -16,14 +16,13 @@ import com.tomirio.chessengine.chessboard.ChessPiece;
 public abstract class Player {
 
     /**
-     * The colour of the player.
-     */
-    public ChessColour playerColour;
-
-    /**
      * The chess board.
      */
     public ChessBoard chessBoard;
+    /**
+     * The colour of the player.
+     */
+    public ChessColour playerColour;
 
     /**
      *
@@ -39,10 +38,8 @@ public abstract class Player {
      * Make a move as a human player
      *
      * @param piece The chess piece
-     * @param row The new row
-     * @param col The new column
      */
-    public abstract void makeMove(ChessPiece piece, int row, int col);
+    public abstract void makeMove(Move move);
 
     /**
      * Play as a non human player (agent)

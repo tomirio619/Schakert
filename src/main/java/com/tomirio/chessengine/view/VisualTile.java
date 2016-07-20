@@ -39,29 +39,27 @@ import javafx.scene.paint.Paint;
 public class VisualTile extends ToggleButton {
 
     /**
-     * The chess piece contained in the visual tile
+     * The HEIGHT of the visual tile.
      */
-    private ChessPiece chessPiece;
-
-    /**
-     * The row.
-     */
-    public final int row;
-
-    /**
-     * The column.
-     */
-    public final int column;
-
+    public static final int HEIGHT = 47;
     /**
      * The WIDTH of the visual tile.
      */
     public static final int WIDTH = 47;
 
     /**
-     * The HEIGHT of the visual tile.
+     * The chess piece contained in the visual tile
      */
-    public static final int HEIGHT = 47;
+    private ChessPiece chessPiece;
+
+    /**
+     * The column.
+     */
+    public final int column;
+    /**
+     * The row.
+     */
+    public final int row;
 
     /**
      * The colour of the visual tile.
@@ -124,38 +122,6 @@ public class VisualTile extends ToggleButton {
         chessPiece = piece;
     }
 
-    /**
-     * Set the colour of the tile.
-     */
-    private ChessColour setAndGetTileColour() {
-        if ((row + column) % 2 == 0) {
-            setBackground(new Background(new BackgroundFill(
-                    Paint.valueOf("BURLYWOOD"),
-                    CornerRadii.EMPTY,
-                    Insets.EMPTY)));
-            return ChessColour.White;
-        } else {
-            setBackground(new Background(new BackgroundFill(
-                    Paint.valueOf("SADDLEBROWN"),
-                    CornerRadii.EMPTY,
-                    Insets.EMPTY)));
-            return ChessColour.Black;
-        }
-    }
-
-    /**
-     * Sets the images and the pieces of the tiles for the first launch.
-     */
-    public void setInitialTileImageAndChessPiece() {
-        for (int row = 0; row < ChessBoard.ROWS; row++) {
-            for (int col = 0; col < ChessBoard.COLS; col++) {
-                if (chessPiece != null) {
-                    setGraphic(new ImageView(getChessIcon(chessPiece)));
-                }
-            }
-        }
-    }
-
     private Image getChessIcon(ChessPiece p) {
         switch (p.getColour()) {
             case Black:
@@ -194,27 +160,91 @@ public class VisualTile extends ToggleButton {
     }
 
     /**
-     * Updates the tile image according to the current value of the chessPiece.
-     *
-     * @param newSize The new size.
-     */
-    public void updateTileImage(double newSize) {
-        setGraphic(null);
-        if (chessPiece != null) {
-            setGraphic(new ImageView(getChessIcon(chessPiece)));
-            setMinSize(WIDTH, HEIGHT);
-            setPrefSize(newSize, newSize);
-        }
-        setPrefSize(newSize, newSize);
-        setMinSize(WIDTH, HEIGHT);
-    }
-
-    /**
      *
      * @return The chess piece.
      */
     public ChessPiece getChessPiece() {
         return chessPiece;
+    }
+
+    /**
+     * Shows that the tile is selected when it was clicked by the user. This is
+     * done by setting the background to dark green.
+     */
+    public void highLightTile() {
+        setStyle("-fx-background-color: #006600; -fx-border-color: #404040;");
+    }
+
+    /**
+     * Remove the indication that this tile is a possible move by setting the
+     * background to its original colour.
+     */
+    public void removeAsPossibleMove() {
+        switch (tileColour) {
+            case Black:
+                setBackground(new Background(new BackgroundFill(
+                        Paint.valueOf("SADDLEBROWN"),
+                        CornerRadii.EMPTY,
+                        Insets.EMPTY)));
+                setStyle("");
+                break;
+            case White:
+                setBackground(new Background(new BackgroundFill(
+                        Paint.valueOf("BURLYWOOD"),
+                        CornerRadii.EMPTY,
+                        Insets.EMPTY)));
+                setStyle("");
+                break;
+        }
+    }
+
+    /**
+     * Removes the highlight of the tile when the user selected another tile.
+     * This is simply done by setting the style to the empty string, thereby
+     * removing all the previous set styles.
+     */
+    public void removeHighlightTile() {
+        setStyle("");
+    }
+
+    /**
+     * Set the colour of the tile.
+     */
+    private ChessColour setAndGetTileColour() {
+        if ((row + column) % 2 == 0) {
+            setBackground(new Background(new BackgroundFill(
+                    Paint.valueOf("BURLYWOOD"),
+                    CornerRadii.EMPTY,
+                    Insets.EMPTY)));
+            return ChessColour.White;
+        } else {
+            setBackground(new Background(new BackgroundFill(
+                    Paint.valueOf("SADDLEBROWN"),
+                    CornerRadii.EMPTY,
+                    Insets.EMPTY)));
+            return ChessColour.Black;
+        }
+    }
+
+    /**
+     * Sets the images and the pieces of the tiles for the first launch.
+     */
+    public void setInitialTileImageAndChessPiece() {
+        for (int row = 0; row < ChessBoard.ROWS; row++) {
+            for (int col = 0; col < ChessBoard.COLS; col++) {
+                if (chessPiece != null) {
+                    setGraphic(new ImageView(getChessIcon(chessPiece)));
+                }
+            }
+        }
+    }
+
+    /**
+     * Show that this tile is a possible move by painting the background light
+     * green.
+     */
+    public void showAsPossibleMove() {
+        setStyle("-fx-background-color: #00FF00; -fx-border-color: #404040;");
     }
 
     @Override
@@ -242,50 +272,18 @@ public class VisualTile extends ToggleButton {
     }
 
     /**
-     * Shows that the tile is selected when it was clicked by the user. This is
-     * done by setting the background to dark green.
+     * Updates the tile image according to the current value of the chessPiece.
+     *
+     * @param newSize The new size.
      */
-    public void highLightTile() {
-        setStyle("-fx-background-color: #006600; -fx-border-color: #404040;");
-    }
-
-    /**
-     * Removes the highlight of the tile when the user selected another tile.
-     * This is simply done by setting the style to the empty string, thereby
-     * removing all the previous set styles.
-     */
-    public void removeHighlightTile() {
-        setStyle("");
-    }
-
-    /**
-     * Show that this tile is a possible move by painting the background light
-     * green.
-     */
-    public void showAsPossibleMove() {
-        setStyle("-fx-background-color: #00FF00; -fx-border-color: #404040;");
-    }
-
-    /**
-     * Remove the indication that this tile is a possible move by setting the
-     * background to its original colour.
-     */
-    public void removeAsPossibleMove() {
-        switch (tileColour) {
-            case Black:
-                setBackground(new Background(new BackgroundFill(
-                        Paint.valueOf("SADDLEBROWN"),
-                        CornerRadii.EMPTY,
-                        Insets.EMPTY)));
-                setStyle("");
-                break;
-            case White:
-                setBackground(new Background(new BackgroundFill(
-                        Paint.valueOf("BURLYWOOD"),
-                        CornerRadii.EMPTY,
-                        Insets.EMPTY)));
-                setStyle("");
-                break;
+    public void updateTileImage(double newSize) {
+        setGraphic(null);
+        if (chessPiece != null) {
+            setGraphic(new ImageView(getChessIcon(chessPiece)));
+            setMinSize(WIDTH, HEIGHT);
+            setPrefSize(newSize, newSize);
         }
+        setPrefSize(newSize, newSize);
+        setMinSize(WIDTH, HEIGHT);
     }
 }

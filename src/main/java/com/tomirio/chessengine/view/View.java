@@ -19,21 +19,24 @@ package com.tomirio.chessengine.view;
 import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessPiece;
 import com.tomirio.chessengine.chessboard.Log;
-import com.tomirio.chessengine.chessboard.PiecePosition;
+import com.tomirio.chessengine.chessboard.Position;
 import com.tomirio.chessengine.chessboard.State;
 import com.tomirio.chessengine.controller.MouseListener;
 import com.tomirio.chessengine.game.Game;
+import com.tomirio.chessengine.moves.Move;
 import java.util.ArrayList;
 import java.util.LinkedList;
-import java.util.Observable;
-import java.util.Observer;
 import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.image.Image;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
@@ -42,37 +45,7 @@ import javafx.stage.Stage;
  *
  * @author Tom Sandmann
  */
-public final class View implements Observer {
-
-    /**
-     * the mainWindow.
-     */
-    public Stage mainWindow;
-
-    /**
-     * The visualBoard contains all the visual tiles.
-     */
-    public VisualTile[][] visualBoard;
-
-    /**
-     * The log.
-     */
-    public Log log;
-
-    /**
-     * The mouse listener, will be set on mouse clicked to every visual tile.
-     */
-    public MouseListener mouseListener;
-
-    /**
-     * The chessboard.
-     */
-    public ChessBoard chessBoard;
-
-    /**
-     * The stackpane.
-     */
-    public StackPane root;
+public final class View {
 
     /**
      * The borderpane.
@@ -80,14 +53,18 @@ public final class View implements Observer {
     public BorderPane borderPane;
 
     /**
+     * The chessboard.
+     */
+    public ChessBoard chessBoard;
+
+    /**
      * The gridpane.
      */
     public GridPane chessboardGrid;
-
     /**
-     * The state.
+     * The game
      */
-    public State state;
+    public Game game;
 
     /**
      * The imageloader
@@ -98,11 +75,30 @@ public final class View implements Observer {
      * The labels
      */
     public LinkedList<Label> labels;
-
     /**
-     * The game
+     * The log.
      */
-    public Game game;
+    public Log log;
+    /**
+     * the mainWindow.
+     */
+    public Stage mainWindow;
+    /**
+     * The mouse listener, will be set on mouse clicked to every visual tile.
+     */
+    public MouseListener mouseListener;
+    /**
+     * The stackpane.
+     */
+    public StackPane root;
+    /**
+     * The state.
+     */
+    public State state;
+    /**
+     * The visualBoard contains all the visual tiles.
+     */
+    public VisualTile[][] visualBoard;
 
     /**
      *
@@ -115,13 +111,25 @@ public final class View implements Observer {
         createMainWindow(primaryStage);
     }
 
+    /**
+     * Adds listeners to the width and height property of the gridpane.
+     */
+    private void addResizeHandlers() {
+        chessboardGrid.widthProperty().addListener((ObservableValue<? extends Number> observableValue, Number oldSceneWidth, Number newSceneWidth) -> {
+            handleResize(chessboardGrid.getWidth(), chessboardGrid.getHeight());
+        });
+        chessboardGrid.heightProperty().addListener((ObservableValue<? extends Number> observableValue, Number oldSceneHeight, Number newSceneHeight) -> {
+            handleResize(chessboardGrid.getWidth(), chessboardGrid.getHeight());
+        });
+
+    }
+
     private void createMainWindow(Stage primaryStage) {
         mainWindow = primaryStage;
         visualBoard = new VisualTile[8][8];
-        chessBoard = new ChessBoard(state);
-        game = new Game(state, chessBoard);
-        mouseListener = new MouseListener(this, state, game);
-        chessBoard.addObserver(this);
+        chessBoard = new ChessBoard();
+        game = new Game(state, chessBoard, this);
+        mouseListener = new MouseListener(this, game);
 
         // Root will contain every visual aspect
         root = new StackPane();
@@ -135,7 +143,23 @@ public final class View implements Observer {
         setLabels();
 
         // Create graphical structure
-        borderPane.setCenter(chessboardGrid);
+        BorderPane visualChessBoard = new BorderPane();
+        chessboardGrid.setAlignment(Pos.CENTER);
+        visualChessBoard.setCenter(chessboardGrid);
+
+        Image doMoveImage = new Image("png/buttons/do.png");
+        Image undoMoveImage = new Image("png/buttons/undo.png");
+
+        Button b2 = new Button();
+        b2.setGraphic(new ImageView(doMoveImage));
+        Button b1 = new Button();
+        b1.setGraphic(new ImageView(undoMoveImage));
+        HBox buttonBar = new HBox();
+        buttonBar.getChildren().addAll(b1, b2);
+        buttonBar.setAlignment(Pos.TOP_CENTER);
+        visualChessBoard.setBottom(buttonBar);
+
+        borderPane.setCenter(visualChessBoard);
         borderPane.setRight(log);
         root.getChildren().add(borderPane);
         Scene mainWindowScene = new Scene(root);
@@ -152,38 +176,44 @@ public final class View implements Observer {
     }
 
     /**
-     *
-     * @param o The class that was observed.
-     * @param arg The argument that this class passed when it called.
+     * Create the visual tiles. Also add the mouse listener to the visual tile.
      */
-    @Override
-    public void update(Observable o, Object arg) {
-        if (!(arg instanceof ChessBoard)) {
-            throw new IllegalArgumentException();
-        } else {
-            ChessBoard b = (ChessBoard) arg;
-            chessBoard = b;
-            state = chessBoard.getState();
-            if (state.weHaveAWinner()) {
-                System.out.println("The winner is " + state.getWinner());
-            } else if (state.isDraw()) {
-                System.out.println("It is a draw!");
+    private void createVisualTiles() {
+        for (int row = 0; row < ChessBoard.ROWS; row++) {
+            for (int column = 0; column < ChessBoard.COLS; column++) {
+                VisualTile t;
+                if (chessBoard.isOccupiedPosition(row, column)) {
+                    ChessPiece p = chessBoard.getPiece(row, column);
+                    t = new VisualTile(row, column, p);
+                } else {
+                    t = new VisualTile(row, column);
+                }
+                t.setInitialTileImageAndChessPiece();
+                t.setOnMouseClicked(mouseListener);
+                visualBoard[row][column] = t;
+                chessboardGrid.add(t, column + 1, row + 1);
             }
-            drawBoard();
         }
     }
 
     /**
-     * Adds listeners to the width and height property of the gridpane.
+     * Draws the current board on the screen.
      */
-    private void addResizeHandlers() {
-        chessboardGrid.widthProperty().addListener((ObservableValue<? extends Number> observableValue, Number oldSceneWidth, Number newSceneWidth) -> {
-            handleResize(chessboardGrid.getWidth(), chessboardGrid.getHeight());
-        });
-        chessboardGrid.heightProperty().addListener((ObservableValue<? extends Number> observableValue, Number oldSceneHeight, Number newSceneHeight) -> {
-            handleResize(chessboardGrid.getWidth(), chessboardGrid.getHeight());
-        });
-
+    public void drawBoard() {
+        removeChessboard();
+        double currentSize = visualBoard[0][0].getPrefWidth();
+        visualBoard = new VisualTile[ChessBoard.ROWS][ChessBoard.COLS];
+        for (int row = 0; row < ChessBoard.ROWS; row++) {
+            for (int column = 0; column < ChessBoard.COLS; column++) {
+                VisualTile t = new VisualTile(row, column,
+                        chessBoard.getPiece(row, column), currentSize, currentSize);
+                t.updateTileImage(currentSize);
+                t.setOnMouseClicked(mouseListener);
+                visualBoard[row][column] = t;
+                chessboardGrid.add(t, column + 1, row + 1);
+            }
+        }
+        updateLabelSize(currentSize);
     }
 
     /**
@@ -212,26 +242,6 @@ public final class View implements Observer {
     }
 
     /**
-     * Draws the current board on the screen.
-     */
-    public void drawBoard() {
-        removeChessboard();
-        double currentSize = visualBoard[0][0].getPrefWidth();
-        visualBoard = new VisualTile[ChessBoard.ROWS][ChessBoard.COLS];
-        for (int row = 0; row < ChessBoard.ROWS; row++) {
-            for (int column = 0; column < ChessBoard.COLS; column++) {
-                VisualTile t = new VisualTile(row, column,
-                        chessBoard.getPiece(row, column), currentSize, currentSize);
-                t.updateTileImage(currentSize);
-                t.setOnMouseClicked(mouseListener);
-                visualBoard[row][column] = t;
-                chessboardGrid.add(t, column + 1, row + 1);
-            }
-        }
-        updateLabelSize(currentSize);
-    }
-
-    /**
      * Removes the chessboard structure from the gridpane. This must be done
      * when a new chessboard structure will be added to the gridpane.
      */
@@ -244,24 +254,14 @@ public final class View implements Observer {
     }
 
     /**
-     * Create the visual tiles. Also add the mouse listener to the visual tile.
+     *
+     * @param possibleMoves The possible moves for this chess piece.
      */
-    private void createVisualTiles() {
-        for (int row = 0; row < ChessBoard.ROWS; row++) {
-            for (int column = 0; column < ChessBoard.COLS; column++) {
-                VisualTile t;
-                if (chessBoard.isOccupiedPosition(row, column)) {
-                    ChessPiece p = chessBoard.getPiece(row, column);
-                    t = new VisualTile(row, column, p);
-                } else {
-                    t = new VisualTile(row, column);
-                }
-                t.setInitialTileImageAndChessPiece();
-                t.setOnMouseClicked(mouseListener);
-                visualBoard[row][column] = t;
-                chessboardGrid.add(t, column + 1, row + 1);
-            }
-        }
+    public void removeTilesAsMoves(ArrayList<Move> possibleMoves) {
+        possibleMoves.stream().forEach((move) -> {
+            Position newPos = move.getNewPos();
+            visualBoard[newPos.getRow()][newPos.getColumn()].removeAsPossibleMove();
+        });
     }
 
     /**
@@ -310,6 +310,36 @@ public final class View implements Observer {
     }
 
     /**
+     *
+     * @param possibleMoves The possible moves for this chess piece.
+     */
+    public void showTilesAsMoves(ArrayList<Move> possibleMoves) {
+        possibleMoves.stream().forEach((move) -> {
+            Position newPos = move.getNewPos();
+            visualBoard[newPos.getRow()][newPos.getColumn()].showAsPossibleMove();
+        });
+    }
+
+    /**
+     * Update the view.
+     *
+     * @param chessBoard The chess board.
+     */
+    public void update(ChessBoard chessBoard) {
+
+//        else{
+//            ChessBoard b = (ChessBoard) arg;
+//            chessBoard = b;
+//            state = chessBoard.getState();
+//            if (state.weHaveAWinner()) {
+//                System.out.println("The winner is " + state.getWinner());
+//            } else if (state.isDraw()) {
+//                System.out.println("It is a draw!");
+//            }
+        drawBoard();
+    }
+
+    /**
      * Updates all the labels to the new size.
      *
      * @param newSize The new size of the labels.
@@ -317,26 +347,6 @@ public final class View implements Observer {
     private void updateLabelSize(double newSize) {
         labels.stream().forEach((l) -> {
             l.setPrefSize(newSize, newSize);
-        });
-    }
-
-    /**
-     *
-     * @param possibleMoves The possible moves for this chess piece.
-     */
-    public void showTilesAsMoves(ArrayList<PiecePosition> possibleMoves) {
-        possibleMoves.stream().forEach((p) -> {
-            visualBoard[p.getRow()][p.getColumn()].showAsPossibleMove();
-        });
-    }
-
-    /**
-     *
-     * @param possibleMoves The possible moves for this chess piece.
-     */
-    public void removeTilesAsMoves(ArrayList<PiecePosition> possibleMoves) {
-        possibleMoves.stream().forEach((p) -> {
-            visualBoard[p.getRow()][p.getColumn()].removeAsPossibleMove();
         });
     }
 }

@@ -25,12 +25,20 @@ import javafx.scene.control.TextArea;
  */
 public class Log extends ScrollPane {
 
+    private static int counter;
+
     /**
      * The list of the log, contains all of the text
      */
     private static TextArea list;
 
-    private static int counter;
+    /**
+     *
+     * @param str The string that must be written to the log
+     */
+    public static void write(String str) {
+        list.insertText(list.getLength(), (counter++ + "\t" + str + "\n"));
+    }
 
     /**
      * Constructor of log
@@ -48,14 +56,6 @@ public class Log extends ScrollPane {
         this.setFitToHeight(true);
         this.setPrefWidth(250);
         list.insertText(list.getLength(), ("# " + "Game Information #" + "\n"));
-    }
-
-    /**
-     *
-     * @param str The string that must be written to the log
-     */
-    public static void write(String str) {
-        list.insertText(list.getLength(), (counter++ + "\t" + str + "\n"));
     }
 
 }

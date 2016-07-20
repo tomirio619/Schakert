@@ -26,7 +26,8 @@ public enum PieceType {
 
     /**
      * King
-     *//**
+     */
+    /**
      * King
      */
     King,
@@ -75,6 +76,10 @@ public enum PieceType {
         }
     }
 
+    /**
+     *
+     * @return Short string representing the chess piece.
+     */
     public String toShortString() {
         switch (this) {
             case King:

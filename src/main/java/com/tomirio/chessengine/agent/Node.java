@@ -18,7 +18,7 @@ package com.tomirio.chessengine.agent;
 
 import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessPiece;
-import com.tomirio.chessengine.chessboard.PiecePosition;
+import com.tomirio.chessengine.chessboard.Position;
 
 /**
  *
@@ -30,22 +30,20 @@ public class Node {
      * The data
      */
     public final ChessBoard chessBoard;
-
     /**
-     * The parent.
+     * The piece that was moved.
      */
-    public final Node parent;
+    public final ChessPiece chessPiece;
 
     /**
      * The move that took place in the parent node which resulted in the current
      * chess board.
      */
-    public final PiecePosition move;
-
+    public final Position move;
     /**
-     * The piece that was moved.
+     * The parent.
      */
-    public final ChessPiece chessPiece;
+    public final Node parent;
 
     /**
      *
@@ -64,35 +62,13 @@ public class Node {
      * @param data The data that this node contains.
      * @param parent The parent of this node.
      * @param move The move.
+     * @param chessPiece The chess piece
      */
-    public Node(ChessBoard data, Node parent, PiecePosition move, ChessPiece chessPiece) {
+    public Node(ChessBoard data, Node parent, Position move, ChessPiece chessPiece) {
         this.chessBoard = data;
         this.parent = parent;
         this.move = move;
         this.chessPiece = chessPiece;
-    }
-
-    /**
-     *
-     * @return String representation of this node.
-     */
-    @Override
-    public String toString() {
-        return chessBoard.toString();
-    }
-
-    /**
-     * Prints the trace from the root node to this node.
-     *
-     * @return String of the trace from the rood to this node.
-     */
-    public String toTrace() {
-        if (parent == null) {
-            return toString() + "\n In dit schaakbord is " + chessBoard.getState().getTurnColour() + " aan zet.\n"
-                    + "Het chesspiece was " + chessPiece + "\n De move was " + move;
-        } else {
-            return parent.toTrace() + toString();
-        }
     }
 
     /**
@@ -101,7 +77,7 @@ public class Node {
      * @return The move that took place in the root of the tree, which
      * eventually led to the chess board of this node.
      */
-    public PiecePosition getRootMove() {
+    public Position getRootMove() {
         toTrace();
         if (parent.parent == null) {
             System.out.println("De move was " + move);
@@ -123,6 +99,28 @@ public class Node {
             return chessPiece;
         } else {
             return parent.getRootPiece();
+        }
+    }
+
+    /**
+     *
+     * @return String representation of this node.
+     */
+    @Override
+    public String toString() {
+        return chessBoard.toString();
+    }
+
+    /**
+     * Prints the trace from the root node to this node.
+     *
+     * @return String of the trace from the rood to this node.
+     */
+    public String toTrace() {
+        if (parent == null) {
+            return toString();
+        } else {
+            return parent.toTrace() + toString();
         }
     }
 }

@@ -1,13 +1,24 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2016 Tom Sandmann
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.tomirio.chessengine.game;
 
 import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessColour;
-import com.tomirio.chessengine.chessboard.ChessPiece;
+import com.tomirio.chessengine.moves.Move;
 
 /**
  *
@@ -25,13 +36,8 @@ public class HumanPlayer extends Player {
     }
 
     @Override
-    public void play() {
-        throw new UnsupportedOperationException("Human players do not implement this method!");
-    }
-
-    @Override
-    public void makeMove(ChessPiece piece, int row, int col) {
-        piece.move(row, col);
+    public void makeMove(Move move) {
+        move.doMove();
         /*
         P = 100
         N = 320
@@ -40,6 +46,11 @@ public class HumanPlayer extends Player {
         Q = 900
         K = 20000
          */
+    }
+
+    @Override
+    public void play() {
+        throw new UnsupportedOperationException("Human players do not implement this method!");
     }
 
 }

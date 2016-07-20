@@ -19,9 +19,13 @@ package com.tomirio.chessengine.chesspieces;
 import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
-import com.tomirio.chessengine.chessboard.PieceType;
 import com.tomirio.chessengine.chessboard.MoveDetails;
-import com.tomirio.chessengine.chessboard.PiecePosition;
+import com.tomirio.chessengine.chessboard.PieceType;
+import com.tomirio.chessengine.chessboard.Position;
+import com.tomirio.chessengine.moves.CaptureMove;
+import com.tomirio.chessengine.moves.CastlingMove;
+import com.tomirio.chessengine.moves.Move;
+import com.tomirio.chessengine.moves.NormalMove;
 import java.util.ArrayList;
 
 /**
@@ -30,9 +34,8 @@ import java.util.ArrayList;
  */
 public class King extends ChessPiece {
 
-    private boolean isCheck;
-
     private boolean castlingPossible;
+    private boolean isCheck;
 
     /**
      * This constructor MUST be used when the chessboard is not known when a new
@@ -42,48 +45,112 @@ public class King extends ChessPiece {
      * @param colour The colour of the chess piece.
      * @param pos The position of the chess piece.
      */
-    public King(ChessColour colour, PiecePosition pos) {
+    public King(ChessColour colour, Position pos) {
         super(PieceType.King, colour, pos);
         isCheck = false;
         castlingPossible = true;
     }
 
-    @Override
-    public ArrayList<PiecePosition> getPossibleMoves() {
-        ArrayList<PiecePosition> possibleMoves = getKingPositions().moves;
-        possibleMoves.addAll(getCastlingMoves());
-        return filterMoves(possibleMoves);
+    /**
+     *
+     * @return <code>True</code> if castling is possible, <code>False</code>
+     * otherwise.
+     */
+    public boolean castlingPossible() {
+        return castlingPossible;
     }
 
     @Override
-    public void move(int row, int column) {
-        castlingPossible = false;
-        super.move(row, column);
+    public boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    private CastlingMove getCastlingMove(Rook rook) {
+        if (getColumn() > rook.getColumn()) {
+            // Left castle involved
+            Position newKingPos = new Position(getRow(), getColumn() - 2);
+            Position newRookPos = new Position(getRow(), getColumn() - 1);
+            if (isSafePosition(newKingPos) && isSafePosition(newRookPos)) {
+                // King does not move over pieces on which it would stand check
+                return new CastlingMove(this, newKingPos, rook, newRookPos);
+            }
+        } else if (getColumn() < rook.getColumn()) {
+            // Right castle involved
+            Position newKingPos = new Position(getRow(), getColumn() + 2);
+            Position newRookPos = new Position(getRow(), getColumn() + 1);
+            if (isSafePosition(newKingPos) && isSafePosition(newRookPos)) {
+                // King does not move over pieces on which it would stand check
+                return new CastlingMove(this, newKingPos, rook, newRookPos);
+            }
+        }
+        return null;
+    }
+
+    /**
+     * @return The possible castling moves for this king.
+     */
+    private ArrayList<Move> getCastlingMoves() {
+        ArrayList<Move> castlingMoves = new ArrayList<>();
+
+        if (!castlingPossible) {
+            // Castling not possible, return empty list
+            return castlingMoves;
+        }
+
+        ArrayList<Rook> rooks = chessBoard.getRooks(getColour());
+        if (rooks.isEmpty() || isCheck) {
+            return castlingMoves;
+        } else {
+            for (Rook rook : rooks) {
+                if (rook.castlingPossible() && rook.getRow() == getRow()) {
+                    if (chessBoard.isEmptySubRow(getPos(), rook.getPos())) {
+                        CastlingMove castlingMove = getCastlingMove(rook);
+                        if (castlingMove != null) {
+                            castlingMoves.add(castlingMove);
+                        }
+                    }
+
+                }
+            }
+            return castlingMoves;
+        }
+    }
+
+    /**
+     *
+     * @param newValue Set the variable castling possible
+     */
+    public void setCastlingPossible(boolean newValue) {
+        castlingPossible = newValue;
     }
 
     @Override
-    public void agentMove(int row, int column) {
-        castlingPossible = false;
-        super.agentMove(row, column);
+    public ArrayList<Position> getCoveredPositions() {
+        return getKingMoves().coveredFriendlyPieces;
     }
 
     /**
      *
      * @return All the possible moves for the king.
      */
-    private MoveDetails getKingPositions() {
+    private MoveDetails getKingMoves() {
         MoveDetails moveDetails = new MoveDetails();
         for (int row = getRow() - 1; row <= getRow() + 1; row++) {
             for (int column = getColumn() - 1; column <= getColumn() + 1; column++) {
-                PiecePosition newPos = new PiecePosition(row, column);
+                Position newPos = new Position(row, column);
                 if (chessBoard.isValidCoordinate(row, column) && newPos.isValid()) {
                     if (!(newPos.equals(getPos()))) {
+                        // Calculated position is not equal to current position
                         if (!chessBoard.isOccupiedPosition(newPos) && isSafePosition(newPos)) {
-                            moveDetails.moves.add(newPos);
+                            // Normal move
+                            NormalMove normalMove = new NormalMove(this, newPos);
+                            moveDetails.moves.add(normalMove);
                         } else if (chessBoard.isOccupiedPosition(newPos)
                                 && chessBoard.getColour(newPos) != getColour()
                                 && isSafePosition(newPos)) {
-                            moveDetails.moves.add(newPos);
+                            // Capture move
+                            CaptureMove captureMove = new CaptureMove(this, newPos);
+                            moveDetails.moves.add(captureMove);
                         } else if (chessBoard.isOccupiedPosition(newPos)
                                 && chessBoard.getColour(newPos) == getColour()) {
                             moveDetails.coveredFriendlyPieces.add(newPos);
@@ -95,91 +162,52 @@ public class King extends ChessPiece {
         return moveDetails;
     }
 
+    @Override
+    public ArrayList<Move> getPossibleMoves() {
+        ArrayList<Move> possibleMoves = getKingMoves().moves;
+        ArrayList<Move> castlingMoves = getCastlingMoves();
+        possibleMoves.addAll(castlingMoves);
+        return filterMoves(possibleMoves);
+    }
+
+    @Override
+    public ArrayList<Move> getRawPossibleMoves() {
+        ArrayList<Move> possibleMoves = getKingMoves().moves;
+        possibleMoves.addAll(getCastlingMoves());
+        return possibleMoves;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 23 * hash + (this.isCheck ? 1 : 0);
+        return hash;
+    }
+
     /**
-     * @return The possible castling moves for this king.
+     * @return the value isCheck.
      */
-    private ArrayList<PiecePosition> getCastlingMoves() {
-        ArrayList<PiecePosition> castlingMoves = new ArrayList<>();
+    public boolean isCheck() {
+        return isCheck;
+    }
 
-        if (!castlingPossible) {
-            // Castling not possible, return empty list
-            return castlingMoves;
-        }
-
-        switch (getColour()) {
-            case Black:
-                ArrayList<Rook> blackRooks = chessBoard.getRooks(getColour());
-                if (blackRooks.isEmpty() || isCheck) {
-                    return castlingMoves;
-                } else {
-                    while (!blackRooks.isEmpty()) {
-                        Rook rook = blackRooks.remove(blackRooks.size() - 1);
-                        if (rook.castlingPossible() && rook.getRow() == getRow()) {
-                            if (chessBoard.isEmptySubRow(getPos(), rook.getPos())) {
-                                if (getColumn() > rook.getColumn()) {
-                                    // King is on the right side of the rook
-                                    PiecePosition p = new PiecePosition(getRow(), getColumn() - 2);
-                                    if (isSafePosition(p)
-                                            && isSafePosition(new PiecePosition(getRow(), getColumn() - 1))) {
-                                        castlingMoves.add(p);
-                                    }
-                                } else {
-                                    // King is on the left side of the rook
-                                    PiecePosition p = new PiecePosition(getRow(), getColumn() + 2);
-                                    if (isSafePosition(p)
-                                            && isSafePosition(new PiecePosition(getRow(), getColumn() + 1))) {
-                                        castlingMoves.add(p);
-                                    }
-                                }
-                            }
-
-                        }
-                    }
-                    return castlingMoves;
-                }
-            case White:
-                ArrayList<Rook> whiteRooks = chessBoard.getRooks(getColour());
-                if (whiteRooks.isEmpty() || isCheck) {
-                    return castlingMoves;
-                } else {
-                    while (!whiteRooks.isEmpty()) {
-                        Rook rook = whiteRooks.remove(whiteRooks.size() - 1);
-                        if (rook.castlingPossible() && rook.getRow() == getRow()) {
-                            if (chessBoard.isEmptySubRow(getPos(), rook.getPos())) {
-                                if (getColumn() > rook.getColumn()) {
-                                    // King is on the right side of the rook
-                                    PiecePosition p = new PiecePosition(getRow(), getColumn() - 2);
-                                    if (isSafePosition(p)
-                                            && isSafePosition(new PiecePosition(getRow(), getColumn() - 1))) {
-                                        castlingMoves.add(p);
-                                    }
-                                } else {
-                                    // King is on the left side of the rook
-                                    PiecePosition p = new PiecePosition(getRow(), getColumn() + 2);
-                                    if (isSafePosition(p)
-                                            && isSafePosition(new PiecePosition(getRow(), getColumn() + 1))) {
-                                        castlingMoves.add(p);
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    return castlingMoves;
-                }
-
-            default:
-                return null;
-        }
+    /**
+     * Setter for the isCheck value.
+     *
+     * @param value the new value for isCheck.
+     */
+    public void setCheck(boolean value) {
+        isCheck = value;
     }
 
     /**
      *
      * @param pos The position.
      * @return <code>True</code> if the position is a safe position. This means
-     * that the king cannot be captured on this position and that it is not
-     * chess after moving to this position. <code>False</code> otherwise.
+     * that the king cannot be captured on this position and that the king is
+     * not check after moving to this position. <code>False</code> otherwise.
      */
-    public boolean isSafePosition(PiecePosition pos) {
+    public boolean isSafePosition(Position pos) {
         for (int row = 0; row < ChessBoard.ROWS; row++) {
             for (int column = 0; column < ChessBoard.COLS; column++) {
                 if (chessBoard.isOccupiedPosition(row, column)
@@ -194,16 +222,8 @@ public class King extends ChessPiece {
         return true;
     }
 
-    /**
-     * Determines if the king can capture this position. It can only do so if
-     * this position is free and within the range of the kings current position.
-     *
-     * @param p The position on the board.
-     * @return <code>True</code> if the position can be captured by this piece,
-     * <code>False</code> otherwise.
-     */
     @Override
-    public boolean posCanBeCaptured(PiecePosition p) {
+    public boolean posCanBeCaptured(Position p) {
         int distRow = Math.abs(p.getRow() - getRow());
         int distCol = Math.abs(p.getColumn() - getColumn());
         if (!p.isValid()) {
@@ -212,8 +232,8 @@ public class King extends ChessPiece {
         }
         if (distRow > 1 || distCol > 1 || p.equals(getPos())) {
             /*
-             The position is not within reach or is the same as the current
-             position of the king.
+            The position is not within reach or is the same as the current
+            position of the king.
              */
             return false;
         } else if (!chessBoard.isOccupiedPosition(p)) {
@@ -221,18 +241,18 @@ public class King extends ChessPiece {
             return true;
         } else {
             /*
-             We can only capture a position if the piece on it has a different
-             colour than this piece has.
+            We can only capture a position if the piece on it has a different
+            colour than this piece has.
              */
             return chessBoard.getColour(p) != getColour();
         }
     }
 
     @Override
-    public boolean posIsCovered(PiecePosition p) {
+    public boolean posIsCovered(Position p) {
         for (int row = getRow() - 1; row <= getRow() + 1; row++) {
             for (int column = getColumn() - 1; column <= getColumn() + 1; column++) {
-                PiecePosition newPos = new PiecePosition(row, column);
+                Position newPos = new Position(row, column);
                 if (newPos.isValid() && !(newPos.equals(getPos())) && newPos.equals(p)) {
                     return true;
                 }
@@ -241,45 +261,9 @@ public class King extends ChessPiece {
         return false;
     }
 
-    /**
-     * @return the value isCheck.
-     */
-    public boolean isCheck() {
-        return isCheck;
-    }
-
-    /**
-     *
-     * @return <code>True</code> if castling is possible, <code>False</code>
-     * otherwise.
-     */
-    public boolean castlingPossible() {
-        return castlingPossible;
-    }
-
-    /**
-     * Setter for the isCheck value.
-     *
-     * @param value the new value for isCheck.
-     */
-    public void setCheck(boolean value) {
-        isCheck = value;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        return super.equals(o);
-    }
-
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 23 * hash + (this.isCheck ? 1 : 0);
-        return hash;
-    }
-
     @Override
     public String toString() {
         return super.toString();
     }
+
 }

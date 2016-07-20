@@ -18,10 +18,11 @@ package com.tomirio.chessengine.chesspieces;
 
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
-import com.tomirio.chessengine.chessboard.PieceType;
 import com.tomirio.chessengine.chessboard.Direction;
 import com.tomirio.chessengine.chessboard.MoveDetails;
-import com.tomirio.chessengine.chessboard.PiecePosition;
+import com.tomirio.chessengine.chessboard.PieceType;
+import com.tomirio.chessengine.chessboard.Position;
+import com.tomirio.chessengine.moves.Move;
 import java.util.ArrayList;
 
 /**
@@ -33,51 +34,15 @@ public class Rook extends ChessPiece {
     private boolean castlingPossible;
 
     /**
-     * Constructor for new rook, use when the board is known at this moment.
-     * The board MUST be manually set using the setBoard method.
-
-* @param colour The colour of this chess piece
+     * Constructor for new rook, use when the board is known at this moment. The
+     * board MUST be manually set using the setBoard method.
+     *
+     * @param colour The colour of this chess piece
      * @param pos The position of this chess piece
      */
-    public Rook(ChessColour colour, PiecePosition pos) {
+    public Rook(ChessColour colour, Position pos) {
         super(PieceType.Rook, colour, pos);
         castlingPossible = true;
-    }
-
-    @Override
-    public ArrayList<PiecePosition> getPossibleMoves() {
-        return filterMoves(getRookPositions());
-    }
-
-    private ArrayList<PiecePosition> getRookPositions() {
-        ArrayList<PiecePosition> moves = new ArrayList<>();
-        moves.addAll(getPositionsInDirection(Direction.N).moves);
-        moves.addAll(getPositionsInDirection(Direction.E).moves);
-        moves.addAll(getPositionsInDirection(Direction.S).moves);
-        moves.addAll(getPositionsInDirection(Direction.W).moves);
-        return moves;
-    }
-
-    @Override
-    public boolean posIsCovered(PiecePosition p) {
-        MoveDetails moveDetails = new MoveDetails();
-        moveDetails.coveredFriendlyPieces.addAll(getPositionsInDirection(Direction.N).coveredFriendlyPieces);
-        moveDetails.coveredFriendlyPieces.addAll(getPositionsInDirection(Direction.E).coveredFriendlyPieces);
-        moveDetails.coveredFriendlyPieces.addAll(getPositionsInDirection(Direction.S).coveredFriendlyPieces);
-        moveDetails.coveredFriendlyPieces.addAll(getPositionsInDirection(Direction.W).coveredFriendlyPieces);
-        return moveDetails.coveredFriendlyPieces.contains(p);
-    }
-
-    @Override
-    public void move(int row, int column) {
-        castlingPossible = false;
-        super.move(row, column);
-    }
-
-    @Override
-    public void agentMove(int row, int column) {
-        castlingPossible = false;
-        super.agentMove(row, column);
     }
 
     /**
@@ -100,6 +65,39 @@ public class Rook extends ChessPiece {
     }
 
     /**
+     * Set new value for castling possible variable.
+     *
+     * @param newValue
+     */
+    public void setCastlingPossible(boolean newValue) {
+        castlingPossible = newValue;
+    }
+
+    @Override
+    public ArrayList<Position> getCoveredPositions() {
+        return getRookMoves().coveredFriendlyPieces;
+    }
+
+    @Override
+    public ArrayList<Move> getPossibleMoves() {
+        return filterMoves(getRookMoves().moves);
+    }
+
+    @Override
+    public ArrayList<Move> getRawPossibleMoves() {
+        return getRookMoves().moves;
+    }
+
+    private MoveDetails getRookMoves() {
+        MoveDetails moveDetails = new MoveDetails();
+        moveDetails.add(getPositionsInDirection(Direction.N));
+        moveDetails.add(getPositionsInDirection(Direction.E));
+        moveDetails.add(getPositionsInDirection(Direction.S));
+        moveDetails.add(getPositionsInDirection(Direction.W));
+        return moveDetails;
+    }
+
+    /**
      *
      * @return The hashcode.
      */
@@ -111,7 +109,7 @@ public class Rook extends ChessPiece {
     }
 
     @Override
-    public boolean posCanBeCaptured(PiecePosition pos) {
-        return getRookPositions().contains(pos);
+    public boolean posIsCovered(Position p) {
+        return getRookMoves().coveredFriendlyPieces.contains(p);
     }
 }

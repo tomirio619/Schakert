@@ -1,15 +1,28 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2016 Tom Sandmann
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.tomirio.chessengine.game;
 
 import com.tomirio.chessengine.agent.AI;
 import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessColour;
-import com.tomirio.chessengine.chessboard.ChessPiece;
 import com.tomirio.chessengine.chessboard.State;
+import com.tomirio.chessengine.moves.Move;
+import com.tomirio.chessengine.view.View;
+import java.util.ArrayList;
 import java.util.NoSuchElementException;
 
 /**
@@ -19,81 +32,53 @@ import java.util.NoSuchElementException;
 public class Game {
 
     /**
-     * White player
-     */
-    public Player whitePlayer;
-
-    /**
      * Black player
      */
     public Player blackPlayer;
+    private final ChessBoard chessBoard;
 
     /**
-     * The state
+     * The colour having turn
      */
-    private final State state;
+    private ChessColour hasTurn;
+
+    /**
+     * All the moves that led to the current state of the chess board.
+     */
+    private final ArrayList<Move> moveList;
+
+    private final View view;
+    /**
+     * White player
+     */
+    public Player whitePlayer;
 
     /**
      * Constructor
      *
      * @param state The state.
      * @param chessBoard The chessboard.
+     * @param view
      */
-    public Game(State state, ChessBoard chessBoard) {
-        this.state = state;
+    public Game(State state, ChessBoard chessBoard, View view) {
+        this.chessBoard = chessBoard;
+        this.view = view;
+        moveList = new ArrayList<>();
+        hasTurn = ChessColour.White;
         whitePlayer = new HumanPlayer(ChessColour.White, chessBoard);
         blackPlayer = new HumanPlayer(ChessColour.Black, chessBoard);
-    }
-
-    /**
-     * Handles a chess move done by a human player.
-     *
-     * @param piece The chess piece.
-     * @param row The new row.
-     * @param col The new column.
-     */
-    public void humanPlay(ChessPiece piece, int row, int col) {
-        switch (state.getTurnColour()) {
-            case Black:
-                blackPlayer.makeMove(piece, row, col);
-                break;
-            case White:
-                whitePlayer.makeMove(piece, row, col);
-                break;
-        }
-        updatePlayers();
     }
 
     /**
      * Calls the right method if an agent has turn.
      */
     public void agentPlay() {
-        switch (state.getTurnColour()) {
+        switch (hasTurn) {
             case Black:
                 new Thread((Runnable) blackPlayer).start();
                 break;
             case White:
                 new Thread((Runnable) whitePlayer).start();
-                break;
-        }
-    }
-
-    /**
-     * Notifies the right player after a move has been made. If the next player
-     * is a human player, he will just be able to make his move by interacting
-     * with the GUI.
-     */
-    public void updatePlayers() {
-        switch (state.getTurnColour()) {
-            case Black:
-                if (blackPlayer instanceof AI) {
-                    new Thread((Runnable) blackPlayer).start();
-                }
-                break;
-            case White:
-                if (whitePlayer instanceof AI) {
-                    new Thread((Runnable) whitePlayer).start();
-                }
                 break;
         }
     }
@@ -113,5 +98,59 @@ public class Game {
             default:
                 throw new NoSuchElementException();
         }
+    }
+
+    /**
+     * Get the colour of the player that currently has turn.
+     *
+     * @return ChessColour having turn.
+     */
+    public ChessColour getTurnColour() {
+        return hasTurn;
+    }
+
+    /**
+     * Handles a chess move done by a human player.
+     */
+    public void humanPlay(Move move) {
+        moveList.add(move);
+        updateTurn();
+        switch (hasTurn) {
+            case Black:
+                blackPlayer.makeMove(move);
+                break;
+            case White:
+                whitePlayer.makeMove(move);
+                break;
+        }
+        view.update(chessBoard);
+        updatePlayers();
+    }
+
+    /**
+     * Notifies the right player after a move has been made. If the next player
+     * is a human player, he will just be able to make his move by interacting
+     * with the GUI.
+     */
+    public void updatePlayers() {
+        switch (hasTurn) {
+            case Black:
+                if (blackPlayer instanceof AI) {
+                    new Thread((Runnable) blackPlayer).start();
+                }
+                break;
+            case White:
+                if (whitePlayer instanceof AI) {
+                    new Thread((Runnable) whitePlayer).start();
+                }
+                break;
+        }
+    }
+
+    /**
+     * Update the player colour having turn.
+     */
+    public void updateTurn() {
+        hasTurn = (hasTurn == ChessColour.White) ? ChessColour.Black : ChessColour.White;
     }
 }

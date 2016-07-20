@@ -16,6 +16,7 @@
  */
 package com.tomirio.chessengine.chessboard;
 
+import com.tomirio.chessengine.moves.Move;
 import java.util.ArrayList;
 
 /**
@@ -25,43 +26,30 @@ import java.util.ArrayList;
 public class MoveDetails {
 
     /**
-     * The moves
-     */
-    public ArrayList<PiecePosition> moves;
-    /**
      * The covered positions
      */
-    public ArrayList<PiecePosition> coveredFriendlyPieces;
+    public ArrayList<Position> coveredFriendlyPieces;
+    /**
+     * The moves
+     */
+    public ArrayList<Move> moves;
 
     /**
-     * initializes both lists
+     * Initializes both lists.
      */
     public MoveDetails() {
         moves = new ArrayList<>();
         coveredFriendlyPieces = new ArrayList<>();
     }
 
-    public MoveDetails(ArrayList<PiecePosition> moves, ArrayList<PiecePosition> coveredFriendlyPieces) {
+    /**
+     *
+     * @param moves The moves.
+     * @param coveredFriendlyPieces The covered friendly pieces.
+     */
+    public MoveDetails(ArrayList<Move> moves, ArrayList<Position> coveredFriendlyPieces) {
         this.moves = moves;
         this.coveredFriendlyPieces = coveredFriendlyPieces;
-    }
-
-    /**
-     * Add new possible moves.
-     *
-     * @param newMoves List of possible moves.
-     */
-    public void addMoves(ArrayList<PiecePosition> newMoves) {
-        moves.addAll(newMoves);
-    }
-
-    /**
-     * Add new covered pieces
-     *
-     * @param newCoveredFriendlyPieces List of covered friendly pieces.
-     */
-    public void addCoveredPieces(ArrayList<PiecePosition> newCoveredFriendlyPieces) {
-        coveredFriendlyPieces.addAll(coveredFriendlyPieces);
     }
 
     /**
@@ -72,6 +60,24 @@ public class MoveDetails {
     public void add(MoveDetails moveDetails) {
         moves.addAll(moveDetails.moves);
         coveredFriendlyPieces.addAll(moveDetails.coveredFriendlyPieces);
+    }
+
+    /**
+     * Add new covered pieces
+     *
+     * @param newCoveredFriendlyPieces List of covered friendly pieces.
+     */
+    public void addCoveredPieces(ArrayList<Move> newCoveredFriendlyPieces) {
+        coveredFriendlyPieces.addAll(coveredFriendlyPieces);
+    }
+
+    /**
+     * Add new possible moves.
+     *
+     * @param newMoves List of possible moves.
+     */
+    public void addMoves(ArrayList<Move> newMoves) {
+        moves.addAll(newMoves);
     }
 
 }

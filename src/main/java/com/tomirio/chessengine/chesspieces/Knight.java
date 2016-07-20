@@ -18,9 +18,12 @@ package com.tomirio.chessengine.chesspieces;
 
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
-import com.tomirio.chessengine.chessboard.PieceType;
 import com.tomirio.chessengine.chessboard.MoveDetails;
-import com.tomirio.chessengine.chessboard.PiecePosition;
+import com.tomirio.chessengine.chessboard.PieceType;
+import com.tomirio.chessengine.chessboard.Position;
+import com.tomirio.chessengine.moves.CaptureMove;
+import com.tomirio.chessengine.moves.Move;
+import com.tomirio.chessengine.moves.NormalMove;
 import java.util.ArrayList;
 
 /**
@@ -36,8 +39,13 @@ public class Knight extends ChessPiece {
      * @param colour The colour.
      * @param pos The position.
      */
-    public Knight(ChessColour colour, PiecePosition pos) {
+    public Knight(ChessColour colour, Position pos) {
         super(PieceType.Knight, colour, pos);
+    }
+
+    @Override
+    public ArrayList<Position> getCoveredPositions() {
+        return getKnightPositions().coveredFriendlyPieces;
     }
 
     /**
@@ -57,14 +65,18 @@ public class Knight extends ChessPiece {
                  difference in row is 2 and in column is 1
                  */
                 if (chessBoard.isValidCoordinate(r, c)) {
-                    PiecePosition p = new PiecePosition(r, c);
+                    Position p = new Position(r, c);
                     int distRow = Math.abs(orgRow - r);
                     int distCol = Math.abs(orgCol - c);
                     if ((distRow == 1 && distCol == 2) || (distRow == 2 && distCol == 1)) {
                         if (!chessBoard.isOccupiedPosition(p)) {
-                            moveDetails.moves.add(p);
+                            // Normal move
+                            NormalMove normalMove = new NormalMove(this, p);
+                            moveDetails.moves.add(normalMove);
                         } else if (chessBoard.getColour(p) != getColour()) {
-                            moveDetails.moves.add(p);
+                            // Capture move
+                            CaptureMove captureMove = new CaptureMove(this, p);
+                            moveDetails.moves.add(captureMove);
                         } else {
                             moveDetails.coveredFriendlyPieces.add(p);
                         }
@@ -76,17 +88,18 @@ public class Knight extends ChessPiece {
     }
 
     @Override
-    public boolean posCanBeCaptured(PiecePosition p) {
-        return this.getKnightPositions().moves.contains(p);
+    public ArrayList<Move> getPossibleMoves() {
+        return filterMoves(getKnightPositions().moves);
     }
 
     @Override
-    public boolean posIsCovered(PiecePosition p) {
+    public ArrayList<Move> getRawPossibleMoves() {
+        return getKnightPositions().moves;
+    }
+
+    @Override
+    public boolean posIsCovered(Position p) {
         return getKnightPositions().coveredFriendlyPieces.contains(p);
     }
 
-    @Override
-    public ArrayList<PiecePosition> getPossibleMoves() {
-        return filterMoves(getKnightPositions().moves);
-    }
 }

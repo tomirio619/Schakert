@@ -16,6 +16,9 @@
  */
 package com.tomirio.chessengine.chessboard;
 
+import com.tomirio.chessengine.moves.CaptureMove;
+import com.tomirio.chessengine.moves.Move;
+import com.tomirio.chessengine.moves.NormalMove;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -28,9 +31,10 @@ import java.util.Objects;
 public abstract class ChessPiece implements Serializable {
 
     /**
-     * The type of the chess piece.
+     * The board, if a new chess piece is created, this board must be set with
+     * the setBoard function, otherwise the value is null!
      */
-    private final PieceType type;
+    protected ChessBoard chessBoard;
 
     /**
      * The colour of the chess piece.
@@ -40,13 +44,11 @@ public abstract class ChessPiece implements Serializable {
     /**
      * The current position of the chess piece.
      */
-    private final PiecePosition pos;
-
+    private final Position pos;
     /**
-     * The board, if a new chess piece is created, this board must be set with
-     * the setBoard function, otherwise the value is null!
+     * The type of the chess piece.
      */
-    protected ChessBoard chessBoard;
+    private final PieceType type;
 
     /**
      * This constructor MUST be used when the chessboard is not known when a new
@@ -57,7 +59,7 @@ public abstract class ChessPiece implements Serializable {
      * @param colour The colour of the chess piece.
      * @param pos The position of the chess piece.
      */
-    public ChessPiece(PieceType type, ChessColour colour, PiecePosition pos) {
+    public ChessPiece(PieceType type, ChessColour colour, Position pos) {
         this.type = type;
         this.colour = colour;
         this.pos = pos;
@@ -72,7 +74,7 @@ public abstract class ChessPiece implements Serializable {
      * @param pos The position.
      * @param board The board.
      */
-    public ChessPiece(PieceType type, ChessColour colour, PiecePosition pos,
+    public ChessPiece(PieceType type, ChessColour colour, Position pos,
             ChessBoard board) {
         this.type = type;
         this.colour = colour;
@@ -81,168 +83,30 @@ public abstract class ChessPiece implements Serializable {
     }
 
     /**
-     *
-     * @param newRow The new row.
-     * @param newColumn The new column.
-     */
-    public void setPosition(int newRow, int newColumn) {
-        pos.setPosition(newRow, newColumn);
-    }
-
-    /**
-     * The new piecePosition.
-     *
-     * @param p The new PiecePosition
-     */
-    public void setPosition(PiecePosition p) {
-        pos.setPosition(p.getRow(), p.getColumn());
-    }
-
-    /**
-     *
-     * @return The column of this chess piece.
-     */
-    public int getColumn() {
-        return pos.getColumn();
-    }
-
-    /**
-     *
-     * @return The type of this chess piece.
-     */
-    public PieceType getType() {
-        return type;
-    }
-
-    /**
-     *
-     * @return The row of this chess piece.
-     */
-    public int getRow() {
-        return pos.getRow();
-    }
-
-    /**
-     *
-     * @return The position of the piece.
-     */
-    public PiecePosition getPos() {
-        return pos;
-    }
-
-    /**
-     *
-     * @return The colour of this chess piece.
-     */
-    public ChessColour getColour() {
-        return colour;
-    }
-
-    /**
-     *
-     * @param chessBoard The board containing all of the chess pieces,
-     * <b>MUST</b>
-     * be called when a new chess piece is created, otherwise the current value
-     * of board will be <code>null</code>!
-     */
-    public void setChessBoard(ChessBoard chessBoard) {
-        this.chessBoard = chessBoard;
-    }
-
-    /**
-     *
-     * @return The string representation of this chess piece.
-     */
-    @Override
-    public String toString() {
-        return colour + "\t | " + pos + " | " + type;
-    }
-
-    /**
-     * Move the chess piece to a new position.
-     *
-     * @param row The new row of this chess piece.
-     * @param column The new column of this chess piece.
-     */
-    public void move(int row, int column) {
-        chessBoard.movePiece(this, row, column);
-    }
-
-    /**
      * Make a move on the chess board without updating the GUI.
      *
-     * @param row The new row of this chess piece.
-     * @param column The new column of this chess piece.
      */
-    public void agentMove(int row, int column) {
-        chessBoard.movePieceAgent(this, row, column);
+    public void agentMove(Move move) {
+        move.doMove();
     }
 
     /**
-     * From the set of possible moves, it only returns those moves that are
-     * valid (<code>board.isValidMove</code>).
+     * Get all the positions in the given direction from a intial position.
      *
-     * @param moves The possible moves for this chess piece.
-     * @return All the legal moves for this chess piece.
+     * @param moves A list with all the moves
+     * @param friendlyCoveredPieces A list with all the friendly covered pieces.
+     * @param curPos The current position.
+     * @param dir The direction.
+     * @return MoveDetails object which contains the moves and covered friendly
+     * pieces.
      */
-    protected ArrayList<PiecePosition> filterMoves(ArrayList<PiecePosition> moves) {
-        ArrayList<PiecePosition> validMoves = new ArrayList<>();
-        while (!moves.isEmpty()) {
-            PiecePosition move = moves.remove(moves.size() - 1);
-            if (chessBoard.isValidMove(this, move.getRow(), move.getColumn())) {
-                validMoves.add(move);
-            }
-        }
-        return validMoves;
-    }
-
-    /**
-     *
-     * @param pos The position.
-     * @return <code>True</code> if this position can be captured by this chess
-     * piece. <code>False</code> otherwise. Capture means that, if the given
-     * position contains a chess piece, this piece could capture this piece. The
-     * position indicates the position of the chess piece.
-     */
-    public abstract boolean posCanBeCaptured(PiecePosition pos);
-
-    /**
-     * This function determines if a given position is covered by this piece. A
-     * piece covers another piece if this piece could capture this piece of the
-     * same colour.
-     *
-     * @param pos The position
-     * @return <code>True</code> if the position is covered by this piece,
-     * <code>False</code> otherwise
-     */
-    public abstract boolean posIsCovered(PiecePosition pos);
-
-    /**
-     *
-     * @return The possible moves for this chess piece. The chess piece can be
-     * be of the following types: Knight, Bishop and Queen. All the other types
-     * extend this class and override a couple of functions, including this one.
-     */
-    public abstract ArrayList<PiecePosition> getPossibleMoves();
-
-    /**
-     *
-     * @param dir The direction for which you want all the possible moves.
-     * @return All the possible moves in a specified direction. When the path
-     * becomes blocked by either a friendly or a enemy piece, the functions
-     * returns the currently found set of moves.
-     */
-    protected MoveDetails getPositionsInDirection(Direction dir) {
-        return allPosInDir(new ArrayList<>(), new ArrayList<>(), this.pos, dir);
-    }
-
-    private MoveDetails allPosInDir(ArrayList<PiecePosition> moves, ArrayList<PiecePosition> friendlyCoveredPieces, PiecePosition curPos, Direction dir) {
+    private MoveDetails allPosInDir(ArrayList<Move> moves, ArrayList<Position> friendlyCoveredPieces, Position curPos, Direction dir) {
         if (!curPos.isValid()) {
-            // position not valid, return
+            // position not valid, return results
             return new MoveDetails(moves, friendlyCoveredPieces);
         } else if (curPos.equals(pos)) {
             // Same as current position of chess piece
-            PiecePosition newPos = getNextPos(dir, curPos);
+            Position newPos = getNextPos(dir, curPos);
             return allPosInDir(moves, friendlyCoveredPieces, newPos, dir);
 
         } else if (chessBoard.isOccupiedPosition(curPos)) {
@@ -252,58 +116,18 @@ public abstract class ChessPiece implements Serializable {
                 return new MoveDetails(moves, friendlyCoveredPieces);
             } else {
                 // Enemy piece, add it to moves list.
-                moves.add(curPos);
+                CaptureMove captureMove = new CaptureMove(this, curPos);
+                moves.add(captureMove);
                 return new MoveDetails(moves, friendlyCoveredPieces);
             }
         } else {
             // position not occupied, add it to move list
-            moves.add(curPos);
+            NormalMove normalMove = new NormalMove(this, curPos);
+            moves.add(normalMove);
             // get next position
-            PiecePosition newPos = this.getNextPos(dir, curPos);
+            Position newPos = this.getNextPos(dir, curPos);
             return allPosInDir(moves, friendlyCoveredPieces, newPos, dir);
         }
-    }
-
-    private PiecePosition getNextPos(Direction dir, PiecePosition curPos) {
-        PiecePosition newPos;
-        switch (dir) {
-            case N:
-                newPos = new PiecePosition(curPos.getRow() - 1, curPos.getColumn());
-                break;
-            case S:
-                newPos = new PiecePosition(curPos.getRow() + 1, curPos.getColumn());
-                break;
-            case W:
-                newPos = new PiecePosition(curPos.getRow(), curPos.getColumn() - 1);
-                break;
-            case E:
-                newPos = new PiecePosition(curPos.getRow(), curPos.getColumn() + 1);
-                break;
-            case NW:
-                newPos = new PiecePosition(curPos.getRow() - 1, curPos.getColumn() - 1);
-                break;
-            case NE:
-                newPos = new PiecePosition(curPos.getRow() - 1, curPos.getColumn() + 1);
-                break;
-            case SW:
-                newPos = new PiecePosition(curPos.getRow() + 1, curPos.getColumn() - 1);
-                break;
-            case SE:
-                newPos = new PiecePosition(curPos.getRow() + 1, curPos.getColumn() + 1);
-                break;
-            default:
-                throw new NoSuchElementException();
-
-        }
-        return newPos;
-    }
-
-    /**
-     *
-     * @return The chess board.
-     */
-    public ChessBoard getChessBoard() {
-        return chessBoard;
     }
 
     /**
@@ -326,6 +150,163 @@ public abstract class ChessPiece implements Serializable {
     }
 
     /**
+     * From the set of possible moves, it only returns those moves that are
+     * valid (<code>board.isValidMove</code>).
+     *
+     * @param moves The possible moves for this chess piece.
+     * @return All the legal moves for this chess piece.
+     */
+    protected ArrayList<Move> filterMoves(ArrayList<Move> moves) {
+        ArrayList<Move> validMoves = new ArrayList<>();
+        for (Move move : moves) {
+            if (chessBoard.isValidMove(move)) {
+                validMoves.add(move);
+            }
+        }
+        return validMoves;
+    }
+
+    /**
+     *
+     * @return The chess board.
+     */
+    public ChessBoard getChessBoard() {
+        return chessBoard;
+    }
+
+    /**
+     *
+     * @param chessBoard The board containing all of the chess pieces,
+     * <b>MUST</b>
+     * be called when a new chess piece is created, otherwise the current value
+     * of board will be <code>null</code>!
+     */
+    public void setChessBoard(ChessBoard chessBoard) {
+        this.chessBoard = chessBoard;
+    }
+
+    /**
+     *
+     * @return The colour of this chess piece.
+     */
+    public ChessColour getColour() {
+        return colour;
+    }
+
+    /**
+     *
+     * @return The column of this chess piece.
+     */
+    public int getColumn() {
+        return pos.getColumn();
+    }
+
+    /**
+     * Positions containing a friendly chess piece that could be captured if
+     * this friendly chess piece was an enemy piece.
+     *
+     * @return
+     */
+    public abstract ArrayList<Position> getCoveredPositions();
+
+    /**
+     * Get the next position given a current position and a direction.
+     *
+     * @param dir The direction.
+     * @param curPos The current position.
+     * @return The next position.
+     */
+    private Position getNextPos(Direction dir, Position curPos) {
+        Position newPos;
+        switch (dir) {
+            case N:
+                newPos = new Position(curPos.getRow() - 1, curPos.getColumn());
+                break;
+            case S:
+                newPos = new Position(curPos.getRow() + 1, curPos.getColumn());
+                break;
+            case W:
+                newPos = new Position(curPos.getRow(), curPos.getColumn() - 1);
+                break;
+            case E:
+                newPos = new Position(curPos.getRow(), curPos.getColumn() + 1);
+                break;
+            case NW:
+                newPos = new Position(curPos.getRow() - 1, curPos.getColumn() - 1);
+                break;
+            case NE:
+                newPos = new Position(curPos.getRow() - 1, curPos.getColumn() + 1);
+                break;
+            case SW:
+                newPos = new Position(curPos.getRow() + 1, curPos.getColumn() - 1);
+                break;
+            case SE:
+                newPos = new Position(curPos.getRow() + 1, curPos.getColumn() + 1);
+                break;
+            default:
+                throw new NoSuchElementException();
+
+        }
+        return newPos;
+    }
+
+    /**
+     *
+     * @return The position of the piece.
+     */
+    public Position getPos() {
+        return pos;
+    }
+
+    /**
+     * The new piecePosition.
+     *
+     * @param p The new PiecePosition
+     */
+    public void setPosition(Position p) {
+        pos.setPosition(p.getRow(), p.getColumn());
+    }
+
+    /**
+     *
+     * @param dir The direction for which you want all the possible moves.
+     * @return All the possible moves in a specified direction. When the path
+     * becomes blocked by either a friendly or a enemy piece, the functions
+     * returns the currently found set of moves.
+     */
+    protected MoveDetails getPositionsInDirection(Direction dir) {
+        return allPosInDir(new ArrayList<>(), new ArrayList<>(), this.pos, dir);
+    }
+
+    /**
+     * @return The possible moves for this chess piece.
+     */
+    public abstract ArrayList<Move> getPossibleMoves();
+
+    /**
+     * Get the possible moves that are not filtered on their validity.
+     *
+     * @return The unfiltered possible moves.
+     */
+    public abstract ArrayList<Move> getRawPossibleMoves();
+
+    /**
+     *
+     * @return The row of this chess piece.
+     */
+    public int getRow() {
+        return pos.getRow();
+    }
+
+    /**
+     *
+     * @return The type of this chess piece.
+     */
+    public PieceType getType() {
+        return type;
+    }
+
+    /**
      *
      * @return The hashcode.
      */
@@ -337,4 +318,64 @@ public abstract class ChessPiece implements Serializable {
         hash = 67 * hash + Objects.hashCode(this.pos);
         return hash;
     }
+
+    /**
+     * Move the chess piece to a new position.
+     *
+     */
+    public void move(Move move) {
+        move.doMove();
+    }
+
+    /**
+     *
+     * @param pos The position.
+     * @return <code>True</code> if this position can be captured by this chess
+     * piece. <code>False</code> otherwise. Capture means that, if the given
+     * position contains a chess piece, this piece could capture this piece. The
+     * position indicates the position of the chess piece.
+     */
+    public boolean posCanBeCaptured(Position pos) {
+        ArrayList<Move> moves = getRawPossibleMoves();
+        for (Move move : moves) {
+            if (move instanceof CaptureMove) {
+                if (move.getNewPos().equals(pos)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    /**
+     * This function determines if a given position is covered by this piece. A
+     * piece covers another piece if this piece could capture the other piece
+     * where both pieces have the same colour.
+     *
+     * @param pos The position
+     * @return <code>True</code> if the position is covered by this piece,
+     * <code>False</code> otherwise
+     */
+    public boolean posIsCovered(Position pos) {
+        return getCoveredPositions().contains(pos);
+    }
+
+    /**
+     *
+     * @param newRow The new row.
+     * @param newColumn The new column.
+     */
+    public void setPosition(int newRow, int newColumn) {
+        pos.setPosition(newRow, newColumn);
+    }
+
+    /**
+     *
+     * @return The string representation of this chess piece.
+     */
+    @Override
+    public String toString() {
+        return colour + "\t | " + pos + " | " + type;
+    }
+
 }

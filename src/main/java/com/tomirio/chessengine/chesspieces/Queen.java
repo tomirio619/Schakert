@@ -19,10 +19,11 @@ package com.tomirio.chessengine.chesspieces;
 import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
-import com.tomirio.chessengine.chessboard.PieceType;
 import com.tomirio.chessengine.chessboard.Direction;
 import com.tomirio.chessengine.chessboard.MoveDetails;
-import com.tomirio.chessengine.chessboard.PiecePosition;
+import com.tomirio.chessengine.chessboard.PieceType;
+import com.tomirio.chessengine.chessboard.Position;
+import com.tomirio.chessengine.moves.Move;
 import java.util.ArrayList;
 
 /**
@@ -39,7 +40,7 @@ public class Queen extends ChessPiece {
      * @param pos The position.
      * @param board The board.
      */
-    public Queen(ChessColour colour, PiecePosition pos, ChessBoard board) {
+    public Queen(ChessColour colour, Position pos, ChessBoard board) {
         super(PieceType.Queen, colour, pos, board);
     }
 
@@ -49,38 +50,43 @@ public class Queen extends ChessPiece {
      * @param colour The colour.
      * @param pos The position.
      */
-    public Queen(ChessColour colour, PiecePosition pos) {
+    public Queen(ChessColour colour, Position pos) {
         super(PieceType.Queen, colour, pos);
     }
 
     @Override
-    public boolean posCanBeCaptured(PiecePosition pos) {
-        return getQueenMoves().contains(pos);
+    public ArrayList<Position> getCoveredPositions() {
+        return getQueenMoves().coveredFriendlyPieces;
+    }
+
+    @Override
+    public ArrayList<Move> getPossibleMoves() {
+        return filterMoves(getQueenMoves().moves);
     }
 
     /**
      * @return All the possible moves for the queen.
      */
-    public ArrayList<PiecePosition> getQueenMoves() {
-        ArrayList<PiecePosition> moves = new ArrayList<>();
+    public MoveDetails getQueenMoves() {
+        MoveDetails moveDetails = new MoveDetails();
         for (Direction d : Direction.values()) {
-            moves.addAll(getPositionsInDirection(d).moves);
+            moveDetails.add(getPositionsInDirection(d));
         }
-        return moves;
+        return moveDetails;
     }
 
     @Override
-    public boolean posIsCovered(PiecePosition p) {
+    public ArrayList<Move> getRawPossibleMoves() {
+        return getQueenMoves().moves;
+    }
+
+    @Override
+    public boolean posIsCovered(Position p) {
         MoveDetails moveDetails = new MoveDetails();
         for (Direction d : Direction.values()) {
             moveDetails.add(getPositionsInDirection(d));
         }
         return moveDetails.coveredFriendlyPieces.contains(p);
-    }
-
-    @Override
-    public ArrayList<PiecePosition> getPossibleMoves() {
-        return filterMoves(getQueenMoves());
     }
 
 }

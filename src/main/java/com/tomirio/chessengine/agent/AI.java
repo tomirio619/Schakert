@@ -19,13 +19,12 @@ package com.tomirio.chessengine.agent;
 import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
-import com.tomirio.chessengine.chessboard.PiecePosition;
+import com.tomirio.chessengine.chessboard.Position;
 import com.tomirio.chessengine.chessboard.State;
 import com.tomirio.chessengine.game.Player;
+import com.tomirio.chessengine.moves.Move;
 import java.util.ArrayList;
 import java.util.HashSet;
-import javafx.application.Platform;
-import org.apache.commons.lang3.SerializationUtils;
 
 /**
  *
@@ -33,6 +32,9 @@ import org.apache.commons.lang3.SerializationUtils;
  */
 public class AI extends Player implements Runnable {
 
+    /**
+     * Skipped nodes
+     */
     public static int skippedNodes = 0;
 
     /**
@@ -40,15 +42,65 @@ public class AI extends Player implements Runnable {
      */
     public int depth;
 
+    /**
+     * Evaluation class
+     */
     public final Evaluation eval;
 
+    /**
+     * Visited nodes
+     */
     private final HashSet<Integer> visitedNodes;
 
+    /**
+     * The AI
+     *
+     * @param playerColour The colour the AI plays with.
+     * @param chessBoard The chess board.
+     */
     public AI(ChessColour playerColour, ChessBoard chessBoard) {
         super(playerColour, chessBoard);
         visitedNodes = new HashSet();
         depth = 4;
         eval = new Evaluation();
+    }
+
+    /**
+     * Generate the next moves.
+     *
+     * @param node The root node.
+     * @param colour The colour for which the moves have to generated.
+     * @return ArrayList containing all the future chess boards.
+     */
+    private ArrayList<Node> generateChildNodes(Node node) {
+        ArrayList<Node> childNodes = new ArrayList<>();
+        State currentState = null;
+        ChessColour hasTurn = currentState.getTurnColour();
+        ArrayList<ChessPiece> pieces = node.chessBoard.getPieces(hasTurn);
+//        for (ChessPiece piece : pieces) {
+//            ArrayList<Position> moves = piece.getPossibleMoves();
+//            for (Position move : moves) {
+//                ChessBoard chessBoardCopy = node.chessBoard.deepClone();
+//                ChessPiece pieceToMove = chessBoardCopy.getPiece(piece.getPos());
+//                ChessPiece pieceCopy = SerializationUtils.clone(pieceToMove);
+//                pieceToMove.agentMove(move);
+//                int hash = chessBoardCopy.getHash();
+//                if (!visitedNodes.contains(hash)) {
+//                    visitedNodes.add(hash);
+//                    Node childNode = new Node(chessBoardCopy, node, move, pieceCopy);
+//                    childNodes.add(childNode);
+//                } else {
+//                    skippedNodes++;
+//                }
+//            }
+//        }
+        return childNodes;
+    }
+
+    @Override
+    public void makeMove(Move move) {
+        // Only necessary for human players
+        throw new UnsupportedOperationException("Agents do not implement this method!");
     }
 
     /**
@@ -78,7 +130,7 @@ public class AI extends Player implements Runnable {
      */
     public Pair<Node, Double> negaMax(Node node, int depth, double alpha, double beta) {
         assert depth >= 0;
-        State currentState = node.chessBoard.getState();
+        State currentState = null;
         if (depth == 0 || (currentState.weHaveAWinner()) || (currentState.isDraw())) {
             assert currentState.getTurnColour() == ((depth % 2 == 0) ? playerColour : playerColour.getOpposite());
             return new Pair<>(node, eval.evaluate(node.chessBoard, playerColour));
@@ -99,38 +151,6 @@ public class AI extends Player implements Runnable {
             }
         }
         return new Pair<>(bestNode, bestValue);
-    }
-
-    /**
-     * Generate the next moves.
-     *
-     * @param node The root node.
-     * @param colour The colour for which the moves have to generated.
-     * @return ArrayList containing all the future chess boards.
-     */
-    private ArrayList<Node> generateChildNodes(Node node) {
-        ArrayList<Node> childNodes = new ArrayList<>();
-        State currentState = node.chessBoard.getState();
-        ChessColour hasTurn = currentState.getTurnColour();
-        ArrayList<ChessPiece> pieces = node.chessBoard.getPieces(hasTurn);
-        for (ChessPiece piece : pieces) {
-            ArrayList<PiecePosition> moves = piece.getPossibleMoves();
-            for (PiecePosition move : moves) {
-                ChessBoard chessBoardCopy = node.chessBoard.deepClone();
-                ChessPiece pieceToMove = chessBoardCopy.getPiece(piece.getPos());
-                ChessPiece pieceCopy = SerializationUtils.clone(pieceToMove);
-                pieceToMove.agentMove(move.getRow(), move.getColumn());
-                int hash = chessBoardCopy.getHash();
-                if (!visitedNodes.contains(hash)) {
-                    visitedNodes.add(hash);
-                    Node childNode = new Node(chessBoardCopy, node, move, pieceCopy);
-                    childNodes.add(childNode);
-                } else {
-                    skippedNodes++;
-                }
-            }
-        }
-        return childNodes;
     }
 
     /**
@@ -168,17 +188,12 @@ public class AI extends Player implements Runnable {
         if (toPlay.first == null) {
             System.out.println("toPlay was null");
         }
-        PiecePosition move = toPlay.first.getRootMove();
+        Position move = toPlay.first.getRootMove();
         // This chess piece lost his observer, we need to move based on the original position
         ChessPiece p = toPlay.first.getRootPiece();
         ChessPiece pieceToMove = chessBoard.getPiece(p.getPos());
-        Platform.runLater(() -> pieceToMove.move(move.getRow(), move.getColumn()));
-    }
-
-    @Override
-    public void makeMove(ChessPiece piece, int row, int col) {
-        // Only necessary for human players
-        throw new UnsupportedOperationException("Agents do not implement this method!");
+        // This should return a move
+        // Platform.runLater(() -> pieceToMove.move(move));
     }
 
     @Override

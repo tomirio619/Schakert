@@ -1,7 +1,18 @@
 /*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+ * Copyright (C) 2016 Tom Sandmann
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 package com.tomirio.chessengine.agent;
 
@@ -17,7 +28,26 @@ import com.google.common.base.Objects;
  */
 public class Pair<F, S> {
 
+    /**
+     * Convenience method for creating an appropriately typed pair.
+     *
+     * @param <A> The type of the first element in the pair.
+     * @param <B> The type of the second element in the pair.
+     * @param a the first object in the Pair
+     * @param b the second object in the pair
+     * @return a Pair that is templatized with the types of a and b
+     */
+    public static <A, B> Pair<A, B> create(A a, B b) {
+        return new Pair<>(a, b);
+    }
+    /**
+     * The first element in the pair.
+     */
     public final F first;
+
+    /**
+     * The second element in the pair.
+     */
     public final S second;
 
     /**
@@ -58,16 +88,4 @@ public class Pair<F, S> {
         return (first == null ? 0 : first.hashCode()) ^ (second == null ? 0 : second.hashCode());
     }
 
-    /**
-     * Convenience method for creating an appropriately typed pair.
-     *
-     * @param <A> The type of the first element in the pair.
-     * @param <B> The type of the second element in the pair.
-     * @param a the first object in the Pair
-     * @param b the second object in the pair
-     * @return a Pair that is templatized with the types of a and b
-     */
-    public static <A, B> Pair<A, B> create(A a, B b) {
-        return new Pair<>(a, b);
-    }
 }

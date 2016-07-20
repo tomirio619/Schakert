@@ -22,36 +22,59 @@ import java.io.Serializable;
  *
  * @author Tom Sandmann
  */
-public class PiecePosition implements Serializable {
+public class Position implements Serializable {
 
+    /**
+     * The column.
+     */
+    private int column;
     /**
      * The row.
      */
     private int row;
 
     /**
-     * The column.
-     */
-    private int column;
-
-    /**
      *
      * @param row The row where the chess piece is currently residing
      * @param column The column where the chess piece is currently residing
      */
-    public PiecePosition(int row, int column) {
+    public Position(int row, int column) {
         this.row = row;
         this.column = column;
     }
 
     /**
      *
-     * @param row The new row of the chess piece
-     * @param column The new column of the chess piece
+     * @return Deep clone of this PiecePosition.
      */
-    public void setPosition(int row, int column) {
-        this.row = row;
-        this.column = column;
+    public Position deepClone() {
+        return new Position(row, column);
+    }
+
+    /**
+     *
+     * @param otherObject
+     * @return <code>True</code> if the otherObject is equal to this instance of
+     * PiecePosition, <code>False</code> otherwise.
+     */
+    @Override
+    public boolean equals(Object otherObject) {
+        if (otherObject == null) {
+            return false;
+        } else if (getClass() != otherObject.getClass()) {
+            return false;
+        } else {
+            Position otherPosition = (Position) otherObject;
+            return (otherPosition.column == column && otherPosition.row == row);
+        }
+    }
+
+    /**
+     *
+     * @return The column of the chess piece
+     */
+    public int getColumn() {
+        return this.column;
     }
 
     /**
@@ -64,10 +87,14 @@ public class PiecePosition implements Serializable {
 
     /**
      *
-     * @return The column of the chess piece
+     * @return The hashcode
      */
-    public int getColumn() {
-        return this.column;
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 23 * hash + this.row;
+        hash = 23 * hash + this.column;
+        return hash;
     }
 
     /**
@@ -83,10 +110,12 @@ public class PiecePosition implements Serializable {
 
     /**
      *
-     * @return Deep clone of this PiecePosition.
+     * @param row The new row of the chess piece
+     * @param column The new column of the chess piece
      */
-    public PiecePosition deepClone() {
-        return new PiecePosition(row, column);
+    public void setPosition(int row, int column) {
+        this.row = row;
+        this.column = column;
     }
 
     /**
@@ -119,33 +148,4 @@ public class PiecePosition implements Serializable {
         }
     }
 
-    /**
-     *
-     * @param otherObject
-     * @return <code>True</code> if the otherObject is equal to this instance of
-     * PiecePosition, <code>False</code> otherwise.
-     */
-    @Override
-    public boolean equals(Object otherObject) {
-        if (otherObject == null) {
-            return false;
-        } else if (getClass() != otherObject.getClass()) {
-            return false;
-        } else {
-            PiecePosition otherPosition = (PiecePosition) otherObject;
-            return (otherPosition.column == column && otherPosition.row == row);
-        }
-    }
-
-    /**
-     *
-     * @return The hashcode
-     */
-    @Override
-    public int hashCode() {
-        int hash = 7;
-        hash = 23 * hash + this.row;
-        hash = 23 * hash + this.column;
-        return hash;
-    }
 }

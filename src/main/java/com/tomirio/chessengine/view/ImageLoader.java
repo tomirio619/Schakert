@@ -30,11 +30,6 @@ public final class ImageLoader {
     public static Image blackBishop;
 
     /**
-     * black rook image.
-     */
-    public static Image blackRook;
-
-    /**
      * black king image.
      */
     public static Image blackKing;
@@ -53,16 +48,23 @@ public final class ImageLoader {
      * black queen image.
      */
     public static Image blackQueen;
+    /**
+     * black rook image.
+     */
+    public static Image blackRook;
+    /**
+     * application icon.
+     */
+    public static Image icon;
+    /**
+     * Path resources.
+     */
+    static String path = "png";
 
     /**
      * black bishop image.
      */
     public static Image whiteBishop;
-
-    /**
-     * white rook image.
-     */
-    public static Image whiteRook;
 
     /**
      * white king image.
@@ -83,36 +85,30 @@ public final class ImageLoader {
      * white queen image.
      */
     public static Image whiteQueen;
-
     /**
-     * application icon.
+     * white rook image.
      */
-    public static Image icon;
-
-    /**
-     * Path resources.
-     */
-    static String path = "PNG";
+    public static Image whiteRook;
 
     /**
      * Initialize
      */
     public final static void initialize() {
-        icon = new Image("Chess_Icon.png");
+        icon = new Image(path + "/Chess_Icon.png");
 
-        blackBishop = new Image(path + "/Black/bishop.png");
-        blackRook = new Image(path + "/Black/rook.png");
-        blackKing = new Image(path + "/Black/king.png");
-        blackKnight = new Image(path + "/Black/knight.png");
-        blackPawn = new Image(path + "/Black/pawn.png");
-        blackQueen = new Image(path + "/Black/queen.png");
+        blackBishop = new Image(path + "/black/bishop.png");
+        blackRook = new Image(path + "/black/rook.png");
+        blackKing = new Image(path + "/black/king.png");
+        blackKnight = new Image(path + "/black/knight.png");
+        blackPawn = new Image(path + "/black/pawn.png");
+        blackQueen = new Image(path + "/black/queen.png");
 
-        whiteBishop = new Image(path + "/White/bishop.png");
-        whiteRook = new Image(path + "/White/rook.png");
-        whiteKing = new Image(path + "/White/king.png");
-        whiteKnight = new Image(path + "/White/knight.png");
-        whitePawn = new Image(path + "/White/pawn.png");
-        whiteQueen = new Image(path + "/White/queen.png");
+        whiteBishop = new Image(path + "/white/bishop.png");
+        whiteRook = new Image(path + "/white/rook.png");
+        whiteKing = new Image(path + "/white/king.png");
+        whiteKnight = new Image(path + "/white/knight.png");
+        whitePawn = new Image(path + "/white/pawn.png");
+        whiteQueen = new Image(path + "/white/queen.png");
     }
 
 }
