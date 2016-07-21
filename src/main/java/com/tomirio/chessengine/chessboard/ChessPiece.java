@@ -338,7 +338,7 @@ public abstract class ChessPiece implements Serializable {
     public boolean posCanBeCaptured(Position pos) {
         ArrayList<Move> moves = getRawPossibleMoves();
         for (Move move : moves) {
-            if (move instanceof CaptureMove) {
+            if (move instanceof NormalMove) {
                 if (move.getNewPos().equals(pos)) {
                     return true;
                 }

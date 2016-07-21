@@ -54,7 +54,8 @@ public class CastlingMove extends NormalMove {
         rook.setCastlingPossible(false);
         chessBoard.silentMovePiece(rook, rookNewPos);
         piece = king;
-        //super.updateGame();
+        chessBoard.setVulnerableEnPassantPos(null);
+        chessBoard.updateKingStatus();
     }
 
     @Override
@@ -71,7 +72,7 @@ public class CastlingMove extends NormalMove {
         rook.setCastlingPossible(true);
         chessBoard.silentMovePiece(rook, rookOrgPos);
         piece = king;
-        //super.updateGame();
+        chessBoard.updateKingStatus();
     }
 
 }

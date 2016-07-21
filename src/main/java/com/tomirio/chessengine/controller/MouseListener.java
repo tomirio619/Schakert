@@ -74,13 +74,7 @@ public class MouseListener implements EventHandler<MouseEvent> {
         possibleMoves = new ArrayList<>();
     }
 
-    public void checkCaptureMove() {
-
-    }
-
-    public void checkNonCaptureMove() {
-
-        // A tile was selected that contained no chess piece
+    private void checkNonCaptureMove() {
         if (possibleMoves.isEmpty()) {
             /*
             There were no possible moves, so the selected tile is not
@@ -91,7 +85,6 @@ public class MouseListener implements EventHandler<MouseEvent> {
         } else {
             Move move = getMove(new Position(currentlySelectedVisualTile.row, currentlySelectedVisualTile.column));
             if (move != null) {
-                // Move found.
                 /*
                 The tile is a possible move of the previous selected chess piece.
                 Make the move, remove the previous possibleMoves on the screen
@@ -112,12 +105,13 @@ public class MouseListener implements EventHandler<MouseEvent> {
     }
 
     /**
-     * See if a position is the newPos of a move.
+     * See if a position is the new position of a move.
      *
-     * @param newPos
-     * @return
+     * @param newPos The new position.
+     * @return  <code>Move</code> if the given position was indeed an end
+     * position of the move. <code>null</code> otherwise.
      */
-    public Move getMove(Position newPos) {
+    private Move getMove(Position newPos) {
         for (Move move : possibleMoves) {
             if (move.getNewPos().equals(newPos)) {
                 return move;
@@ -129,7 +123,6 @@ public class MouseListener implements EventHandler<MouseEvent> {
     @Override
     public void handle(MouseEvent event) {
         currentlySelectedVisualTile = (VisualTile) event.getSource();
-
         removePreviousHighlight();
 
         if (currentlySelectedVisualTile.getChessPiece() == null) {
@@ -143,18 +136,18 @@ public class MouseListener implements EventHandler<MouseEvent> {
                 // The move could still be a capture move
                 Move move = getMove(new Position(currentlySelectedVisualTile.row, currentlySelectedVisualTile.column));
                 if (move != null) {
+                    // The move did exists, apply the move
                     game.humanPlay(move);
                     previousSelectedVisualTile = null;
                     removeAvailableMoves(possibleMoves);
                     possibleMoves.clear();
 
                 } else {
-                    // There were some possible moves, but the chess piece was not in those
+                    // There was no move with this end position
                     removeAvailableMoves(possibleMoves);
                     previousSelectedVisualTile = currentlySelectedVisualTile;
-                    if (currentlySelectedVisualTile.getChessPiece().getColour() == game.getTurnColour() //&& !state.weHaveAWinner()
-                            ) {
-
+                    if (currentlySelectedVisualTile.getChessPiece().getColour() == game.getTurnColour()
+                            && !game.weHaveAWinner()) {
                         currentlySelectedVisualTile.highLightTile();
                         possibleMoves = currentlySelectedVisualTile.getChessPiece().getPossibleMoves();
                         showAvailableMoves(possibleMoves);
@@ -171,13 +164,13 @@ public class MouseListener implements EventHandler<MouseEvent> {
      * @param possibleMoves The positions of the previously visual tiles
      * currently shown as possible moves.
      */
-    public void removeAvailableMoves(ArrayList<Move> possibleMoves) {
+    private void removeAvailableMoves(ArrayList<Move> possibleMoves) {
         if (possibleMoves != null) {
             view.removeTilesAsMoves(possibleMoves);
         }
     }
 
-    public void removePreviousHighlight() {
+    private void removePreviousHighlight() {
         // Remove the highlight of the previous tile if this tile is not null
         if (previousSelectedVisualTile != null) {
             previousSelectedVisualTile.removeHighlightTile();
@@ -192,21 +185,23 @@ public class MouseListener implements EventHandler<MouseEvent> {
      * moves for the selected piece.
      *
      */
-    public void showAvailableMoves(ArrayList<Move> possibleMoves) {
+    private void showAvailableMoves(ArrayList<Move> possibleMoves) {
         if (possibleMoves != null) {
             view.showTilesAsMoves(possibleMoves);
         }
     }
 
-    public void showNewPossibleMoves() {
+    /**
+     * Show the possible moves for a chess piece.
+     */
+    private void showNewPossibleMoves() {
         /*
         There where no possible moves so no chess piece can be captured.
         Show the possible moves of the chesspiece in this tile.
         Only do this when the player is human
          */
         ChessColour playerColour = currentlySelectedVisualTile.getChessPiece().getColour();
-        if (playerColour == game.getTurnColour()
-                //&& !state.weHaveAWinner()
+        if (playerColour == game.getTurnColour() && !game.weHaveAWinner()
                 && !(game.getPlayer(playerColour) instanceof AI)) {
             possibleMoves = currentlySelectedVisualTile.getChessPiece().getPossibleMoves();
             previousSelectedVisualTile = currentlySelectedVisualTile;

@@ -20,25 +20,25 @@ import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessPiece;
 import com.tomirio.chessengine.chessboard.Log;
 import com.tomirio.chessengine.chessboard.Position;
-import com.tomirio.chessengine.chessboard.State;
 import com.tomirio.chessengine.controller.MouseListener;
 import com.tomirio.chessengine.game.Game;
 import com.tomirio.chessengine.moves.Move;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import javafx.beans.value.ObservableValue;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
 import javafx.scene.paint.Paint;
+import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
 
 /**
@@ -92,10 +92,6 @@ public final class View {
      */
     public StackPane root;
     /**
-     * The state.
-     */
-    public State state;
-    /**
      * The visualBoard contains all the visual tiles.
      */
     public VisualTile[][] visualBoard;
@@ -106,7 +102,6 @@ public final class View {
      */
     public View(Stage primaryStage) {
         log = new Log();
-        state = new State();
         imageLoader = new ImageLoader();
         createMainWindow(primaryStage);
     }
@@ -128,7 +123,7 @@ public final class View {
         mainWindow = primaryStage;
         visualBoard = new VisualTile[8][8];
         chessBoard = new ChessBoard();
-        game = new Game(state, chessBoard, this);
+        game = new Game(chessBoard, this);
         mouseListener = new MouseListener(this, game);
 
         // Root will contain every visual aspect
@@ -147,15 +142,40 @@ public final class View {
         chessboardGrid.setAlignment(Pos.CENTER);
         visualChessBoard.setCenter(chessboardGrid);
 
-        Image doMoveImage = new Image("png/buttons/do.png");
-        Image undoMoveImage = new Image("png/buttons/undo.png");
+        // Create SVG images containg left and right arrows.
+        SVGPath doSvg = new SVGPath();
+        SVGPath undoSVG = new SVGPath();
+        doSvg.setContent("M24.291,14.276L14.705,4.69c-0.878-0.878-2.317-0.878-3.195,0l-0.8,0.8c-0.878,0.877-0.878,2.316,0,3.194 "
+                + "L18.024,16l-7.315,7.315c-0.878,0.878-0.878,2.317,0,3.194l0.8,0.8c0.878,0.879,2.317,0.879,3.195,0l9.586-9.587 "
+                + "c0.472-0.471,0.682-1.103,0.647-1.723C24.973,15.38,24.763,14.748,24.291,14.276z");
+        undoSVG.setContent("M7.701,14.276l9.586-9.585c0.879-0.878,2.317-0.878,3.195,0l0.801,0.8c0.878,0.877,0.878,2.316,0,3.194  "
+                + "L13.968,16l7.315,7.315c0.878,0.878,0.878,2.317,0,3.194l-0.801,0.8c-0.878,0.879-2.316,0.879-3.195,0l-9.586-9.587  "
+                + "C7.229,17.252,7.02,16.62,7.054,16C7.02,15.38,7.229,14.748,7.701,14.276z");
 
-        Button b2 = new Button();
-        b2.setGraphic(new ImageView(doMoveImage));
-        Button b1 = new Button();
-        b1.setGraphic(new ImageView(undoMoveImage));
+        // Set button images.
+        Button doMoveBtn = new Button();
+        Button undoMoveBtn = new Button();
+        doMoveBtn.setGraphic(doSvg);
+        undoMoveBtn.setGraphic(undoSVG);
+
+        // Add mouse click listeners.
+        doMoveBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                game.doMove();
+            }
+        });
+
+        undoMoveBtn.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                game.undoMove();
+            }
+        });
+
+        // Create horizontal box with buttons
         HBox buttonBar = new HBox();
-        buttonBar.getChildren().addAll(b1, b2);
+        buttonBar.getChildren().addAll(undoMoveBtn, doMoveBtn);
         buttonBar.setAlignment(Pos.TOP_CENTER);
         visualChessBoard.setBottom(buttonBar);
 

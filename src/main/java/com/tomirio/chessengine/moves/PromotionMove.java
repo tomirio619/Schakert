@@ -36,7 +36,7 @@ public class PromotionMove extends NormalMove {
      * @param pawn The pawn.
      * @param newPos The new position.
      */
-    public PromotionMove(Pawn pawn, Position newPos) {
+    public PromotionMove(ChessPiece pawn, Position newPos) {
         super(pawn, newPos);
     }
 
@@ -47,26 +47,37 @@ public class PromotionMove extends NormalMove {
             // Enemy piece is captured
             possibleCapturedPiece = chessBoard.getPiece(newPos);
         }
+        // Move the pawn to the new position
         chessBoard.silentMovePiece(piece, newPos);
+        // Create a queen with the same colour and position of the pawn we just moved.
         Queen q = new Queen(piece.getColour(), piece.getPos(), chessBoard);
         chessBoard.setPiece(q);
+        // Set piece to the queen we just created
         piece = q;
-        //super.updateGame();
+        chessBoard.setVulnerableEnPassantPos(null);
+        chessBoard.updateKingStatus();
     }
 
     @Override
     public void undoMove() {
         super.undoMove();
-        Pawn p = new Pawn(piece.getColour(), orgPos, chessBoard);
+        /*
+        Create a new pawn with the position of queen we just moved back.
+        Note that we cannot use orgPos here, it will give the wrong position.
+        Might be due to the reference being passed to the queen, which could be
+        modified in the move is done and undone multiple times.
+         */
+        Pawn p = new Pawn(piece.getColour(), piece.getPos(), chessBoard);
         chessBoard.setPiece(p);
+        // Set the piece to the pawn we just created
         piece = p;
-
         if (possibleCapturedPiece != null) {
             // During the promotion in this move, an enemy piece was captured.
             chessBoard.setPiece(possibleCapturedPiece);
         }
         possibleCapturedPiece = null;
-        //super.updateGame();
+        chessBoard.setVulnerableEnPassantPos(this.orgVulnerableEnPassantPos);
+        chessBoard.updateKingStatus();
     }
 
 }

@@ -20,7 +20,6 @@ import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
 import com.tomirio.chessengine.chessboard.Position;
-import com.tomirio.chessengine.chessboard.State;
 import com.tomirio.chessengine.game.Player;
 import com.tomirio.chessengine.moves.Move;
 import java.util.ArrayList;
@@ -74,8 +73,7 @@ public class AI extends Player implements Runnable {
      */
     private ArrayList<Node> generateChildNodes(Node node) {
         ArrayList<Node> childNodes = new ArrayList<>();
-        State currentState = null;
-        ChessColour hasTurn = currentState.getTurnColour();
+        ChessColour hasTurn = null;
         ArrayList<ChessPiece> pieces = node.chessBoard.getPieces(hasTurn);
 //        for (ChessPiece piece : pieces) {
 //            ArrayList<Position> moves = piece.getPossibleMoves();
@@ -130,9 +128,8 @@ public class AI extends Player implements Runnable {
      */
     public Pair<Node, Double> negaMax(Node node, int depth, double alpha, double beta) {
         assert depth >= 0;
-        State currentState = null;
-        if (depth == 0 || (currentState.weHaveAWinner()) || (currentState.isDraw())) {
-            assert currentState.getTurnColour() == ((depth % 2 == 0) ? playerColour : playerColour.getOpposite());
+        if (depth == 0 // || (currentState.weHaveAWinner()) || (currentState.isDraw()
+                ) {
             return new Pair<>(node, eval.evaluate(node.chessBoard, playerColour));
         }
         ArrayList<Node> childNodes = generateChildNodes(node);

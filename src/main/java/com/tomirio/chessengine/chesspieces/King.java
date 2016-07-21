@@ -202,18 +202,18 @@ public class King extends ChessPiece {
 
     /**
      *
-     * @param pos The position.
+     * @param p The position.
      * @return <code>True</code> if the position is a safe position. This means
      * that the king cannot be captured on this position and that the king is
      * not check after moving to this position. <code>False</code> otherwise.
      */
-    public boolean isSafePosition(Position pos) {
+    public boolean isSafePosition(Position p) {
         for (int row = 0; row < ChessBoard.ROWS; row++) {
             for (int column = 0; column < ChessBoard.COLS; column++) {
                 if (chessBoard.isOccupiedPosition(row, column)
                         && chessBoard.getColour(row, column) != getColour()) {
                     ChessPiece piece = chessBoard.getPiece(row, column);
-                    if (piece.posCanBeCaptured(pos) || piece.posIsCovered(pos)) {
+                    if (piece.posCanBeCaptured(p) || piece.posIsCovered(p)) {
                         return false;
                     }
                 }

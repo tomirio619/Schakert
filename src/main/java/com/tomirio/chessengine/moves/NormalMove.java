@@ -16,6 +16,7 @@
  */
 package com.tomirio.chessengine.moves;
 
+import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
 import com.tomirio.chessengine.chessboard.PieceType;
 import com.tomirio.chessengine.chessboard.Position;
@@ -38,16 +39,18 @@ public class NormalMove extends Move {
 
     @Override
     public void doMove() {
-        System.out.println("We kijken naar de methode doMove van het stuk " + piece);
-
         if (piece.getType() == PieceType.Pawn) {
             if (Math.abs(newPos.getRow() - orgPos.getRow()) == 2) {
-                // This move enables enPassant
-                chessBoard.setVulnerableEnPassantPos(newPos.deepClone());
+                // This move enables enPassant.
+                int rowShift = (piece.getColour() == ChessColour.White) ? 1 : -1;
+                Position vulnerableEnPassantPos = new Position(newPos.getRow() + rowShift, newPos.getColumn());
+                chessBoard.setVulnerableEnPassantPos(vulnerableEnPassantPos.deepClone());
             }
+        } else {
+            chessBoard.setVulnerableEnPassantPos(null);
         }
         chessBoard.silentMovePiece(piece, newPos);
-        //super.updateGame();
+        chessBoard.updateKingStatus();
     }
 
     ;
@@ -61,15 +64,9 @@ public class NormalMove extends Move {
 
     @Override
     public void undoMove() {
-        System.out.println("We kijken naar de methode undoMove van het stuk " + piece);
-        if (piece.getType() == PieceType.Pawn) {
-            if (Math.abs(newPos.getRow() - orgPos.getRow()) == 2) {
-                // This move disables enPassant
-                chessBoard.setVulnerableEnPassantPos(null);
-            }
-        }
+        chessBoard.setVulnerableEnPassantPos(orgVulnerableEnPassantPos);
         chessBoard.silentMovePiece(piece, orgPos);
-        //super.updateGame();
+        chessBoard.updateKingStatus();
     }
 
 }

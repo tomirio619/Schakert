@@ -14,30 +14,3 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tomirio.chessengine;
-
-import com.tomirio.chessengine.view.View;
-import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory;
-import javafx.application.Application;
-import javafx.stage.Stage;
-
-/**
- *
- * @author Tom Sandmann
- */
-public class ChessEngine extends Application {
-
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String[] args) {
-        launch(args);
-    }
-
-    @Override
-    public void start(Stage primaryStage) {
-        SvgImageLoaderFactory.install();
-        View view = new View(primaryStage);
-    }
-
-}

@@ -23,6 +23,7 @@ import com.tomirio.chessengine.chessboard.MoveDetails;
 import com.tomirio.chessengine.chessboard.PieceType;
 import com.tomirio.chessengine.chessboard.Position;
 import com.tomirio.chessengine.moves.CaptureMove;
+import com.tomirio.chessengine.moves.EnPassantMove;
 import com.tomirio.chessengine.moves.Move;
 import com.tomirio.chessengine.moves.NormalMove;
 import com.tomirio.chessengine.moves.PromotionMove;
@@ -68,9 +69,9 @@ public class Pawn extends ChessPiece {
      */
     private MoveDetails getCaptureMoves() {
         MoveDetails moveDetails = new MoveDetails();
-        int direction = (getColour() == ChessColour.Black) ? 1 : -1;
-        Position left = new Position(getRow() + direction * 1, getColumn() - 1);
-        Position right = new Position(getRow() + direction * 1, getColumn() + 1);
+        int rowShift = (getColour() == ChessColour.Black) ? 1 : -1;
+        Position left = new Position(getRow() + rowShift, getColumn() - 1);
+        Position right = new Position(getRow() + rowShift, getColumn() + 1);
 
         ArrayList<Position> positions = new ArrayList();
         positions.add(left);
@@ -107,10 +108,41 @@ public class Pawn extends ChessPiece {
                                 }
                         }
                     }
+                } else if (pos.equals(chessBoard.getVulnerableEnPassantPos())) {
+                    /*
+                    To prevent pieces of similar colours trying to execute an
+                    enPassant on a friendly piece, we must check if there is an enemy
+                    on the row above or below the vulnerable position.
+                     */
+                    // Inverse the rowshift, making it negative for black and positive for white pieces.
+                    rowShift = -rowShift;
+                    Position vulnerableEnPassantPos = chessBoard.getVulnerableEnPassantPos();
+                    if (chessBoard.isOccupiedPosition(vulnerableEnPassantPos.getRow() + rowShift,
+                            vulnerableEnPassantPos.getColumn())) {
+                        // The position is occupied.
+                        ChessPiece p = chessBoard.getPiece(vulnerableEnPassantPos.getRow() + rowShift,
+                                vulnerableEnPassantPos.getColumn());
+                        if (p.getColour() != getColour() && p.getType() == PieceType.Pawn) {
+                            // Enemy pawn, we can execute enPassant on it
+                            ChessPiece chessPiece = getCapturedEnPassantPawn();
+                            EnPassantMove enPassantMove = new EnPassantMove(this, pos, chessPiece);
+                            moveDetails.moves.add(enPassantMove);
+                        }
+                    }
                 }
             }
         }
         return moveDetails;
+    }
+
+    /**
+     * Return the pawn that will be captured with an enPassant move.
+     *
+     * @return The pawn captured by the enPassant move.
+     */
+    private ChessPiece getCapturedEnPassantPawn() {
+        ChessPiece enPassantPawn = chessBoard.getPiece(getRow(), chessBoard.getVulnerableEnPassantPos().getColumn());
+        return enPassantPawn;
     }
 
     @Override
@@ -126,7 +158,7 @@ public class Pawn extends ChessPiece {
     private ArrayList<Move> getInitialNonCaptureMoves() {
         ArrayList<Move> initialMoves = new ArrayList();
         int direction = (getColour() == ChessColour.Black) ? 1 : -1;
-        Position singleStep = new Position(getRow() + direction * 1, getColumn());
+        Position singleStep = new Position(getRow() + direction, getColumn());
         if (chessBoard.isOccupiedPosition(singleStep)) {
             return initialMoves;
         } else {
@@ -152,7 +184,7 @@ public class Pawn extends ChessPiece {
     private ArrayList<Move> getNonCaptureMoves() {
         ArrayList<Move> initialMoves = new ArrayList();
         int direction = (getColour() == ChessColour.Black) ? 1 : -1;
-        Position singleStep = new Position(getRow() + direction * 1, getColumn());
+        Position singleStep = new Position(getRow() + direction, getColumn());
 
         if (chessBoard.isOccupiedPosition(singleStep)) {
             // Position in front of pawn is occupied
@@ -197,13 +229,24 @@ public class Pawn extends ChessPiece {
     private MoveDetails getPawnMoves() {
         MoveDetails moveDetails = new MoveDetails();
         moveDetails.add(getCaptureMoves());
-        if (getPos().getRow() == 1 || getPos().getRow() == 6) {
-            moveDetails.moves.addAll(getInitialNonCaptureMoves());
-            return moveDetails;
-        } else {
-            moveDetails.moves.addAll(getNonCaptureMoves());
-            return moveDetails;
+        switch (getColour()) {
+            case Black:
+                if (getPos().getRow() == 1) {
+                    moveDetails.moves.addAll(getInitialNonCaptureMoves());
+                } else {
+                    moveDetails.moves.addAll(getNonCaptureMoves());
+                }
+                break;
+            case White:
+                if (getPos().getRow() == 6) {
+                    moveDetails.moves.addAll(getInitialNonCaptureMoves());
+                } else {
+                    moveDetails.moves.addAll(getNonCaptureMoves());
+                }
+                break;
         }
+        moveDetails.moves.addAll(getNonCaptureMoves());
+        return moveDetails;
     }
 
     @Override
@@ -223,8 +266,16 @@ public class Pawn extends ChessPiece {
     }
 
     @Override
-    public boolean posIsCovered(Position pos) {
-        return getPawnMoves().coveredFriendlyPieces.contains(pos);
+    public boolean posCanBeCaptured(Position p) {
+        int rowShift = (getColour() == ChessColour.Black) ? 1 : -1;
+        Position left = new Position(getRow() + rowShift, getColumn() - 1);
+        Position right = new Position(getRow() + rowShift, getColumn() + 1);
+        return (p.equals(left) || p.equals(right));
+    }
+
+    @Override
+    public boolean posIsCovered(Position p) {
+        return getPawnMoves().coveredFriendlyPieces.contains(p);
     }
 
 }

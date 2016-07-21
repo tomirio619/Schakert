@@ -16,8 +16,8 @@
  */
 package com.tomirio.chessengine.moves;
 
+import com.tomirio.chessengine.chessboard.ChessPiece;
 import com.tomirio.chessengine.chessboard.Position;
-import com.tomirio.chessengine.chesspieces.Pawn;
 
 /**
  *
@@ -31,7 +31,7 @@ public class EnPassantMove extends CaptureMove {
      * @param newPos The new position.
      * @param capturedPawn The captured pawn.
      */
-    public EnPassantMove(Pawn pawn, Position newPos, Pawn capturedPawn) {
+    public EnPassantMove(ChessPiece pawn, Position newPos, ChessPiece capturedPawn) {
         super(pawn, newPos);
         // super sets the wrong capturedPiece, so we have to update it.
         this.capturedPiece = capturedPawn;
@@ -42,6 +42,7 @@ public class EnPassantMove extends CaptureMove {
         chessBoard.setVulnerableEnPassantPos(null);
         chessBoard.silentMovePiece(piece, newPos);
         chessBoard.deletePieceOnPos(capturedPiece.getPos());
+        chessBoard.updateKingStatus();
     }
 
     @Override

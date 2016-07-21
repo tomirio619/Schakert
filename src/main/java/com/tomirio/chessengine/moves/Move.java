@@ -39,6 +39,8 @@ public abstract class Move {
      * The position of the piece before the move took place.
      */
     Position orgPos;
+
+    Position orgVulnerableEnPassantPos;
     /**
      * The piece involved in the move
      */
@@ -54,6 +56,9 @@ public abstract class Move {
         this.orgPos = piece.getPos().deepClone();
         this.newPos = newPos.deepClone();
         this.chessBoard = piece.getChessBoard();
+        if (chessBoard.getVulnerableEnPassantPos() != null) {
+            this.orgVulnerableEnPassantPos = chessBoard.getVulnerableEnPassantPos().deepClone();
+        }
     }
 
     /**
@@ -86,12 +91,4 @@ public abstract class Move {
      * Undo the move.
      */
     public abstract void undoMove();
-
-    /**
-     * Update the game.
-     */
-    public void updateGame() {
-        chessBoard.updateKingStatus();
-    }
-
 }

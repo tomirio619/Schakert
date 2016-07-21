@@ -22,7 +22,6 @@ import static com.tomirio.chessengine.chessboard.ChessBoard.ROWS;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
 import com.tomirio.chessengine.chessboard.Position;
-import com.tomirio.chessengine.chessboard.State;
 import java.util.NoSuchElementException;
 
 /**
@@ -83,8 +82,7 @@ public class Evaluation {
      * given colour.
      */
     public double evaluate(ChessBoard chessBoard, ChessColour playerColour) {
-        State currentState = null;
-        ChessColour hasTurn = currentState.getTurnColour();
+        ChessColour hasTurn = null; //TODO MUST FIX THIS.
         double evaluationScore = evaluateBoard(chessBoard, hasTurn);
         double enemyEvaluationScore = evaluateBoard(chessBoard, hasTurn.getOpposite());
         double heuristicValue = evaluationScore - enemyEvaluationScore;

@@ -43,6 +43,10 @@ public class ChessBoard extends Observable implements Serializable {
      * The number of rows of the board.
      */
     public static final int ROWS = 8;
+    /**
+     * The black king.
+     */
+    private King blackKing;
 
     /**
      * The board containing all the chess pieces.
@@ -56,6 +60,11 @@ public class ChessBoard extends Observable implements Serializable {
      * such a capture.
      */
     private Position vulnerableEnPassantPos;
+
+    /**
+     * The white king.
+     */
+    private King whiteKing;
 
     /**
      * Constructor.
@@ -108,6 +117,7 @@ public class ChessBoard extends Observable implements Serializable {
 
     /**
      * Delete a chess piece on a specified position
+     *
      * @param pos The position of the chess piece that has to be deleted.
      */
     public void deletePieceOnPos(Position pos) {
@@ -147,23 +157,13 @@ public class ChessBoard extends Observable implements Serializable {
     }
 
     /**
-     * Get the king with a specific colour.
+     * Get the king based on a given colour
      *
-     * @param colour The colour of the king.
+     * @param colour The colour.
      * @return The king that has the specified colour.
      */
     public King getKing(ChessColour colour) {
-        for (int r = 0; r < ROWS; r++) {
-            for (int c = 0; c < COLS; c++) {
-                if (isOccupiedPosition(r, c) && getPiece(r, c).getType() == PieceType.King) {
-                    King k = (King) getPiece(r, c);
-                    if (k.getColour() == colour) {
-                        return k;
-                    }
-                }
-            }
-        }
-        return null;
+        return (colour == ChessColour.White) ? whiteKing : blackKing;
     }
 
     /**
@@ -258,9 +258,10 @@ public class ChessBoard extends Observable implements Serializable {
     }
 
     /**
-     * Get the position of the pawn that currently is vulnerable for an enPassant
-     * capture.
-     * @return  The position of the pawn vulnerable for an enPassant capture.
+     * Get the position of the pawn that currently is vulnerable for an
+     * enPassant capture.
+     *
+     * @return The position of the pawn vulnerable for an enPassant capture.
      */
     public Position getVulnerableEnPassantPos() {
         return vulnerableEnPassantPos;
@@ -301,7 +302,8 @@ public class ChessBoard extends Observable implements Serializable {
 
         // Black King and Queen
         board[0][3] = new Queen(ChessColour.Black, new Position(0, 3));
-        board[0][4] = new King(ChessColour.Black, new Position(0, 4));
+        blackKing = new King(ChessColour.Black, new Position(0, 4));
+        board[0][4] = blackKing;
 
         // White pawns
         for (int col = 0; col < COLS; col++) {
@@ -322,7 +324,8 @@ public class ChessBoard extends Observable implements Serializable {
 
         // White King and Queen
         board[7][3] = new Queen(ChessColour.White, new Position(7, 3));
-        board[7][4] = new King(ChessColour.White, new Position(7, 4));
+        whiteKing = new King(ChessColour.White, new Position(7, 4));
+        board[7][4] = whiteKing;
     }
 
     /**
@@ -396,19 +399,19 @@ public class ChessBoard extends Observable implements Serializable {
      * making this test move. A move can also make other pieces captured, which
      * are not restored when just calling <code>silentRestorePiece()</code>.
      *
+     * @param move The move.
      * @return <code>True</code> if this position is a valid move for the given
      * chess piece. <code>False</code> otherwise.
      */
     public boolean isValidMove(Move move) {
-        System.out.println("Voor mode zag het bord er zo uit:\n" + this);
         move.doMove();
-        System.out.println("Na de doMove()\n" + this);
 
-        King k = getKing(move.getInvolvedPiece().getColour());
+        ChessColour pieceColour = move.getInvolvedPiece().getColour();
+        King k = getKing(pieceColour);
         boolean valid = k.isSafePosition(k.getPos());
 
         move.undoMove();
-        System.out.println("Na de undoMove\n" + this);
+
         return valid;
     }
 
@@ -477,24 +480,36 @@ public class ChessBoard extends Observable implements Serializable {
             for (int c = 0; c < COLS; c++) {
                 if (isOccupiedPosition(r, c)) {
                     ChessPiece p = getPiece(r, c);
-                    ArrayList<Move> possibleMoves = p.getPossibleMoves();
-                    for (Move move : possibleMoves) {
-                        if (move.getNewPos().equals(getKing(ChessColour.White).getPos())) {
-                            getKing(ChessColour.White).setCheck(true);
-                            whiteKingChanged = true;
-                        } else if (move.getNewPos().equals(getKing(ChessColour.Black).getPos())) {
-                            getKing(ChessColour.Black).setCheck(true);
-                            blackKingChanged = true;
-                        }
+                    switch (p.getColour()) {
+                        case Black:
+                            /*
+                            Check if this black piece can capture the position
+                            of the white king
+                             */
+                            if (p.posCanBeCaptured(whiteKing.getPos())) {
+                                whiteKing.setCheck(true);
+                                whiteKingChanged = true;
+                            }
+                            break;
+                        case White:
+                            /*
+                            Check if this white piece can capture the position
+                            of the black king
+                             */
+                            if (p.posCanBeCaptured(blackKing.getPos())) {
+                                blackKing.setCheck(blackKingChanged);
+                                blackKingChanged = true;
+                            }
+
                     }
                 }
             }
         }
         if (!whiteKingChanged) {
-            getKing(ChessColour.White).setCheck(false);
+            whiteKing.setCheck(false);
         }
         if (!blackKingChanged) {
-            getKing(ChessColour.Black).setCheck(false);
+            blackKing.setCheck(false);
         }
     }
 }

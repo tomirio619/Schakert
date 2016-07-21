@@ -39,11 +39,9 @@ public class CaptureMove extends NormalMove {
 
     @Override
     public void undoMove() {
-        System.out.println("In captureMove: voor de undoMove:\n" + chessBoard);
-        System.out.println("Het geslagen stuk was " + capturedPiece);
         super.undoMove();
         chessBoard.setPiece(capturedPiece);
-        System.out.println("in captureMove: na de undoMove:\n" + chessBoard);
-        //super.updateGame();
+        chessBoard.setVulnerableEnPassantPos(this.orgVulnerableEnPassantPos);
+        chessBoard.updateKingStatus();
     }
 }
