@@ -74,7 +74,6 @@ public class Log extends GridPane {
 
             this.add(moveNumber, 0, moveCounter);
 
-            System.out.println(move);
             Label newMove = new Label(move.toString());
             newMove.setTextFill(Color.BLACK);
 
