@@ -27,7 +27,7 @@
                 <version>8.5.0</version>
                 <configuration>
                     <mainClass>com.tomirio.chessengine.ChessEngine</mainClass>
-                    <updateExistingJar>false</updateExistingJar>
+                    <updateExistingJar>true</updateExistingJar>
                 </configuration>
                 <executions>
                     <execution>

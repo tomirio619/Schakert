@@ -46,14 +46,6 @@ public class Rook extends ChessPiece {
     }
 
     /**
-     * @return <code>True</code> if castling is possible, <code>False</code>
-     * otherwise.
-     */
-    public boolean castlingPossible() {
-        return castlingPossible;
-    }
-
-    /**
      *
      * @param o The object.
      * @return <code>True</code> if the object is equal to the instance of this
@@ -62,6 +54,14 @@ public class Rook extends ChessPiece {
     @Override
     public boolean equals(Object o) {
         return super.equals(o);
+    }
+
+    /**
+     * @return <code>True</code> if castling is possible, <code>False</code>
+     * otherwise.
+     */
+    public boolean getCastlingPossible() {
+        return castlingPossible;
     }
 
     /**
@@ -111,5 +111,10 @@ public class Rook extends ChessPiece {
     @Override
     public boolean posIsCovered(Position p) {
         return getRookMoves().coveredFriendlyPieces.contains(p);
+    }
+
+    @Override
+    public String toString() {
+        return super.toString() + " castlingPossible: " + this.castlingPossible;
     }
 }

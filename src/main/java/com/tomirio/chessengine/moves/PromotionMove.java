@@ -59,13 +59,37 @@ public class PromotionMove extends NormalMove {
     }
 
     @Override
+    public String toString() {
+        String prefix = "";
+        if (this.isDisambiguatingMove() != null) {
+            prefix += this.getUniquePrefix(isDisambiguatingMove());
+        }
+        if (possibleCapturedPiece != null) {
+            if (this.putsEnemyKingInCheckMate()) {
+                return prefix + orgPos.toString() + "x" + newPos.toString() + "=Q" + "#";
+            } else if (this.putsEnemyKingInCheck()) {
+                return prefix + orgPos.toString() + "x" + newPos.toString() + "=Q" + "+";
+            } else {
+                return prefix + orgPos.toString() + "x" + newPos.toString() + "=Q";
+            }
+
+        } else if (this.putsEnemyKingInCheckMate()) {
+            return prefix + newPos.toString() + "=Q" + "#";
+        } else if (this.putsEnemyKingInCheck()) {
+            return prefix + newPos.toString() + "=Q" + "+";
+        } else {
+            return prefix + newPos.toString() + "=Q";
+        }
+    }
+
+    @Override
     public void undoMove() {
         super.undoMove();
         /*
         Create a new pawn with the position of queen we just moved back.
         Note that we cannot use orgPos here, it will give the wrong position.
         Might be due to the reference being passed to the queen, which could be
-        modified in the move is done and undone multiple times.
+        modified if the move is done and undone multiple times.
          */
         Pawn p = new Pawn(piece.getColour(), piece.getPos(), chessBoard);
         chessBoard.setPiece(p);
@@ -76,7 +100,7 @@ public class PromotionMove extends NormalMove {
             chessBoard.setPiece(possibleCapturedPiece);
         }
         possibleCapturedPiece = null;
-        chessBoard.setVulnerableEnPassantPos(this.orgVulnerableEnPassantPos);
+        restoreVulnerableEnPassantPosition();
         chessBoard.updateKingStatus();
     }
 

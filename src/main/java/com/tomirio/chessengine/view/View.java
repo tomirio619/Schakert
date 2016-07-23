@@ -18,7 +18,6 @@ package com.tomirio.chessengine.view;
 
 import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessPiece;
-import com.tomirio.chessengine.chessboard.Log;
 import com.tomirio.chessengine.chessboard.Position;
 import com.tomirio.chessengine.controller.MouseListener;
 import com.tomirio.chessengine.game.Game;
@@ -33,6 +32,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
+import javafx.scene.control.ScrollPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
@@ -107,7 +107,8 @@ public final class View {
     }
 
     /**
-     * Adds listeners to the width and height property of the gridpane.
+     * Adds listeners to the width and height property of the visual
+     * representation of the chessboard, which essentially is a GridPane .
      */
     private void addResizeHandlers() {
         chessboardGrid.widthProperty().addListener((ObservableValue<? extends Number> observableValue, Number oldSceneWidth, Number newSceneWidth) -> {
@@ -123,7 +124,7 @@ public final class View {
         mainWindow = primaryStage;
         visualBoard = new VisualTile[8][8];
         chessBoard = new ChessBoard();
-        game = new Game(chessBoard, this);
+        game = new Game(chessBoard, this, log);
         mouseListener = new MouseListener(this, game);
 
         // Root will contain every visual aspect
@@ -180,7 +181,16 @@ public final class View {
         visualChessBoard.setBottom(buttonBar);
 
         borderPane.setCenter(visualChessBoard);
-        borderPane.setRight(log);
+
+        // Make log scrollable
+        ScrollPane scrollableLog = new ScrollPane();
+        scrollableLog.setContent(log);
+        scrollableLog.setFitToHeight(true);
+        scrollableLog.setFitToWidth(true);
+        // Make sure it automatically scrolls down.
+        scrollableLog.vvalueProperty().bind(log.heightProperty());
+
+        borderPane.setRight(scrollableLog);
         root.getChildren().add(borderPane);
         Scene mainWindowScene = new Scene(root);
         mainWindow.getIcons().add(ImageLoader.icon);
@@ -188,7 +198,8 @@ public final class View {
         mainWindow.centerOnScreen();
         mainWindow.setScene(mainWindowScene);
         mainWindow.sizeToScene();
-        mainWindow.setResizable(true);
+        // Currently resizing is disabled.
+        mainWindow.setResizable(false);
         mainWindow.show();
         mainWindow.setMinWidth(primaryStage.getWidth());
         mainWindow.setMinHeight(primaryStage.getHeight());
@@ -346,16 +357,6 @@ public final class View {
      * @param chessBoard The chess board.
      */
     public void update(ChessBoard chessBoard) {
-
-//        else{
-//            ChessBoard b = (ChessBoard) arg;
-//            chessBoard = b;
-//            state = chessBoard.getState();
-//            if (state.weHaveAWinner()) {
-//                System.out.println("The winner is " + state.getWinner());
-//            } else if (state.isDraw()) {
-//                System.out.println("It is a draw!");
-//            }
         drawBoard();
     }
 

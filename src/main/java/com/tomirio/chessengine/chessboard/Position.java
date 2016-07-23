@@ -126,26 +126,25 @@ public class Position implements Serializable {
     public String toString() {
         switch (column) {
             case 0:
-                return "(" + "a" + "," + (8 - row) + ")";
+                return "a" + (8 - row);
             case 1:
-                return "(" + "b" + "," + (8 - row) + ")";
+                return "b" + (8 - row);
             case 2:
-                return "(" + "c" + "," + (8 - row) + ")";
+                return "c" + (8 - row);
             case 3:
-                return "(" + "d" + "," + (8 - row) + ")";
+                return "d" + (8 - row);
             case 4:
-                return "(" + "e" + "," + (8 - row) + ")";
+                return "e" + (8 - row);
             case 5:
-                return "(" + "f" + "," + (8 - row) + ")";
+                return "f" + (8 - row);
             case 6:
-                return "(" + "g" + "," + (8 - row) + ")";
+                return "g" + (8 - row);
             case 7:
-                return "(" + "h" + "," + (8 - row) + ")";
+                return "h" + (8 - row);
             default:
                 throw new IndexOutOfBoundsException("The position"
                         + "(" + row + ", " + column + ")"
                         + " is not within the board!");
         }
     }
-
 }

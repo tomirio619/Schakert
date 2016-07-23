@@ -21,6 +21,7 @@ import com.tomirio.chessengine.chessboard.ChessBoard;
 import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chesspieces.King;
 import com.tomirio.chessengine.moves.Move;
+import com.tomirio.chessengine.view.Log;
 import com.tomirio.chessengine.view.View;
 import java.util.ArrayList;
 import java.util.NoSuchElementException;
@@ -51,6 +52,11 @@ public class Game {
      * The colour having turn.
      */
     private ChessColour hasTurn;
+
+    /**
+     * The log.
+     */
+    private final Log log;
     /**
      * All the moves that led to the current state of the chess board.
      */
@@ -80,12 +86,14 @@ public class Game {
      * Constructor
      *
      * @param chessBoard The chessboard.
-     * @param view
+     * @param view The view.
      */
-    public Game(ChessBoard chessBoard, View view) {
+    public Game(ChessBoard chessBoard, View view, Log log) {
+        this.log = log;
         whiteIsCheckMate = false;
         blackIsCheckMate = false;
         staleMate = false;
+
         this.chessBoard = chessBoard;
         this.view = view;
         moveList = new ArrayList<>();
@@ -120,7 +128,6 @@ public class Game {
                 // There is a next move in the list we can apply
                 Move move = moveList.get(appliedMove + 1);
                 move.doMove();
-
                 appliedMove++;
                 updateTurn();
 
@@ -162,6 +169,11 @@ public class Game {
      */
     public void humanPlay(Move move) {
         updateTurn();
+        removeObsoleteMoves();
+        moveList.add(move);
+        log.addMove(move);
+        appliedMove++;
+        // Only apply the move when we have the String representation
         switch (hasTurn) {
             case Black:
                 blackPlayer.makeMove(move);
@@ -170,9 +182,7 @@ public class Game {
                 whitePlayer.makeMove(move);
                 break;
         }
-        removeObsoleteMoves();
-        moveList.add(move);
-        appliedMove++;
+        updateGameStatus();
         view.update(chessBoard);
         updatePlayers();
     }
@@ -256,14 +266,17 @@ public class Game {
                 && !blackKing.isCheck()
                 && !chessBoard.canMakeAMove(ChessColour.Black)) {
             staleMate = true;
+            log.gameFinished(chessBoard);
         } else if (whiteKing.isCheck()
                 && whiteKing.getPossibleMoves().isEmpty()
                 && !chessBoard.canMakeAMove(ChessColour.White)) {
             winner = ChessColour.Black;
+            log.gameFinished(chessBoard);
         } else if (blackKing.isCheck()
                 && blackKing.getPossibleMoves().isEmpty()
                 && !chessBoard.canMakeAMove(ChessColour.Black)) {
             winner = ChessColour.White;
+            log.gameFinished(chessBoard);
         }
     }
 

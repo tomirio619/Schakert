@@ -85,6 +85,7 @@ public abstract class ChessPiece implements Serializable {
     /**
      * Make a move on the chess board without updating the GUI.
      *
+     * @param move The move.
      */
     public void agentMove(Move move) {
         move.doMove();
@@ -322,6 +323,7 @@ public abstract class ChessPiece implements Serializable {
     /**
      * Move the chess piece to a new position.
      *
+     * @param move The move.
      */
     public void move(Move move) {
         move.doMove();
@@ -375,7 +377,6 @@ public abstract class ChessPiece implements Serializable {
      */
     @Override
     public String toString() {
-        return colour + "\t | " + pos + " | " + type;
+        return colour + " | " + pos + " | " + type;
     }
-
 }

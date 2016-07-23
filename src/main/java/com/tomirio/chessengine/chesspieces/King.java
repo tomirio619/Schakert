@@ -34,7 +34,14 @@ import java.util.ArrayList;
  */
 public class King extends ChessPiece {
 
+    /**
+     * Indicate if castling is possible
+     */
     private boolean castlingPossible;
+
+    /**
+     * indicate if the king is check
+     */
     private boolean isCheck;
 
     /**
@@ -49,15 +56,6 @@ public class King extends ChessPiece {
         super(PieceType.King, colour, pos);
         isCheck = false;
         castlingPossible = true;
-    }
-
-    /**
-     *
-     * @return <code>True</code> if castling is possible, <code>False</code>
-     * otherwise.
-     */
-    public boolean castlingPossible() {
-        return castlingPossible;
     }
 
     @Override
@@ -102,7 +100,7 @@ public class King extends ChessPiece {
             return castlingMoves;
         } else {
             for (Rook rook : rooks) {
-                if (rook.castlingPossible() && rook.getRow() == getRow()) {
+                if (rook.getCastlingPossible() && rook.getRow() == getRow()) {
                     if (chessBoard.isEmptySubRow(getPos(), rook.getPos())) {
                         CastlingMove castlingMove = getCastlingMove(rook);
                         if (castlingMove != null) {
@@ -114,6 +112,15 @@ public class King extends ChessPiece {
             }
             return castlingMoves;
         }
+    }
+
+    /**
+     *
+     * @return <code>True</code> if castling is possible, <code>False</code>
+     * otherwise.
+     */
+    public boolean getCastlingPossible() {
+        return castlingPossible;
     }
 
     /**
@@ -192,12 +199,10 @@ public class King extends ChessPiece {
     }
 
     /**
-     * Setter for the isCheck value.
-     *
-     * @param value the new value for isCheck.
+     * @param newValue Set wheter the king is check or not.
      */
-    public void setCheck(boolean value) {
-        isCheck = value;
+    public void setCheck(boolean newValue) {
+        isCheck = newValue;
     }
 
     /**
@@ -263,7 +268,7 @@ public class King extends ChessPiece {
 
     @Override
     public String toString() {
-        return super.toString();
+        return super.toString() + " Castling possible: " + this.castlingPossible;
     }
 
 }

@@ -37,7 +37,7 @@ public abstract class Player {
     /**
      * Make a move as a human player
      *
-     * @param piece The chess piece
+     * @param move The move.
      */
     public abstract void makeMove(Move move);
 

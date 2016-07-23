@@ -17,6 +17,7 @@
 package com.tomirio.chessengine.moves;
 
 import com.tomirio.chessengine.chessboard.ChessPiece;
+import com.tomirio.chessengine.chessboard.PieceType;
 import com.tomirio.chessengine.chessboard.Position;
 
 /**
@@ -35,6 +36,30 @@ public class CaptureMove extends NormalMove {
     public CaptureMove(ChessPiece piece, Position newPos) {
         super(piece, newPos);
         capturedPiece = chessBoard.getPiece(newPos);
+    }
+
+    @Override
+    public String toString() {
+        String prefix = "";
+        if (this.isDisambiguatingMove() != null) {
+            prefix += this.getUniquePrefix(isDisambiguatingMove());
+        }
+        if (piece.getType() == PieceType.Pawn) {
+            if (putsEnemyKingInCheckMate()) {
+                return prefix + "x" + newPos.toString() + "#";
+            } else if (putsEnemyKingInCheck()) {
+                return prefix + "x" + newPos.toString() + "+";
+            } else {
+                return prefix + "x" + newPos.toString();
+            }
+
+        } else if (this.putsEnemyKingInCheckMate()) {
+            return piece.getType().toShortString() + prefix + "x" + newPos.toString() + "#";
+        } else if (putsEnemyKingInCheck()) {
+            return piece.getType().toShortString() + prefix + "x" + newPos.toString() + "+";
+        } else {
+            return piece.getType().toShortString() + prefix + "x" + newPos.toString();
+        }
     }
 
     @Override

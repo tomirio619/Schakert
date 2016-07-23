@@ -47,8 +47,12 @@ public class EnPassantMove extends CaptureMove {
 
     @Override
     public String toString() {
-        return "enPassant move. Pawn that moved: " + piece + "\n"
-                + "New position of pawn: " + newPos
-                + "Captured piece: " + capturedPiece;
+        if (putsEnemyKingInCheckMate()) {
+            return orgPos.toString().charAt(0) + "x" + newPos.toString() + " e.p." + "#";
+        } else if (this.putsEnemyKingInCheck()) {
+            return orgPos.toString().charAt(0) + "x" + newPos.toString() + " e.p." + "+";
+        } else {
+            return orgPos.toString().charAt(0) + "x" + newPos.toString() + " e.p.";
+        }
     }
 }

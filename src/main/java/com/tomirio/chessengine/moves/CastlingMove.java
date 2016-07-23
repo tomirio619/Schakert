@@ -60,8 +60,27 @@ public class CastlingMove extends NormalMove {
 
     @Override
     public String toString() {
-        return "Castling move: king moved to " + newPos + "\n"
-                + "Castle moved to " + rookNewPos;
+        int colDist = Math.abs(rookOrgPos.getColumn() - orgPos.getColumn());
+        if (colDist == 3) {
+            // King side rook, castling short. 
+            if (this.putsEnemyKingInCheckMate()) {
+                return "O-O" + "#";
+            } else if (this.putsEnemyKingInCheck()) {
+                return "O-O" + "+";
+            } else {
+                return "O-O";
+            }
+
+        } else // Queen side rook, castling long.
+        {
+            if (this.putsEnemyKingInCheckMate()) {
+                return "O-O-O" + "#";
+            } else if (this.putsEnemyKingInCheck()) {
+                return "O-O-O" + "+";
+            } else {
+                return "O-O-O";
+            }
+        }
     }
 
     @Override

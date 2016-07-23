@@ -47,12 +47,10 @@ public class ChessBoard extends Observable implements Serializable {
      * The black king.
      */
     private King blackKing;
-
     /**
      * The board containing all the chess pieces.
      */
     private final ChessPiece[][] board;
-
     /**
      * Note that during a chess game, the maximum number of pawns that could be
      * captured with an enPassant move is 1. Therefore we use a single variable
@@ -474,42 +472,40 @@ public class ChessBoard extends Observable implements Serializable {
      * Updates the check status of both kings.
      */
     public void updateKingStatus() {
+        ArrayList<ChessPiece> allPieces = new ArrayList();
+        allPieces.addAll(getPieces(ChessColour.Black));
+        allPieces.addAll(getPieces(ChessColour.White));
         boolean whiteKingChanged = false;
         boolean blackKingChanged = false;
-        for (int r = 0; r < ROWS; r++) {
-            for (int c = 0; c < COLS; c++) {
-                if (isOccupiedPosition(r, c)) {
-                    ChessPiece p = getPiece(r, c);
-                    switch (p.getColour()) {
-                        case Black:
-                            /*
-                            Check if this black piece can capture the position
-                            of the white king
-                             */
-                            if (p.posCanBeCaptured(whiteKing.getPos())) {
-                                whiteKing.setCheck(true);
-                                whiteKingChanged = true;
-                            }
-                            break;
-                        case White:
-                            /*
-                            Check if this white piece can capture the position
-                            of the black king
-                             */
-                            if (p.posCanBeCaptured(blackKing.getPos())) {
-                                blackKing.setCheck(blackKingChanged);
-                                blackKingChanged = true;
-                            }
-
+        for (ChessPiece piece : allPieces) {
+            switch (piece.getColour()) {
+                case Black:
+                    /*
+                    Check if this black piece can capture the position
+                    of the white king
+                     */
+                    if (piece.posCanBeCaptured(whiteKing.getPos())) {
+                        whiteKing.setCheck(true);
+                        whiteKingChanged = true;
                     }
-                }
+                    break;
+                case White:
+                    /*
+                    Check if this white piece can capture the position
+                    of the black king
+                     */
+                    if (piece.posCanBeCaptured(blackKing.getPos())) {
+                        blackKing.setCheck(true);
+                        blackKingChanged = true;
+                    }
+            }
+            if (!whiteKingChanged) {
+                whiteKing.setCheck(false);
+            }
+            if (!blackKingChanged) {
+                blackKing.setCheck(false);
             }
         }
-        if (!whiteKingChanged) {
-            whiteKing.setCheck(false);
-        }
-        if (!blackKingChanged) {
-            blackKing.setCheck(false);
-        }
     }
+
 }

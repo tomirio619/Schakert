@@ -16,7 +16,6 @@
  */
 package com.tomirio.chessengine.moves;
 
-import com.tomirio.chessengine.chessboard.ChessColour;
 import com.tomirio.chessengine.chessboard.ChessPiece;
 import com.tomirio.chessengine.chessboard.PieceType;
 import com.tomirio.chessengine.chessboard.Position;
@@ -39,16 +38,8 @@ public class NormalMove extends Move {
 
     @Override
     public void doMove() {
-        if (piece.getType() == PieceType.Pawn) {
-            if (Math.abs(newPos.getRow() - orgPos.getRow()) == 2) {
-                // This move enables enPassant.
-                int rowShift = (piece.getColour() == ChessColour.White) ? 1 : -1;
-                Position vulnerableEnPassantPos = new Position(newPos.getRow() + rowShift, newPos.getColumn());
-                chessBoard.setVulnerableEnPassantPos(vulnerableEnPassantPos.deepClone());
-            }
-        } else {
-            chessBoard.setVulnerableEnPassantPos(null);
-        }
+        updateVulnerableEnPassantPosition();
+        updateCastlingValues();
         chessBoard.silentMovePiece(piece, newPos);
         chessBoard.updateKingStatus();
     }
@@ -58,14 +49,38 @@ public class NormalMove extends Move {
 
     @Override
     public String toString() {
-        return "Piece that is moved: " + piece + "\n"
-                + "New position: " + newPos;
+        String prefix = "";
+        if (this.isDisambiguatingMove() != null) {
+            prefix += this.getUniquePrefix(isDisambiguatingMove());
+        }
+        if (piece.getType() == PieceType.Pawn) {
+            // Also need to check for ambuigity
+            String pos = newPos.toString();
+            if (this.putsEnemyKingInCheckMate()) {
+                return prefix + pos + "#";
+            } else if (putsEnemyKingInCheck()) {
+                return prefix + pos + "+";
+            } else {
+                return prefix + pos;
+            }
+        } else {
+            String type = piece.getType().toShortString();
+            String move = prefix + newPos.toString();
+            if (putsEnemyKingInCheckMate()) {
+                return type + move + "#";
+            } else if (putsEnemyKingInCheck()) {
+                return type + move + "+";
+            } else {
+                return type + move;
+            }
+        }
     }
 
     @Override
     public void undoMove() {
-        chessBoard.setVulnerableEnPassantPos(orgVulnerableEnPassantPos);
         chessBoard.silentMovePiece(piece, orgPos);
+        restoreVulnerableEnPassantPosition();
+        restorePreviousCastlingValues();
         chessBoard.updateKingStatus();
     }
 
