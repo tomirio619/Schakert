@@ -1,8 +1,0 @@
-https://www.iconfinder.com/iconsets/faticons.
-
-Also see 
-http://stackoverflow.com/questions/30702977/javafx-how-to-resize-button-containing-svg-image
-
-And see:
-
-https://github.com/codecentric/javafxsvg
