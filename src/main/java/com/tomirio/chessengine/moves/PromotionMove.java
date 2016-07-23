@@ -61,8 +61,8 @@ public class PromotionMove extends NormalMove {
     @Override
     public String toString() {
         String prefix = "";
-        if (this.isDisambiguatingMove() != null) {
-            prefix += this.getUniquePrefix(isDisambiguatingMove());
+        if (!getAmbiguousPieces().isEmpty()) {
+            prefix += this.getUniquePrefix(getAmbiguousPieces());
         }
         if (possibleCapturedPiece != null) {
             if (this.putsEnemyKingInCheckMate()) {

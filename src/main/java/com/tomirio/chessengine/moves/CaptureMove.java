@@ -41,8 +41,8 @@ public class CaptureMove extends NormalMove {
     @Override
     public String toString() {
         String prefix = "";
-        if (this.isDisambiguatingMove() != null) {
-            prefix += this.getUniquePrefix(isDisambiguatingMove());
+        if (!getAmbiguousPieces().isEmpty()) {
+            prefix += this.getUniquePrefix(getAmbiguousPieces());
         }
         if (piece.getType() == PieceType.Pawn) {
             if (putsEnemyKingInCheckMate()) {

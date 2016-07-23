@@ -81,6 +81,38 @@ public abstract class Move {
     public abstract void doMove();
 
     /**
+     * Get Chesspieces of the same type that can move to the same new position
+     * as this move.
+     *
+     * @return List of ambiguous chess pieces.
+     */
+    protected ArrayList<ChessPiece> getAmbiguousPieces() {
+        ArrayList<ChessPiece> ambiguousPieces = new ArrayList();
+        if (piece.getType() == PieceType.King) {
+            return ambiguousPieces;
+        }
+        ArrayList<ChessPiece> friendlyPieces = chessBoard.getPieces(piece.getColour());
+        for (ChessPiece p : friendlyPieces) {
+            if (p.getType() == piece.getType()) {
+                // Both pieces are of the same type
+                if (!p.getPos().equals(piece.getPos())) {
+                    // Other piece is not the same as the piece in this move.
+                    for (Move move : p.getPossibleMoves()) {
+                        if (move.getNewPos().equals(newPos)) {
+                            /*
+                            Other piece can move to the same position as
+                            the piece that is involved in this move.
+                             */
+                            ambiguousPieces.add(p);
+                        }
+                    }
+                }
+            }
+        }
+        return ambiguousPieces;
+    }
+
+    /**
      * Get the chess piece that was involved in the move
      *
      * @return
@@ -108,18 +140,18 @@ public abstract class Move {
      * one or more pawns have promoted, resulting in a player having three or
      * more identical pieces able to reach the same square).
      *
-     * @param otherPiece The other piece.
+     * @param ambiguousPieces   The ambiguous chess pieces.
      * @return The correct prefix to make the representation of the move unique.
      */
-    protected String getUniquePrefix(ChessPiece otherPiece) {
+    protected String getUniquePrefix(ArrayList<ChessPiece> ambiguousPieces) {
         // Ranks are rows
         // Files are columns
-        if (otherPiece.getColumn() != piece.getColumn()) {
+        if (isUniqueColumn(ambiguousPieces)) {
             // file of departure is different
             return Character.toString(piece.getPos().toString().charAt(0));
-        } else if (otherPiece.getRow() != piece.getRow()) {
+        } else if (isUniqueRow(ambiguousPieces)) {
             // rank of deperature is different
-            return Integer.toString(piece.getRow());
+            return Character.toString(piece.getPos().toString().charAt(1));
         } else {
             return piece.getPos().toString();
         }
@@ -152,31 +184,44 @@ public abstract class Move {
     }
 
     /**
-     * Check wheter this move is disambiguous or not.
+     * For all the pieces of the same type having a move that is the same as the
+     * final position of this move, check whether the column of the piece
+     * involved in this move is different from the ambiguous pieces.
      *
-     * @return <code>null</code> if the move is disambiguous,
-     * <code>ChessPiece</code> otherwise.
+     * @param ambiguousPieces The ambiguous pieces.
+     * @return <code>True</code> if the column is unique, <code>False</code>
+     * otherwise.
      */
-    protected ChessPiece isDisambiguatingMove() {
-        if (piece.getType() == PieceType.King) {
-            return null;
-        }
-        ArrayList<ChessPiece> friendlyPieces = chessBoard.getPieces(piece.getColour());
-        for (ChessPiece p : friendlyPieces) {
-            if (p.getType() == piece.getType()) {
-                // Both pieces are of the same type
-                if (!p.getPos().equals(piece.getPos())) {
-                    // Both pieces are not on the same position.
-                    for (Move move : p.getPossibleMoves()) {
-                        if (move.getNewPos().equals(newPos)) {
-                            // Both piece can move to the same position, move not disambiguous.
-                            return p;
-                        }
-                    }
-                }
+    private boolean isUniqueColumn(ArrayList<ChessPiece> ambiguousPieces) {
+        for (ChessPiece otherPiece : ambiguousPieces) {
+            if (otherPiece.getColumn() == piece.getColumn()) {
+                // Column is not unique
+                return false;
             }
         }
-        return null;
+        // Column is unique
+        return true;
+    }
+
+    /**
+     * For all the pieces of the same type having a move that is the same as the
+     * final position of this move, check whether the row of the piece involved
+     * in this move is different from the ambiguous pieces.
+     *
+     * @param ambiguousPieces The ambiguous pieces.
+     * @return <code>True</code> if the row is unique, <code>False</code>
+     * otherwise.
+     */
+    private boolean isUniqueRow(ArrayList<ChessPiece> ambiguousPieces) {
+        for (ChessPiece otherPiece : ambiguousPieces) {
+            if (otherPiece.getRow() == piece.getRow()) {
+                // Row is not unique
+                return false;
+            }
+
+        }
+        // Row is unique
+        return true;
     }
 
     /**
@@ -186,10 +231,9 @@ public abstract class Move {
      * <code>False</code>
      */
     protected boolean putsEnemyKingInCheck() {
-        boolean putsEnemyKingInCheck = false;
         doMove();
         King k = chessBoard.getKing(piece.getColour().getOpposite());
-        putsEnemyKingInCheck = k.isCheck();
+        boolean putsEnemyKingInCheck = k.isCheck();
         undoMove();
         return putsEnemyKingInCheck;
     }
@@ -202,14 +246,13 @@ public abstract class Move {
      * check mate position, <code>False</code> otherwise.
      */
     protected boolean putsEnemyKingInCheckMate() {
-        boolean putsEnemyKingInCheckMate = false;
         doMove();
-        putsEnemyKingInCheckMate = isCheckMate(piece.getColour().getOpposite());
+        boolean putsEnemyKingInCheckMate = isCheckMate(piece.getColour().getOpposite());
         undoMove();
         return putsEnemyKingInCheckMate;
     }
 
-    public void restorePreviousCastlingValues() {
+    protected void restorePreviousCastlingValues() {
         if (piece.getType() == PieceType.King) {
             King king = (King) piece;
             king.setCastlingPossible(previousCastlingPossibleKing);
@@ -220,7 +263,7 @@ public abstract class Move {
         }
     }
 
-    public void restoreVulnerableEnPassantPosition() {
+    protected void restoreVulnerableEnPassantPosition() {
         chessBoard.setVulnerableEnPassantPos(orgVulnerableEnPassantPos);
 
     }
@@ -236,13 +279,13 @@ public abstract class Move {
         }
     }
 
-    @Override
     /*
     NOTE: this method produces the String representation of the move
     assuming the move has NOT been performed on the chess board.
     It will actually perform the move, check whether it puts the enemy king in 
     check (or mate) position, and undo it.
      */
+    @Override
     public abstract String toString();
 
     /**
@@ -250,7 +293,7 @@ public abstract class Move {
      */
     public abstract void undoMove();
 
-    public void updateCastlingValues() {
+    protected void updateCastlingValues() {
         if (piece.getType() == PieceType.King) {
             King king = (King) piece;
             king.setCastlingPossible(false);
@@ -261,7 +304,7 @@ public abstract class Move {
         }
     }
 
-    public void updateVulnerableEnPassantPosition() {
+    protected void updateVulnerableEnPassantPosition() {
         if (piece.getType() == PieceType.Pawn) {
             if (Math.abs(newPos.getRow() - orgPos.getRow()) == 2) {
                 // This move enables enPassant.

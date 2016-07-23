@@ -50,8 +50,8 @@ public class NormalMove extends Move {
     @Override
     public String toString() {
         String prefix = "";
-        if (this.isDisambiguatingMove() != null) {
-            prefix += this.getUniquePrefix(isDisambiguatingMove());
+        if (!getAmbiguousPieces().isEmpty()) {
+            prefix += this.getUniquePrefix(getAmbiguousPieces());
         }
         if (piece.getType() == PieceType.Pawn) {
             // Also need to check for ambuigity
