@@ -94,7 +94,7 @@ public final class ImageLoader {
      * Initialize
      */
     public final static void initialize() {
-        icon = new Image(path + "/Chess_Icon.png");
+        icon = new Image(path + "/chess_icon.png");
 
         blackBishop = new Image(path + "/black/bishop.png");
         blackRook = new Image(path + "/black/rook.png");
