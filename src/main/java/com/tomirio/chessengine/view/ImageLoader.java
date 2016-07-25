@@ -59,7 +59,7 @@ public final class ImageLoader {
     /**
      * Path resources.
      */
-    static String path = "png";
+    static String path = "images";
 
     /**
      * black bishop image.

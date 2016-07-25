@@ -101,7 +101,6 @@ public final class View {
      * @param primaryStage The primary stage.
      */
     public View(Stage primaryStage) {
-        log = new Log();
         imageLoader = new ImageLoader();
         createMainWindow(primaryStage);
     }
@@ -124,6 +123,7 @@ public final class View {
         mainWindow = primaryStage;
         visualBoard = new VisualTile[8][8];
         chessBoard = new ChessBoard();
+        log = new Log(chessBoard);
         game = new Game(chessBoard, this, log);
         mouseListener = new MouseListener(this, game);
 
@@ -146,6 +146,10 @@ public final class View {
         // Create SVG images containg left and right arrows.
         SVGPath doSvg = new SVGPath();
         SVGPath undoSVG = new SVGPath();
+        /* see 
+        https://www.iconfinder.com/iconsets/faticons.
+        for the used svg images.
+         */
         doSvg.setContent("M24.291,14.276L14.705,4.69c-0.878-0.878-2.317-0.878-3.195,0l-0.8,0.8c-0.878,0.877-0.878,2.316,0,3.194 "
                 + "L18.024,16l-7.315,7.315c-0.878,0.878-0.878,2.317,0,3.194l0.8,0.8c0.878,0.879,2.317,0.879,3.195,0l9.586-9.587 "
                 + "c0.472-0.471,0.682-1.103,0.647-1.723C24.973,15.38,24.763,14.748,24.291,14.276z");
@@ -187,17 +191,20 @@ public final class View {
         scrollableLog.setContent(log);
         scrollableLog.setFitToHeight(true);
         scrollableLog.setFitToWidth(true);
+        scrollableLog.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         // Make sure it automatically scrolls down.
         scrollableLog.vvalueProperty().bind(log.heightProperty());
 
         borderPane.setRight(scrollableLog);
         root.getChildren().add(borderPane);
         Scene mainWindowScene = new Scene(root);
+
         mainWindow.getIcons().add(ImageLoader.icon);
         mainWindow.setTitle("Chess");
         mainWindow.centerOnScreen();
         mainWindow.setScene(mainWindowScene);
         mainWindow.sizeToScene();
+
         // Currently resizing is disabled.
         mainWindow.setResizable(false);
         mainWindow.show();

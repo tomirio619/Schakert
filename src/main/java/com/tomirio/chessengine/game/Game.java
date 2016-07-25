@@ -93,7 +93,7 @@ public class Game {
         whiteIsCheckMate = false;
         blackIsCheckMate = false;
         staleMate = false;
-
+        
         this.chessBoard = chessBoard;
         this.view = view;
         moveList = new ArrayList<>();
@@ -127,10 +127,11 @@ public class Game {
             if (appliedMove + 1 < moveList.size()) {
                 // There is a next move in the list we can apply
                 Move move = moveList.get(appliedMove + 1);
+                log.addMove(move);
                 move.doMove();
                 appliedMove++;
                 updateTurn();
-
+                //log.addMove(move);    // This breaks doing and redoing
                 view.update(chessBoard);
             }
         }
@@ -195,14 +196,7 @@ public class Game {
      * <code>False</code> otherwise.
      */
     public boolean isCheckMate(ChessColour colour) {
-        switch (colour) {
-            case Black:
-                return blackIsCheckMate;
-            case White:
-                return whiteIsCheckMate;
-            default:
-                throw new NoSuchElementException();
-        }
+        return chessBoard.isCheckMate(colour);
     }
 
     /**
@@ -242,11 +236,12 @@ public class Game {
                 // we can index the move
                 Move move = moveList.get(appliedMove);
                 move.undoMove();
-
+                
                 appliedMove--;
                 updateTurn();
-
+                
                 view.update(chessBoard);
+                log.undoMove();
             }
         }
     }
@@ -258,7 +253,7 @@ public class Game {
     public void updateGameStatus() {
         King blackKing = chessBoard.getKing(ChessColour.Black);
         King whiteKing = chessBoard.getKing(ChessColour.White);
-
+        
         if (whiteKing.getPossibleMoves().isEmpty()
                 && !whiteKing.isCheck()
                 && !chessBoard.canMakeAMove(ChessColour.White)
@@ -266,17 +261,17 @@ public class Game {
                 && !blackKing.isCheck()
                 && !chessBoard.canMakeAMove(ChessColour.Black)) {
             staleMate = true;
-            log.gameFinished(chessBoard);
+            log.gameFinished();
         } else if (whiteKing.isCheck()
                 && whiteKing.getPossibleMoves().isEmpty()
                 && !chessBoard.canMakeAMove(ChessColour.White)) {
             winner = ChessColour.Black;
-            log.gameFinished(chessBoard);
+            log.gameFinished();
         } else if (blackKing.isCheck()
                 && blackKing.getPossibleMoves().isEmpty()
                 && !chessBoard.canMakeAMove(ChessColour.Black)) {
             winner = ChessColour.White;
-            log.gameFinished(chessBoard);
+            log.gameFinished();
         }
     }
 
@@ -315,5 +310,5 @@ public class Game {
     public boolean weHaveAWinner() {
         return winner != null;
     }
-
+    
 }

@@ -27,6 +27,7 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.NoSuchElementException;
 import java.util.Observable;
 
 /**
@@ -120,6 +121,15 @@ public class ChessBoard extends Observable implements Serializable {
      */
     public void deletePieceOnPos(Position pos) {
         board[pos.getRow()][pos.getColumn()] = null;
+    }
+    /**
+     *
+     * @return <code>True</code> if the game is finished,
+     * <code>False</code> otherwise.
+     */
+    public boolean gameIsFinished() {
+        return isCheckMate(ChessColour.Black) || isCheckMate(ChessColour.White)
+                || isStaleMate();
     }
 
     /**
@@ -325,6 +335,27 @@ public class ChessBoard extends Observable implements Serializable {
         whiteKing = new King(ChessColour.White, new Position(7, 4));
         board[7][4] = whiteKing;
     }
+    /**
+     *
+     * @param playerColour The colour of the player
+     * @return  <code>True</code> if the colour of the player is check mate,
+     * <code>False</code> otherwise.
+     */
+    public boolean isCheckMate(ChessColour playerColour) {
+        switch (playerColour) {
+            case Black:
+                return blackKing.isCheck()
+                        && blackKing.getPossibleMoves().isEmpty()
+                        && !canMakeAMove(ChessColour.Black);
+                
+            case White:
+                return whiteKing.isCheck()
+                        && whiteKing.getPossibleMoves().isEmpty()
+                        && !canMakeAMove(ChessColour.White);
+            default:
+                throw new NoSuchElementException();
+        }
+    }
 
     /**
      * For two specified positions in the same row, determine if all the
@@ -375,6 +406,20 @@ public class ChessBoard extends Observable implements Serializable {
      */
     public boolean isOccupiedPosition(int row, int column) {
         return (board[row][column] != null);
+    }
+    /**
+     *
+     * @return <code>True</code> if the current state of the chess board is
+     * stalemate. <code>False</code> otherwise.
+     */
+    public boolean isStaleMate() {
+        boolean staleMate = whiteKing.getPossibleMoves().isEmpty()
+                && !whiteKing.isCheck()
+                && !canMakeAMove(ChessColour.White)
+                || blackKing.getPossibleMoves().isEmpty()
+                && !blackKing.isCheck()
+                && !canMakeAMove(ChessColour.Black);
+        return staleMate;
     }
 
     /**
@@ -507,5 +552,6 @@ public class ChessBoard extends Observable implements Serializable {
             }
         }
     }
+    
 
 }

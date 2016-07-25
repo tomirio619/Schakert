@@ -140,7 +140,7 @@ public abstract class Move {
      * one or more pawns have promoted, resulting in a player having three or
      * more identical pieces able to reach the same square).
      *
-     * @param ambiguousPieces   The ambiguous chess pieces.
+     * @param ambiguousPieces The ambiguous chess pieces.
      * @return The correct prefix to make the representation of the move unique.
      */
     protected String getUniquePrefix(ArrayList<ChessPiece> ambiguousPieces) {

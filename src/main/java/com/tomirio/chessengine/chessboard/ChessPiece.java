@@ -87,7 +87,7 @@ public abstract class ChessPiece implements Serializable {
      *
      * @param move The move.
      */
-    public void agentMove(Move move) {
+    public final void agentMove(Move move) {
         move.doMove();
     }
 
@@ -157,7 +157,7 @@ public abstract class ChessPiece implements Serializable {
      * @param moves The possible moves for this chess piece.
      * @return All the legal moves for this chess piece.
      */
-    protected ArrayList<Move> filterMoves(ArrayList<Move> moves) {
+    protected final ArrayList<Move> filterMoves(ArrayList<Move> moves) {
         ArrayList<Move> validMoves = new ArrayList<>();
         for (Move move : moves) {
             if (chessBoard.isValidMove(move)) {
@@ -171,7 +171,7 @@ public abstract class ChessPiece implements Serializable {
      *
      * @return The chess board.
      */
-    public ChessBoard getChessBoard() {
+    public final ChessBoard getChessBoard() {
         return chessBoard;
     }
 
@@ -182,7 +182,7 @@ public abstract class ChessPiece implements Serializable {
      * be called when a new chess piece is created, otherwise the current value
      * of board will be <code>null</code>!
      */
-    public void setChessBoard(ChessBoard chessBoard) {
+    public final void setChessBoard(ChessBoard chessBoard) {
         this.chessBoard = chessBoard;
     }
 
@@ -190,7 +190,7 @@ public abstract class ChessPiece implements Serializable {
      *
      * @return The colour of this chess piece.
      */
-    public ChessColour getColour() {
+    public final ChessColour getColour() {
         return colour;
     }
 
@@ -198,7 +198,7 @@ public abstract class ChessPiece implements Serializable {
      *
      * @return The column of this chess piece.
      */
-    public int getColumn() {
+    public final int getColumn() {
         return pos.getColumn();
     }
 
@@ -255,7 +255,7 @@ public abstract class ChessPiece implements Serializable {
      *
      * @return The position of the piece.
      */
-    public Position getPos() {
+    public final Position getPos() {
         return pos;
     }
 
@@ -264,7 +264,7 @@ public abstract class ChessPiece implements Serializable {
      *
      * @param p The new PiecePosition
      */
-    public void setPosition(Position p) {
+    public final void setPosition(Position p) {
         pos.setPosition(p.getRow(), p.getColumn());
     }
 
@@ -275,7 +275,7 @@ public abstract class ChessPiece implements Serializable {
      * becomes blocked by either a friendly or a enemy piece, the functions
      * returns the currently found set of moves.
      */
-    protected MoveDetails getPositionsInDirection(Direction dir) {
+    protected final MoveDetails getPositionsInDirection(Direction dir) {
         return allPosInDir(new ArrayList<>(), new ArrayList<>(), this.pos, dir);
     }
 
@@ -295,7 +295,7 @@ public abstract class ChessPiece implements Serializable {
      *
      * @return The row of this chess piece.
      */
-    public int getRow() {
+    public final int getRow() {
         return pos.getRow();
     }
 
@@ -325,7 +325,7 @@ public abstract class ChessPiece implements Serializable {
      *
      * @param move The move.
      */
-    public void move(Move move) {
+    public final void move(Move move) {
         move.doMove();
     }
 
@@ -367,7 +367,7 @@ public abstract class ChessPiece implements Serializable {
      * @param newRow The new row.
      * @param newColumn The new column.
      */
-    public void setPosition(int newRow, int newColumn) {
+    public final void setPosition(int newRow, int newColumn) {
         pos.setPosition(newRow, newColumn);
     }
 
