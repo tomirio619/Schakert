@@ -1,2 +1,2 @@
-# Chess-Engine
+# Schakert
 A chess engine written in Java.
