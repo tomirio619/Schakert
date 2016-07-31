@@ -73,18 +73,22 @@ public class Position implements Serializable {
             throw new IllegalArgumentException("The file should not be a numerical value!");
         }
 
-        int ascii = (int) file;
+        int fileASCII = (int) file;
 
-        if (file < 97 || file > 104) {
+        if (fileASCII < 97 || fileASCII > 104) {
             throw new IllegalArgumentException("The file should lie between 'a' and 'h'!");
         }
-
-        this.row = rank - 8;
+        /*
+        This substraction gives a row value of 0 for rank "8" and a column 
+        value of 7 for rank "1".
+         */
+        this.row = 8 - rankDigit;
         /*
         This substraction gives a column value of 0 for file "a" and a column 
         value of 7 for file "h".
          */
-        this.column = ascii - 97;
+        this.column = fileASCII - 97;
+
     }
 
     /**

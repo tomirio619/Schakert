@@ -16,8 +16,8 @@
  */
 package com.tomirio.schakert.moves;
 
-import com.tomirio.schakert.chessboard.ChessPiece;
 import com.tomirio.schakert.chessboard.Position;
+import com.tomirio.schakert.chesspieces.ChessPiece;
 import com.tomirio.schakert.chesspieces.Pawn;
 import com.tomirio.schakert.chesspieces.Queen;
 
@@ -27,44 +27,32 @@ import com.tomirio.schakert.chesspieces.Queen;
  */
 public class PromotionMove extends NormalMove {
 
-    ChessPiece possibleCapturedPiece;
-
     /**
      * A promotion move. Note that this move also keeps in mind a possible
      * capture.
      *
-     * @param pawn The pawn.
+     * @param movedPawn The moved pawn.
      * @param newPos The new position.
      */
-    public PromotionMove(ChessPiece pawn, Position newPos) {
-        super(pawn, newPos);
+    public PromotionMove(ChessPiece movedPawn, Position newPos) {
+        super(movedPawn, newPos);
     }
 
     @Override
     public void doMove() {
-        // Check for possible capture 
-        if (chessBoard.isOccupiedPosition(newPos)) {
-            // Enemy piece is captured
-            possibleCapturedPiece = chessBoard.getPiece(newPos);
-        }
-        // Move the pawn to the new position
-        chessBoard.silentMovePiece(piece, newPos);
+        super.doMove();
         // Create a queen with the same colour and position of the pawn we just moved.
-        Queen q = new Queen(piece.getColour(), piece.getPos(), chessBoard);
+        Queen q = new Queen(movedPiece.getColour(), movedPiece.getPos(), chessBoard);
         chessBoard.setPiece(q);
         // Set piece to the queen we just created
-        piece = q;
+        movedPiece = q;
         chessBoard.setEnPassantTargetSquare(null);
         chessBoard.updateKingStatus();
     }
 
     @Override
     public boolean isCaptureMove() {
-        if (chessBoard.isOccupiedPosition(newPos)) {
-            return chessBoard.getPiece(newPos).getColour() != piece.getColour();
-        } else {
-            return false;
-        }
+        return false;
     }
 
     @Override
@@ -73,18 +61,10 @@ public class PromotionMove extends NormalMove {
         if (!getAmbiguousPieces().isEmpty()) {
             prefix += this.getUniquePrefix(getAmbiguousPieces());
         }
-        if (possibleCapturedPiece != null) {
-            if (this.putsEnemyKingInCheckMate()) {
-                return prefix + orgPos.toString() + "x" + newPos.toString() + "=Q" + "#";
-            } else if (this.putsEnemyKingInCheck()) {
-                return prefix + orgPos.toString() + "x" + newPos.toString() + "=Q" + "+";
-            } else {
-                return prefix + orgPos.toString() + "x" + newPos.toString() + "=Q";
-            }
 
-        } else if (this.putsEnemyKingInCheckMate()) {
+        if (this.movePutsEnemyKingInCheckmate()) {
             return prefix + newPos.toString() + "=Q" + "#";
-        } else if (this.putsEnemyKingInCheck()) {
+        } else if (this.movePutsEnemyKingInCheck()) {
             return prefix + newPos.toString() + "=Q" + "+";
         } else {
             return prefix + newPos.toString() + "=Q";
@@ -100,15 +80,10 @@ public class PromotionMove extends NormalMove {
         Might be due to the reference being passed to the queen, which could be
         modified if the move is done and undone multiple times.
          */
-        Pawn p = new Pawn(piece.getColour(), piece.getPos(), chessBoard);
+        Pawn p = new Pawn(movedPiece.getColour(), movedPiece.getPos(), chessBoard);
         chessBoard.setPiece(p);
         // Set the piece to the pawn we just created
-        piece = p;
-        if (possibleCapturedPiece != null) {
-            // During the promotion in this move, an enemy piece was captured.
-            chessBoard.setPiece(possibleCapturedPiece);
-        }
-        possibleCapturedPiece = null;
+        movedPiece = p;
         restoreVulnerableEnPassantPosition();
         chessBoard.updateKingStatus();
     }

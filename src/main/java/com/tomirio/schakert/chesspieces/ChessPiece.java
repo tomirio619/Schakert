@@ -14,13 +14,19 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tomirio.schakert.chessboard;
+package com.tomirio.schakert.chesspieces;
 
+import com.tomirio.schakert.chessboard.ChessBoard;
+import com.tomirio.schakert.chessboard.ChessColour;
+import com.tomirio.schakert.chessboard.Direction;
+import com.tomirio.schakert.chessboard.MoveDetails;
+import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.moves.CaptureMove;
 import com.tomirio.schakert.moves.Move;
 import com.tomirio.schakert.moves.NormalMove;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Locale;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 
@@ -375,6 +381,10 @@ public abstract class ChessPiece implements Serializable {
         pos.setPosition(newRow, newColumn);
     }
 
+
+    public String toShortString() {
+        return (getColour() == ChessColour.White) ? type.toShortString() : type.toShortString().toLowerCase(Locale.ENGLISH);
+    }
     /**
      *
      * @return The string representation of this chess piece.

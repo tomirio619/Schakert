@@ -20,8 +20,8 @@ import com.tomirio.schakert.chessboard.ChessBoard;
 import static com.tomirio.schakert.chessboard.ChessBoard.COLS;
 import static com.tomirio.schakert.chessboard.ChessBoard.ROWS;
 import com.tomirio.schakert.chessboard.ChessColour;
-import com.tomirio.schakert.chessboard.ChessPiece;
 import com.tomirio.schakert.chessboard.Position;
+import com.tomirio.schakert.chesspieces.ChessPiece;
 import java.util.NoSuchElementException;
 
 /**
@@ -161,12 +161,11 @@ public class Evaluation {
             default:
                 throw new NoSuchElementException();
         }
-//        if (chessBoard.getState().isCheckMate(colour)) {
-//            return 0;
-//        } else {
-//            return weight;
-//        }
-        return weight;
+        if (chessBoard.inCheckmate(colour)) {
+            return -20000;
+        } else {
+            return weight;
+        }
     }
 
     private int getKnightBonus(ChessColour colour, Position pos) {

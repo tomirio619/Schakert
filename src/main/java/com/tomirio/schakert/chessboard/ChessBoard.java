@@ -17,9 +17,11 @@
 package com.tomirio.schakert.chessboard;
 
 import com.tomirio.schakert.chesspieces.Bishop;
+import com.tomirio.schakert.chesspieces.ChessPiece;
 import com.tomirio.schakert.chesspieces.King;
 import com.tomirio.schakert.chesspieces.Knight;
 import com.tomirio.schakert.chesspieces.Pawn;
+import com.tomirio.schakert.chesspieces.PieceType;
 import com.tomirio.schakert.chesspieces.Queen;
 import com.tomirio.schakert.chesspieces.Rook;
 import com.tomirio.schakert.moves.Move;
@@ -31,15 +33,13 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Locale;
 import java.util.NoSuchElementException;
-import java.util.Observable;
 
 /**
  *
  * @author Tom Sandmann
  */
-public class ChessBoard extends Observable implements Serializable {
+public class ChessBoard implements Serializable {
 
     /**
      * The number of columns of the board.
@@ -75,9 +75,6 @@ public class ChessBoard extends Observable implements Serializable {
      */
     public ChessBoard() {
         board = new ChessPiece[ROWS][COLS];
-        initializeBoard();
-        setChessBoardForPieces();
-        //perftTest();
     }
 
     /**
@@ -146,9 +143,10 @@ public class ChessBoard extends Observable implements Serializable {
      * otherwise.
      */
     public boolean gameIsFinished() {
-        return isCheckMate(ChessColour.Black) || isCheckMate(ChessColour.White)
-                || isStaleMate();
+        return inCheckmate(ChessColour.Black) || inCheckmate(ChessColour.White)
+                || inStalemate();
     }
+
     /**
      * The black king.
      *
@@ -219,6 +217,7 @@ public class ChessBoard extends Observable implements Serializable {
     public King getKing(ChessColour colour) {
         return (colour == ChessColour.White) ? whiteKing : blackKing;
     }
+
     /**
      * <b>Assuming</b> the rook is on its initial position, return the kingside
      * rook.
@@ -287,6 +286,7 @@ public class ChessBoard extends Observable implements Serializable {
         }
         return pieces;
     }
+
     /**
      * <b>Assuming</b> the rook is on its initial position, return the queenside
      * rook.
@@ -345,6 +345,7 @@ public class ChessBoard extends Observable implements Serializable {
         }
         return rooks;
     }
+
     /**
      * Set the white king.
      *
@@ -354,6 +355,43 @@ public class ChessBoard extends Observable implements Serializable {
         this.whiteKing = k;
     }
 
+
+    /**
+     *
+     * @param playerColour The colour of the player
+     * @return  <code>True</code> if the colour of the player is check mate,
+     * <code>False</code> otherwise.
+     */
+    public boolean inCheckmate(ChessColour playerColour) {
+        switch (playerColour) {
+            case Black:
+                return blackKing.inCheck()
+                        && blackKing.getPossibleMoves().isEmpty()
+                        && !canMakeAMove(ChessColour.Black);
+
+            case White:
+                return whiteKing.inCheck()
+                        && whiteKing.getPossibleMoves().isEmpty()
+                        && !canMakeAMove(ChessColour.White);
+            default:
+                throw new NoSuchElementException();
+        }
+    }
+    /**
+     * @see
+     * <a href="http://chess.stackexchange.com/questions/6048/is-there-an-easy-way-to-detect-draw-in-king-pawn-vs-king-endgame">
+     * http://chess.stackexchange.com/questions/6048/is-there-an-easy-way-to-detect-draw-in-king-pawn-vs-king-endgame</a>
+     * @return <code>True</code> if the current state of the chess board is
+     * stalemate. <code>False</code> otherwise.
+     */
+    public boolean inStalemate() {
+        return whiteKing.getPossibleMoves().isEmpty()
+                && !whiteKing.inCheck()
+                && !canMakeAMove(ChessColour.White)
+                || blackKing.getPossibleMoves().isEmpty()
+                && !blackKing.inCheck()
+                && !canMakeAMove(ChessColour.Black);
+    }
     /**
      * Initializes the chess board with all its pieces.
      */
@@ -401,28 +439,6 @@ public class ChessBoard extends Observable implements Serializable {
         board[7][3] = new Queen(ChessColour.White, new Position(7, 3));
         whiteKing = new King(ChessColour.White, new Position(7, 4));
         board[7][4] = whiteKing;
-    }
-
-    /**
-     *
-     * @param playerColour The colour of the player
-     * @return  <code>True</code> if the colour of the player is check mate,
-     * <code>False</code> otherwise.
-     */
-    public boolean isCheckMate(ChessColour playerColour) {
-        switch (playerColour) {
-            case Black:
-                return blackKing.isCheck()
-                        && blackKing.getPossibleMoves().isEmpty()
-                        && !canMakeAMove(ChessColour.Black);
-
-            case White:
-                return whiteKing.isCheck()
-                        && whiteKing.getPossibleMoves().isEmpty()
-                        && !canMakeAMove(ChessColour.White);
-            default:
-                throw new NoSuchElementException();
-        }
     }
 
     /**
@@ -476,19 +492,6 @@ public class ChessBoard extends Observable implements Serializable {
         return (board[row][column] != null);
     }
 
-    /**
-     *
-     * @return <code>True</code> if the current state of the chess board is
-     * stalemate. <code>False</code> otherwise.
-     */
-    public boolean isStaleMate() {
-        return whiteKing.getPossibleMoves().isEmpty()
-                && !whiteKing.isCheck()
-                && !canMakeAMove(ChessColour.White)
-                || blackKing.getPossibleMoves().isEmpty()
-                && !blackKing.isCheck()
-                && !canMakeAMove(ChessColour.Black);
-    }
 
     /**
      * Check if a given coordinate is within the chess board.
@@ -520,12 +523,11 @@ public class ChessBoard extends Observable implements Serializable {
         // Check whether the move puts his king in check.
         ChessColour pieceColour = move.getInvolvedPiece().getColour();
         King k = getKing(pieceColour);
-        boolean isCheck = k.isCheck();
+        boolean inCheck = k.inCheck();
         // Undo the move.
         move.undoMove();
-        return !isCheck;
+        return !inCheck;
     }
-
 
     /**
      * Makes sure all the chess pieces have a instance of this class.
@@ -562,27 +564,23 @@ public class ChessBoard extends Observable implements Serializable {
     @Override
     public String toString() {
         StringBuilder bld = new StringBuilder();
+        bld.append("  +------------------------+\n");
         for (int r = 0; r < ROWS; r++) {
+            bld.append(8 - r).append(" |");
             for (int c = 0; c < COLS; c++) {
                 if (!isOccupiedPosition(r, c)) {
-                    bld.append(" - ");
+                    bld.append(" . ");
                 } else {
                     ChessPiece piece = getPiece(r, c);
-                    if (piece.getColour() == ChessColour.Black) {
-                        // Black pieces will be printed in lower case
-                        bld.append(" ").append(piece.getType().toShortString().toLowerCase(Locale.ENGLISH)).append(" ");
-                    } else {
-                        // White pieces will be printed as normal (in higher case)
-                        bld.append(" ").append(piece.getType().toShortString()).append(" ");
-                    }
+                    bld.append(" ").append(piece.toShortString()).append(" ");
                 }
             }
-            bld.append("\n");
+            bld.append("|\n");
         }
+        bld.append("  +------------------------+\n");
+        bld.append("    a  b  c  d  e  f  g  h");
         return bld.toString();
     }
-
-
 
     /**
      * Updates the check status of both kings.

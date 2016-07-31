@@ -73,7 +73,8 @@ public class FENParser {
         chessBoard = new ChessBoard();
         chessBoard.clearBoard();
         this.FEN = FEN;
-        parseFEN(FEN, 0);
+        int row = 0;
+        parseFEN(FEN, row);
 
         int firstOccuringWhitespace = FEN.indexOf(" ");
         FENboardString = FEN.substring(0, firstOccuringWhitespace);
@@ -174,12 +175,15 @@ public class FENParser {
     public ChessBoard getChessBoard() {
         return chessBoard;
     }
+
     public String getFEN() {
         return FEN;
     }
+
     public String getFENboardString() {
         return this.FENboardString;
     }
+
     public String getFENstateString() {
         return this.FENstateString;
     }
@@ -195,6 +199,7 @@ public class FENParser {
     public int getNrOfHalfMoves() {
         return nrOfHalfMoves;
     }
+
     private void parseCastlingAvailability(String castlingAvailability) {
         if (!castlingAvailability.equals("-")) {
             for (int i = 0; i < castlingAvailability.length(); i++) {
@@ -223,8 +228,9 @@ public class FENParser {
                 }
             }
         }
-        
+
     }
+
     /**
      * Parse the en Passant target square.
      *
@@ -234,6 +240,9 @@ public class FENParser {
     private void parseEnPassant(String enPassantTargetSquare) {
         if (!enPassantTargetSquare.equals("-")) {
             chessBoard.setEnPassantTargetSquare(new Position(enPassantTargetSquare));
+            if (!enPassantTargetSquare.equals(chessBoard.getEnPassantTargetSquare().toString())) {
+                throw new IllegalArgumentException("En passant target square was not equal to the parsed position.");
+            }
         }
     }
 
@@ -311,6 +320,7 @@ public class FENParser {
         }
         parseFEN(FEN.substring(forwardSlashIndex + 1), row + 1);
     }
+
     /**
      * Parse the number of full moves from the FEN string.
      *
@@ -321,7 +331,6 @@ public class FENParser {
         this.nrOfFullMoves = Integer.parseInt(fullMoveCounter);
     }
 
-
     /**
      * Parse the number of half moves from the FEN string.
      *
@@ -331,6 +340,7 @@ public class FENParser {
     private void parseHalfMoveCounter(String halfMoveCounter) {
         this.nrOfHalfMoves = Integer.parseInt(halfMoveCounter);
     }
+
     /**
      * After all the ranks have been parsed, we parse what we like to call the
      * "state information". This includes the castling availability, the en
@@ -343,7 +353,7 @@ public class FENParser {
      */
     private void parseStateInformation(String FEN) {
         String[] stateInformation = FEN.split(" ");
-        
+
         boolean FENincludesCounters = true;
         if (stateInformation.length == 3) {
             // The FEN string does not contain full move and half move counters.

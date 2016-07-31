@@ -18,7 +18,7 @@ package com.tomirio.schakert.agent;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
 import com.tomirio.schakert.chessboard.ChessColour;
-import com.tomirio.schakert.chessboard.ChessPiece;
+import com.tomirio.schakert.chesspieces.ChessPiece;
 import com.tomirio.schakert.game.Player;
 import com.tomirio.schakert.moves.Move;
 import java.util.ArrayList;
@@ -156,9 +156,9 @@ public class AI extends Player implements Callable<Move> {
      * http://stackoverflow.com/questions/25615312/negamax-chess-algorithm-how-to-use-final-return
      */
     public Pair<Node, Double> negaMax(Node node, int depth, double alpha, double beta, ChessColour hasTurn) {
-        if (depth == 0 || chessBoard.isStaleMate()
-                || chessBoard.isCheckMate(ChessColour.Black)
-                || chessBoard.isCheckMate(ChessColour.White)) {
+        if (depth == 0 || chessBoard.inStalemate()
+                || chessBoard.inCheckmate(ChessColour.Black)
+                || chessBoard.inCheckmate(ChessColour.White)) {
             return new Pair<>(node, eval.evaluate(chessBoard, playerColour, hasTurn));
         }
         ArrayList<Node> childNodes = generateChildNodes(node, hasTurn);

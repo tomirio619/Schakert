@@ -18,10 +18,10 @@ package com.tomirio.schakert.moves;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
 import com.tomirio.schakert.chessboard.ChessColour;
-import com.tomirio.schakert.chessboard.ChessPiece;
-import com.tomirio.schakert.chessboard.PieceType;
 import com.tomirio.schakert.chessboard.Position;
+import com.tomirio.schakert.chesspieces.ChessPiece;
 import com.tomirio.schakert.chesspieces.King;
+import com.tomirio.schakert.chesspieces.PieceType;
 import com.tomirio.schakert.chesspieces.Rook;
 import java.util.ArrayList;
 
@@ -35,6 +35,10 @@ public abstract class Move {
      * The chessBoard.
      */
     protected final ChessBoard chessBoard;
+    /**
+     * The piece involved in the move.
+     */
+    protected ChessPiece movedPiece;
 
     /**
      * The position of the piece after the move took place.
@@ -49,10 +53,6 @@ public abstract class Move {
      * Position that a pawn could en Passant capture.
      */
     protected Position orgVulnerableEnPassantPos;
-    /**
-     * The piece involved in the move.
-     */
-    protected ChessPiece piece;
     /**
      * Previous value for the variable that indicates whether the king that was
      * involved in this move is able to perform a castling move.
@@ -70,7 +70,7 @@ public abstract class Move {
      * @param newPos The new position of the chess piece.
      */
     public Move(ChessPiece piece, Position newPos) {
-        this.piece = piece;
+        this.movedPiece = piece;
         this.orgPos = piece.getPos().deepClone();
         this.newPos = newPos.deepClone();
         this.chessBoard = piece.getChessBoard();
@@ -94,14 +94,14 @@ public abstract class Move {
      */
     protected ArrayList<ChessPiece> getAmbiguousPieces() {
         ArrayList<ChessPiece> ambiguousPieces = new ArrayList();
-        if (piece.getType() == PieceType.King) {
+        if (movedPiece.getType() == PieceType.King) {
             return ambiguousPieces;
         }
-        ArrayList<ChessPiece> friendlyPieces = chessBoard.getPieces(piece.getColour());
+        ArrayList<ChessPiece> friendlyPieces = chessBoard.getPieces(movedPiece.getColour());
         for (ChessPiece p : friendlyPieces) {
-            if (p.getType() == piece.getType()) {
+            if (p.getType() == movedPiece.getType()) {
                 // Both pieces are of the same type
-                if (!p.getPos().equals(piece.getPos())) {
+                if (!p.getPos().equals(movedPiece.getPos())) {
                     // Other piece is not the same as the piece in this move.
                     for (Move move : p.getPossibleMoves()) {
                         if (move.getNewPos().equals(newPos)) {
@@ -124,7 +124,7 @@ public abstract class Move {
      * @return
      */
     public ChessPiece getInvolvedPiece() {
-        return piece;
+        return movedPiece;
     }
 
     /**
@@ -154,15 +154,31 @@ public abstract class Move {
         // Files are columns
         if (isUniqueColumn(ambiguousPieces)) {
             // file of departure is different
-            return Character.toString(piece.getPos().toString().charAt(0));
+            return Character.toString(movedPiece.getPos().toString().charAt(0));
         } else if (isUniqueRow(ambiguousPieces)) {
             // rank of deperature is different
-            return Character.toString(piece.getPos().toString().charAt(1));
+            return Character.toString(movedPiece.getPos().toString().charAt(1));
         } else {
-            return piece.getPos().toString();
+            return movedPiece.getPos().toString();
         }
     }
+    /**
+     *
+     * @return <code>True</code> if the move puts the enemy player in check.
+     * <code>False</code> otherwise.
+     */
+    public boolean inCheckMove() {
+        return movePutsEnemyKingInCheck();
+    }
 
+    /**
+     *
+     * @return <code>True</code> if the move puts the enemy player in check
+     * mate. <code>False</code> otherwise.
+     */
+    public boolean inCheckmateMove() {
+        return movePutsEnemyKingInCheckmate();
+    }
     /**
      *
      * @return <code>True</code> if the move is a capture move.
@@ -172,32 +188,14 @@ public abstract class Move {
 
     /**
      *
-     * @return <code>True</code> if the move puts the enemy player in check
-     * mate. <code>False</code> otherwise.
-     */
-    public boolean isCheckMateMove() {
-        return putsEnemyKingInCheckMate();
-    }
-
-    /**
-     *
-     * @return <code>True</code> if the move puts the enemy player in check.
-     * <code>False</code> otherwise.
-     */
-    public boolean isCheckMove() {
-        return putsEnemyKingInCheck();
-    }
-
-    /**
-     *
      * @return <code>True</code> if the move puts the game in a stale mate
      * state. <code>False</code> otherwise.
      */
-    private boolean isStaleMateMove() {
+    private boolean isStalemateMove() {
         doMove();
-        boolean isStaleMate = chessBoard.isStaleMate();
+        boolean isStalemate = chessBoard.inStalemate();
         undoMove();
-        return isStaleMate;
+        return isStalemate;
     }
 
     /**
@@ -211,7 +209,7 @@ public abstract class Move {
      */
     private boolean isUniqueColumn(ArrayList<ChessPiece> ambiguousPieces) {
         for (ChessPiece otherPiece : ambiguousPieces) {
-            if (otherPiece.getColumn() == piece.getColumn()) {
+            if (otherPiece.getColumn() == movedPiece.getColumn()) {
                 // Column is not unique
                 return false;
             }
@@ -231,7 +229,7 @@ public abstract class Move {
      */
     private boolean isUniqueRow(ArrayList<ChessPiece> ambiguousPieces) {
         for (ChessPiece otherPiece : ambiguousPieces) {
-            if (otherPiece.getRow() == piece.getRow()) {
+            if (otherPiece.getRow() == movedPiece.getRow()) {
                 // Row is not unique
                 return false;
             }
@@ -247,12 +245,18 @@ public abstract class Move {
      * function returns <code>True</code>. Otherwise it returns
      * <code>False</code>
      */
-    protected boolean putsEnemyKingInCheck() {
+    protected boolean movePutsEnemyKingInCheck() {
         doMove();
-        King k = chessBoard.getKing(piece.getColour().getOpposite());
-        boolean putsEnemyKingInCheck = k.isCheck();
+        King k = chessBoard.getKing(movedPiece.getColour().getOpposite());
+        boolean attacksEnemyKing = false;
+        for (Move move : movedPiece.getPossibleMoves()) {
+            if (move.isCaptureMove() && move.getNewPos().equals(k.getPos())) {
+                attacksEnemyKing = true;
+                break;
+            }
+        }
         undoMove();
-        return putsEnemyKingInCheck;
+        return attacksEnemyKing;
     }
 
     /**
@@ -262,11 +266,11 @@ public abstract class Move {
      * @return <code>True</code> if applying the move would put the enemy in
      * check mate position, <code>False</code> otherwise.
      */
-    protected boolean putsEnemyKingInCheckMate() {
+    protected boolean movePutsEnemyKingInCheckmate() {
         doMove();
-        boolean putsEnemyKingInCheckMate = chessBoard.isCheckMate(piece.getColour().getOpposite());
+        boolean putsEnemyKingInCheckmate = chessBoard.inCheckmate(movedPiece.getColour().getOpposite());
         undoMove();
-        return putsEnemyKingInCheckMate;
+        return putsEnemyKingInCheckmate;
     }
 
     /**
@@ -274,12 +278,12 @@ public abstract class Move {
      * possible
      */
     protected void restorePreviousCastlingValues() {
-        if (piece.getType() == PieceType.King) {
-            King king = (King) piece;
+        if (movedPiece.getType() == PieceType.King) {
+            King king = (King) movedPiece;
             king.setCastlingPossible(previousCastlingPossibleKing);
         }
-        if (piece.getType() == PieceType.Rook) {
-            Rook rook = (Rook) piece;
+        if (movedPiece.getType() == PieceType.Rook) {
+            Rook rook = (Rook) movedPiece;
             rook.setCastlingPossible(previousCastlingPossibleRook);
         }
     }
@@ -294,18 +298,18 @@ public abstract class Move {
     }
 
     private void saveCurrentCastlingValues() {
-        if (piece.getType() == PieceType.King) {
-            King king = (King) piece;
+        if (movedPiece.getType() == PieceType.King) {
+            King king = (King) movedPiece;
             previousCastlingPossibleKing = king.getCastlingPossible();
         }
-        if (piece.getType() == PieceType.Rook) {
-            Rook rook = (Rook) piece;
+        if (movedPiece.getType() == PieceType.Rook) {
+            Rook rook = (Rook) movedPiece;
             previousCastlingPossibleRook = rook.getCastlingPossible();
         }
     }
 
-    public boolean staleMateMove() {
-        return isStaleMateMove();
+    public boolean stalemateMove() {
+        return isStalemateMove();
     }
 
     /*
@@ -327,12 +331,12 @@ public abstract class Move {
      * rook.
      */
     protected void updateCastlingValues() {
-        if (piece.getType() == PieceType.King) {
-            King king = (King) piece;
+        if (movedPiece.getType() == PieceType.King) {
+            King king = (King) movedPiece;
             king.setCastlingPossible(false);
         }
-        if (piece.getType() == PieceType.Rook) {
-            Rook rook = (Rook) piece;
+        if (movedPiece.getType() == PieceType.Rook) {
+            Rook rook = (Rook) movedPiece;
             rook.setCastlingPossible(false);
         }
     }
@@ -342,10 +346,10 @@ public abstract class Move {
      * forward.
      */
     protected void updateVulnerableEnPassantPosition() {
-        if (piece.getType() == PieceType.Pawn) {
+        if (movedPiece.getType() == PieceType.Pawn) {
             if (Math.abs(newPos.getRow() - orgPos.getRow()) == 2) {
                 // This move enables enPassant.
-                int rowShift = (piece.getColour() == ChessColour.White) ? 1 : -1;
+                int rowShift = (movedPiece.getColour() == ChessColour.White) ? 1 : -1;
                 Position vulnerableEnPassantPos = new Position(newPos.getRow() + rowShift, newPos.getColumn());
                 chessBoard.setEnPassantTargetSquare(vulnerableEnPassantPos.deepClone());
             }

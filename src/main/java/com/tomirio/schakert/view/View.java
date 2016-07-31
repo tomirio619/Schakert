@@ -17,8 +17,8 @@
 package com.tomirio.schakert.view;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chessboard.ChessPiece;
 import com.tomirio.schakert.chessboard.Position;
+import com.tomirio.schakert.chesspieces.ChessPiece;
 import com.tomirio.schakert.controller.MouseListener;
 import com.tomirio.schakert.game.Game;
 import com.tomirio.schakert.moves.Move;
@@ -135,8 +135,12 @@ public final class View {
         mainWindow = primaryStage;
         visualBoard = new VisualTile[8][8];
         chessBoard = new ChessBoard();
-        log = new Log(chessBoard);
+
+        log = new Log();
         game = new Game(chessBoard, this, log);
+        chessBoard = game.getBoard();
+        log.setBoard(chessBoard);
+
         mouseListener = new MouseListener(this, game);
 
         // Root will contain every visual aspect
@@ -220,7 +224,6 @@ public final class View {
         mainWindow.show();
         mainWindow.setMinWidth(primaryStage.getWidth());
         mainWindow.setMinHeight(primaryStage.getHeight());
-
     }
 
     /**

@@ -18,7 +18,7 @@ package com.tomirio.schakert.perft;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
 import com.tomirio.schakert.chessboard.ChessColour;
-import com.tomirio.schakert.chessboard.ChessPiece;
+import com.tomirio.schakert.chesspieces.ChessPiece;
 import com.tomirio.schakert.game.FENParser;
 import com.tomirio.schakert.moves.EnPassantMove;
 import com.tomirio.schakert.moves.Move;
@@ -49,7 +49,7 @@ public class PerftTest {
     private ChessBoard chessBoard;
 
     private int nrOfCaptureMoves;
-    private int nrOfCheckMates;
+    private int nrOfCheckmates;
     private int nrOfChecks;
     private int nrOfEnPassantMoves;
     private int nrOfNodes;
@@ -100,7 +100,7 @@ public class PerftTest {
         );
 
         nrOfCaptureMoves = 0;
-        nrOfCheckMates = 0;
+        nrOfCheckmates = 0;
         nrOfChecks = 0;
         nrOfEnPassantMoves = 0;
         nrOfPromotions = 0;
@@ -131,7 +131,7 @@ public class PerftTest {
         for (ChessPiece piece : chessBoard.getPieces(playerColour)) {
             for (Move move : piece.getPossibleMoves()) {
                 // Mate and stale mate moves are not counted.
-                if (!move.isCheckMateMove() && !move.staleMateMove()) {
+                if (!move.inCheckmateMove() && !move.stalemateMove()) {
                     updateDebugVariables(move);
                     if (showOutput && move.isCaptureMove()) {
                         System.out.println("Capture move!");
@@ -161,7 +161,7 @@ public class PerftTest {
         System.out.println("Number of nodes:" + this.nrOfNodes);
         System.out.println("Expected number of nodes:" + expectedNodeCount);
         System.out.println("Number of captures:" + nrOfCaptureMoves);
-        System.out.println("Number of checkmates:" + nrOfCheckMates);
+        System.out.println("Number of checkmates:" + nrOfCheckmates);
         System.out.println("Number of checks:" + nrOfChecks);
         System.out.println("Number of en Passant captures:" + nrOfEnPassantMoves);
         System.out.println("Number of promotions:" + nrOfPromotions);
@@ -171,7 +171,7 @@ public class PerftTest {
 
     public void resetCount() {
         nrOfCaptureMoves = 0;
-        nrOfCheckMates = 0;
+        nrOfCheckmates = 0;
         nrOfChecks = 0;
         nrOfEnPassantMoves = 0;
         nrOfPromotions = 0;
@@ -233,10 +233,10 @@ public class PerftTest {
         if (move instanceof EnPassantMove) {
             nrOfEnPassantMoves++;
         }
-        if (move.isCheckMateMove()) {
-            nrOfCheckMates++;
+        if (move.inCheckmateMove()) {
+            nrOfCheckmates++;
         }
-        if (move.isCheckMove()) {
+        if (move.inCheckMove()) {
             nrOfChecks++;
         }
         if (move instanceof PromotionMove) {

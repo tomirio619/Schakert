@@ -18,7 +18,7 @@ package com.tomirio.schakert.view;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
 import com.tomirio.schakert.chessboard.ChessColour;
-import com.tomirio.schakert.chessboard.ChessPiece;
+import com.tomirio.schakert.chesspieces.ChessPiece;
 import java.util.NoSuchElementException;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;

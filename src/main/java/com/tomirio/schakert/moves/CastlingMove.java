@@ -49,11 +49,11 @@ public class CastlingMove extends NormalMove {
     @Override
     public void doMove() {
         super.doMove();
-        King king = (King) piece;
+        King king = (King) movedPiece;
         king.setCastlingPossible(false);
         rook.setCastlingPossible(false);
         chessBoard.silentMovePiece(rook, rookNewPos);
-        piece = king;
+        movedPiece = king;
         chessBoard.setEnPassantTargetSquare(null);
         chessBoard.updateKingStatus();
     }
@@ -68,18 +68,18 @@ public class CastlingMove extends NormalMove {
         int colDist = Math.abs(rookOrgPos.getColumn() - orgPos.getColumn());
         if (colDist == 3) {
             // King side rook, castling short. 
-            if (this.putsEnemyKingInCheckMate()) {
+            if (this.movePutsEnemyKingInCheckmate()) {
                 return "O-O" + "#";
-            } else if (this.putsEnemyKingInCheck()) {
+            } else if (this.movePutsEnemyKingInCheck()) {
                 return "O-O" + "+";
             } else {
                 return "O-O";
             }
 
         } else // Queen side rook, castling long.
-         if (this.putsEnemyKingInCheckMate()) {
+         if (this.movePutsEnemyKingInCheckmate()) {
                 return "O-O-O" + "#";
-            } else if (this.putsEnemyKingInCheck()) {
+            } else if (this.movePutsEnemyKingInCheck()) {
                 return "O-O-O" + "+";
             } else {
                 return "O-O-O";
@@ -89,11 +89,11 @@ public class CastlingMove extends NormalMove {
     @Override
     public void undoMove() {
         super.undoMove();
-        King king = (King) piece;
+        King king = (King) movedPiece;
         king.setCastlingPossible(true);
         rook.setCastlingPossible(true);
         chessBoard.silentMovePiece(rook, rookOrgPos);
-        piece = king;
+        movedPiece = king;
         chessBoard.updateKingStatus();
     }
 

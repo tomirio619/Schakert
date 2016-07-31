@@ -17,10 +17,8 @@
 package com.tomirio.schakert.chesspieces;
 
 import com.tomirio.schakert.chessboard.ChessColour;
-import com.tomirio.schakert.chessboard.ChessPiece;
 import com.tomirio.schakert.chessboard.Direction;
 import com.tomirio.schakert.chessboard.MoveDetails;
-import com.tomirio.schakert.chessboard.PieceType;
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.moves.Move;
 import java.util.ArrayList;
@@ -44,6 +42,7 @@ public class Rook extends ChessPiece {
         super(PieceType.Rook, colour, pos);
         castlingPossible = true;
     }
+
     @Override
     public boolean equals(Object otherObject) {
         if (otherObject == null) {
@@ -109,7 +108,6 @@ public class Rook extends ChessPiece {
         hash = 67 * hash + (this.castlingPossible ? 1 : 0);
         return hash;
     }
-    
 
     @Override
     public boolean posIsCovered(Position p) {

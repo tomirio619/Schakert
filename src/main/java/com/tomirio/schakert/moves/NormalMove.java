@@ -16,9 +16,9 @@
  */
 package com.tomirio.schakert.moves;
 
-import com.tomirio.schakert.chessboard.ChessPiece;
-import com.tomirio.schakert.chessboard.PieceType;
 import com.tomirio.schakert.chessboard.Position;
+import com.tomirio.schakert.chesspieces.ChessPiece;
+import com.tomirio.schakert.chesspieces.PieceType;
 
 /**
  *
@@ -29,18 +29,18 @@ public class NormalMove extends Move {
     /**
      * A normal move.
      *
-     * @param piece The chess piece.
+     * @param movedPiece The chess piece.
      * @param newPos The new position.
      */
-    public NormalMove(ChessPiece piece, Position newPos) {
-        super(piece, newPos);
+    public NormalMove(ChessPiece movedPiece, Position newPos) {
+        super(movedPiece, newPos);
     }
 
     @Override
     public void doMove() {
         updateVulnerableEnPassantPosition();
         updateCastlingValues();
-        chessBoard.silentMovePiece(piece, newPos);
+        chessBoard.silentMovePiece(movedPiece, newPos);
         chessBoard.updateKingStatus();
     }
 
@@ -55,22 +55,22 @@ public class NormalMove extends Move {
         if (!getAmbiguousPieces().isEmpty()) {
             prefix += this.getUniquePrefix(getAmbiguousPieces());
         }
-        if (piece.getType() == PieceType.Pawn) {
+        if (movedPiece.getType() == PieceType.Pawn) {
             // Also need to check for ambuigity
             String pos = newPos.toString();
-            if (this.putsEnemyKingInCheckMate()) {
+            if (this.movePutsEnemyKingInCheckmate()) {
                 return prefix + pos + "#";
-            } else if (putsEnemyKingInCheck()) {
+            } else if (movePutsEnemyKingInCheck()) {
                 return prefix + pos + "+";
             } else {
                 return prefix + pos;
             }
         } else {
-            String type = piece.getType().toShortString();
+            String type = movedPiece.getType().toShortString();
             String move = prefix + newPos.toString();
-            if (putsEnemyKingInCheckMate()) {
+            if (movePutsEnemyKingInCheckmate()) {
                 return type + move + "#";
-            } else if (putsEnemyKingInCheck()) {
+            } else if (movePutsEnemyKingInCheck()) {
                 return type + move + "+";
             } else {
                 return type + move;
@@ -80,7 +80,7 @@ public class NormalMove extends Move {
 
     @Override
     public void undoMove() {
-        chessBoard.silentMovePiece(piece, orgPos);
+        chessBoard.silentMovePiece(movedPiece, orgPos);
         restoreVulnerableEnPassantPosition();
         restorePreviousCastlingValues();
         chessBoard.updateKingStatus();

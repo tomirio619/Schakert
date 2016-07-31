@@ -34,86 +34,86 @@ import org.junit.Test;
  * @author S4ndmann
  */
 public class FENParserTest {
+
     @BeforeClass
     public static void setUpClass() {
     }
+
     @AfterClass
     public static void tearDownClass() {
     }
-    
+
     List<String> FENtestingStrings;
-    
+
     public FENParserTest() {
         // see http://mathieupage.com/?p=65 for a FEN database
         FENtestingStrings = Arrays.asList(
                 "8/​1p6/​1P1p4/​1B1Pk2p/​8/​7K/​8/​4r3 b - - 0 52"
         );
-                
-        
+
     }
-    private boolean castlingAvailabilityIsCorrectlySet(FENParser fenParser){
+
+    private boolean castlingAvailabilityIsCorrectlySet(FENParser fenParser) {
         ChessBoard chessBoard = fenParser.getChessBoard();
         String state = fenParser.getFENstateString();
-        // Get castlig availaibility part of the FEN string.
+        // Get castling availaibility part of the FEN string.
         String castlingAvailability = state.split(" ")[1];
 
-        if (castlingAvailability.equals("-")){
+        if (castlingAvailability.equals("-")) {
             // The kings should not be able to castle.
             King blackKing = chessBoard.getKing(ChessColour.Black);
             King whiteKing = chessBoard.getKing(ChessColour.White);
-            return !blackKing.getCastlingPossible() 
+            return !blackKing.getCastlingPossible()
                     && !whiteKing.getCastlingPossible();
-        }
-        else{
-            for(int i = 0; i<castlingAvailability.length(); i++){
+        } else {
+            for (int i = 0; i < castlingAvailability.length(); i++) {
                 Character c = castlingAvailability.charAt(i);
                 switch (c) {
                     case 'K':
                         // White should be able to castle kingside.
-                        return chessBoard.getKing(ChessColour.White).getCastlingPossible() &&
-                                chessBoard.getKingSideRook(ChessColour.White).getCastlingPossible();
+                        return chessBoard.getKing(ChessColour.White).getCastlingPossible()
+                                && chessBoard.getKingSideRook(ChessColour.White).getCastlingPossible();
                     case 'Q':
                         // White should be able to castle queenside.
-                        return chessBoard.getKing(ChessColour.White).getCastlingPossible() &&
-                                chessBoard.getQueenSideRook(ChessColour.White).getCastlingPossible();
-                        
+                        return chessBoard.getKing(ChessColour.White).getCastlingPossible()
+                                && chessBoard.getQueenSideRook(ChessColour.White).getCastlingPossible();
+
                     case 'k':
                         // black should be able to castle kingside.
-                        return chessBoard.getKing(ChessColour.Black).getCastlingPossible() &&
-                                chessBoard.getKingSideRook(ChessColour.Black).getCastlingPossible();     
+                        return chessBoard.getKing(ChessColour.Black).getCastlingPossible()
+                                && chessBoard.getKingSideRook(ChessColour.Black).getCastlingPossible();
                     case 'q':
                         // Black should be able to castle queenside.
-                        return chessBoard.getKing(ChessColour.Black).getCastlingPossible() &&
-                                chessBoard.getQueenSideRook(ChessColour.Black).getCastlingPossible();
+                        return chessBoard.getKing(ChessColour.Black).getCastlingPossible()
+                                && chessBoard.getQueenSideRook(ChessColour.Black).getCastlingPossible();
                 }
             }
         }
         return true;
     }
-    
-    
+
     @Before
     public void setUp() {
     }
-    
+
     @After
     public void tearDown() {
     }
 
-    
-    @Test 
-    public void testInitialFENParse(){
-    System.out.println("Testing the initial FEN parse");
+    @Test
+    public void testInitialFENParse() {
+        System.out.println("Testing the initial FEN parse");
         String startingPositionFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
         FENParser fenParser = new FENParser(startingPositionFEN);
         ChessBoard chessBoard = fenParser.getChessBoard();
-        for (int row = 2; row < 6; row++){
-            for (int col = 0; col < ChessBoard.COLS; col++){
+        for (int row = 2; row < 6; row++) {
+            for (int col = 0; col < ChessBoard.COLS; col++) {
                 assertEquals(chessBoard.isOccupiedPosition(row, col), false);
             }
         }
         assertTrue(castlingAvailabilityIsCorrectlySet(fenParser));
     }
+
     /**
      * Test of getChessBoard method, of class FENParser.
      */
@@ -124,5 +124,5 @@ public class FENParserTest {
         FENParser fenParser = new FENParser(Kiwipete);
         assertTrue(castlingAvailabilityIsCorrectlySet(fenParser));
     }
-    
+
 }

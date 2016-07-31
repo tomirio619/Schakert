@@ -18,9 +18,7 @@ package com.tomirio.schakert.chesspieces;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
 import com.tomirio.schakert.chessboard.ChessColour;
-import com.tomirio.schakert.chessboard.ChessPiece;
 import com.tomirio.schakert.chessboard.MoveDetails;
-import com.tomirio.schakert.chessboard.PieceType;
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.moves.CaptureMove;
 import com.tomirio.schakert.moves.CastlingMove;
@@ -42,7 +40,7 @@ public class King extends ChessPiece {
     /**
      * indicate if the king is check
      */
-    private boolean isCheck;
+    private boolean inCheck;
 
     /**
      * This constructor MUST be used when the chessboard is not known when a new
@@ -54,7 +52,7 @@ public class King extends ChessPiece {
      */
     public King(ChessColour colour, Position pos) {
         super(PieceType.King, colour, pos);
-        isCheck = false;
+        inCheck = false;
         castlingPossible = true;
     }
 
@@ -106,7 +104,7 @@ public class King extends ChessPiece {
         }
 
         ArrayList<Rook> rooks = chessBoard.getRooks(getColour());
-        if (rooks.isEmpty() || isCheck) {
+        if (rooks.isEmpty() || inCheck) {
             return castlingMoves;
         } else {
             for (Rook rook : rooks) {
@@ -139,6 +137,12 @@ public class King extends ChessPiece {
      */
     public void setCastlingPossible(boolean newValue) {
         castlingPossible = newValue;
+    }
+    /**
+     * @param newValue Set wheter the king is check or not.
+     */
+    public void setCheck(boolean newValue) {
+        inCheck = newValue;
     }
 
     @Override
@@ -197,23 +201,17 @@ public class King extends ChessPiece {
     @Override
     public int hashCode() {
         int hash = 7;
-        hash = 23 * hash + (this.isCheck ? 1 : 0);
+        hash = 23 * hash + (this.inCheck ? 1 : 0);
         return hash;
     }
 
     /**
-     * @return the value isCheck.
+     * @return the value inCheck.
      */
-    public boolean isCheck() {
-        return isCheck;
+    public boolean inCheck() {
+        return inCheck;
     }
 
-    /**
-     * @param newValue Set wheter the king is check or not.
-     */
-    public void setCheck(boolean newValue) {
-        isCheck = newValue;
-    }
 
     /**
      *

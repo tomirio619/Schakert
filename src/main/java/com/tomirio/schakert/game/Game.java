@@ -51,7 +51,7 @@ public class Game {
     /**
      * The chess board.
      */
-    private final ChessBoard chessBoard;
+    private ChessBoard chessBoard;
     /**
      * The colour having turn.
      */
@@ -90,11 +90,16 @@ public class Game {
         this.chessBoard = chessBoard;
         this.view = view;
         moveList = new ArrayList<>();
-        // We have applied any move, so the index of the applied move is -1
+        // We have not applied any move, so the index of the applied move is -1
         appliedMove = -1;
         hasTurn = ChessColour.White;
         whitePlayer = new HumanPlayer(ChessColour.White, chessBoard);
-        blackPlayer = new AI(ChessColour.Black, chessBoard);
+        blackPlayer = new HumanPlayer(ChessColour.Black, chessBoard);
+
+        String startingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        String behtingStudy = "8/8/7p/3KNN1k/2p4p/8/3P2p1/8 w - -";
+        loadFEN(behtingStudy);
+        notifyPlayers();
     }
 
     /**
@@ -131,13 +136,38 @@ public class Game {
             if (appliedMove + 1 < moveList.size()) {
                 // There is a next move in the list we can apply
                 Move move = moveList.get(appliedMove + 1);
+                /*
+                We need to add the move before it is applied.
+                This due to toString() using doMove() and undoMove() to determine
+                the PGN notaton of the move.
+                 */
                 log.addMove(move);
                 move.doMove();
                 appliedMove++;
-                updateTurn();
                 view.update(chessBoard);
+                updateTurn();
+                updateGameStatus();
+                /**
+                 * When redoing a move made in the past, and both players are
+                 * AI, we do not want the AI play further. Only let them play
+                 * when the applied move is points to...
+                 */
+                if (blackPlayer instanceof AI && whitePlayer instanceof AI) {
+                    if (appliedMove + 1 == moveList.size()) {
+                        /**
+                         * When doing and undoing moves, we only want the AI to
+                         * continu playing when whe redid the last known move.
+                         */
+                        notifyPlayers();
+                    }
+                } else {
+                    notifyPlayers();
+                }
             }
         }
+    }
+    public ChessBoard getBoard() {
+        return chessBoard;
     }
 
     /**
@@ -174,21 +204,7 @@ public class Game {
     public void humanPlay(Move move) {
         removeObsoleteMoves();
         moveList.add(move);
-        log.addMove(move);
-        appliedMove++;
-        // Only apply the move when we have the String representation
-        switch (hasTurn) {
-            case Black:
-                blackPlayer.makeMove(move);
-                break;
-            case White:
-                whitePlayer.makeMove(move);
-                break;
-        }
-        view.update(chessBoard);
-        updateTurn();
-        updateGameStatus();
-        updatePlayers();
+        doMove();
     }
 
     /**
@@ -198,8 +214,38 @@ public class Game {
      * @return <code>True</code> if the player with that colour is checkmate,
      * <code>False</code> otherwise.
      */
-    public boolean isCheckMate(ChessColour colour) {
-        return chessBoard.isCheckMate(colour);
+    public boolean inCheckmate(ChessColour colour) {
+        return chessBoard.inCheckmate(colour);
+    }
+
+
+    public final void loadFEN(String FEN) {
+        FENParser fenParser = new FENParser(FEN);
+        chessBoard = fenParser.getChessBoard();
+        hasTurn = fenParser.getHasTurn();
+    }
+    /**
+     * Notifies the right player after a move has been made. If the next player
+     * is a human player, he will be able to make his move by interacting with
+     * the GUI.
+     */
+    public final void notifyPlayers() {
+        if (weHaveAWinner() || chessBoard.inStalemate()) {
+            // The game has ended
+        } else {
+            switch (hasTurn) {
+                case Black:
+                    if (blackPlayer instanceof AI) {
+                        agentPlay();
+                    }
+                    break;
+                case White:
+                    if (whitePlayer instanceof AI) {
+                        agentPlay();
+                    }
+                    break;
+            }
+        }
     }
 
     /**
@@ -229,13 +275,18 @@ public class Game {
             if (appliedMove < moveList.size()) {
                 // we can index the move
                 Move move = moveList.get(appliedMove);
+                /*
+                Before undoing the move, log will check whether the current state
+                was an end state (check mate, stale mate). Based on this information,
+                it will update the move log correctly.
+                 */
+                log.undoMove();
                 move.undoMove();
 
                 appliedMove--;
-                updateTurn();
 
+                updateTurn();
                 view.update(chessBoard);
-                log.undoMove();
             }
         }
     }
@@ -249,42 +300,22 @@ public class Game {
         King whiteKing = chessBoard.getKing(ChessColour.White);
 
         if (whiteKing.getPossibleMoves().isEmpty()
-                && !whiteKing.isCheck()
+                && !whiteKing.inCheck()
                 && !chessBoard.canMakeAMove(ChessColour.White)
                 || blackKing.getPossibleMoves().isEmpty()
-                && !blackKing.isCheck()
+                && !blackKing.inCheck()
                 && !chessBoard.canMakeAMove(ChessColour.Black)) {
             log.gameFinished();
-        } else if (whiteKing.isCheck()
+        } else if (whiteKing.inCheck()
                 && whiteKing.getPossibleMoves().isEmpty()
                 && !chessBoard.canMakeAMove(ChessColour.White)) {
             winner = ChessColour.Black;
             log.gameFinished();
-        } else if (blackKing.isCheck()
+        } else if (blackKing.inCheck()
                 && blackKing.getPossibleMoves().isEmpty()
                 && !chessBoard.canMakeAMove(ChessColour.Black)) {
             winner = ChessColour.White;
             log.gameFinished();
-        }
-    }
-
-    /**
-     * Notifies the right player after a move has been made. If the next player
-     * is a human player, he will be able to make his move by interacting with
-     * the GUI.
-     */
-    public void updatePlayers() {
-        switch (hasTurn) {
-            case Black:
-                if (blackPlayer instanceof AI) {
-                    agentPlay();
-                }
-                break;
-            case White:
-                if (whitePlayer instanceof AI) {
-                    agentPlay();
-                }
-                break;
         }
     }
 
@@ -303,5 +334,6 @@ public class Game {
     public boolean weHaveAWinner() {
         return winner != null;
     }
+
 
 }

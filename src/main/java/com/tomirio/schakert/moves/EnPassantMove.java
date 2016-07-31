@@ -16,8 +16,8 @@
  */
 package com.tomirio.schakert.moves;
 
-import com.tomirio.schakert.chessboard.ChessPiece;
 import com.tomirio.schakert.chessboard.Position;
+import com.tomirio.schakert.chesspieces.ChessPiece;
 
 /**
  *
@@ -40,7 +40,7 @@ public class EnPassantMove extends CaptureMove {
     @Override
     public void doMove() {
         chessBoard.setEnPassantTargetSquare(null);
-        chessBoard.silentMovePiece(piece, newPos);
+        chessBoard.silentMovePiece(movedPiece, newPos);
         chessBoard.deletePieceOnPos(capturedPiece.getPos());
         chessBoard.updateKingStatus();
     }
@@ -52,9 +52,9 @@ public class EnPassantMove extends CaptureMove {
 
     @Override
     public String toString() {
-        if (putsEnemyKingInCheckMate()) {
+        if (movePutsEnemyKingInCheckmate()) {
             return orgPos.toString().charAt(0) + "x" + newPos.toString() + " e.p." + "#";
-        } else if (this.putsEnemyKingInCheck()) {
+        } else if (this.movePutsEnemyKingInCheck()) {
             return orgPos.toString().charAt(0) + "x" + newPos.toString() + " e.p." + "+";
         } else {
             return orgPos.toString().charAt(0) + "x" + newPos.toString() + " e.p.";

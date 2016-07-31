@@ -18,24 +18,34 @@ package com.tomirio.schakert.moves;
 
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.chesspieces.ChessPiece;
-import com.tomirio.schakert.chesspieces.PieceType;
+import com.tomirio.schakert.chesspieces.Pawn;
+import com.tomirio.schakert.chesspieces.Queen;
 
 /**
  *
  * @author S4ndmann
  */
-public class CaptureMove extends NormalMove {
-
-    ChessPiece capturedPiece;
+public class CapturePromotionMove extends CaptureMove {
 
     /**
      *
      * @param capturingPiece The piece that made the capture move.
      * @param newPos The new positon after the capture took place.
      */
-    public CaptureMove(ChessPiece capturingPiece, Position newPos) {
+    public CapturePromotionMove(ChessPiece capturingPiece, Position newPos) {
         super(capturingPiece, newPos);
-        capturedPiece = chessBoard.getPiece(newPos);
+    }
+
+    @Override
+    public void doMove() {
+        super.doMove();
+        // Create a queen with the same colour and position of the pawn we just moved.
+        Queen q = new Queen(movedPiece.getColour(), movedPiece.getPos(), chessBoard);
+        chessBoard.setPiece(q);
+        // Set piece to the queen we just created
+        movedPiece = q;
+        chessBoard.setEnPassantTargetSquare(null);
+        chessBoard.updateKingStatus();
     }
 
     @Override
@@ -43,36 +53,32 @@ public class CaptureMove extends NormalMove {
         return true;
     }
 
+
     @Override
     public String toString() {
         String prefix = "";
         if (!getAmbiguousPieces().isEmpty()) {
             prefix += this.getUniquePrefix(getAmbiguousPieces());
         }
-        if (movedPiece.getType() == PieceType.Pawn) {
-            if (movePutsEnemyKingInCheckmate()) {
-                return prefix + "x" + newPos.toString() + "#";
-            } else if (movePutsEnemyKingInCheck()) {
-                return prefix + "x" + newPos.toString() + "+";
-            } else {
-                return prefix + "x" + newPos.toString();
-            }
-
-        } else if (this.movePutsEnemyKingInCheckmate()) {
-            return movedPiece.getType().toShortString() + prefix + "x" + newPos.toString() + "#";
+        if (movePutsEnemyKingInCheckmate()) {
+            return prefix + "x" + newPos.toString() + "=Q" + "#";
         } else if (movePutsEnemyKingInCheck()) {
-            return movedPiece.getType().toShortString() + prefix + "x" + newPos.toString() + "+";
+            return prefix + "x" + newPos.toString() + "=Q" + "+";
         } else {
-            return movedPiece.getType().toShortString() + prefix + "x" + newPos.toString();
+            return prefix + "x" + newPos.toString() + "=Q";
         }
     }
-
     @Override
     public void undoMove() {
         super.undoMove();
-        chessBoard.setPiece(capturedPiece);
-        chessBoard.setEnPassantTargetSquare(this.orgVulnerableEnPassantPos);
-        chessBoard.updateKingStatus();
+        /*
+        Create a new pawn with the position of queen we just moved back.
+        Note that we cannot use orgPos here, it will give the wrong position.
+        Might be due to the reference being passed to the queen, which could be
+        modified if the move is done and undone multiple times.
+        */
+        Pawn p = new Pawn(movedPiece.getColour(), movedPiece.getPos(), chessBoard);
+        chessBoard.setPiece(p);
     }
 
 }

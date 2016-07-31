@@ -34,7 +34,7 @@ public class Log extends GridPane {
     /**
      * The chess board.
      */
-    private final ChessBoard chessBoard;
+    private ChessBoard chessBoard;
     /**
      * A move consists of a turn by each player
      */
@@ -61,6 +61,19 @@ public class Log extends GridPane {
     public Log(ChessBoard chessBoard) {
         super();
         this.chessBoard = chessBoard;
+        moveNumbers = new ArrayList();
+        moveStrings = new ArrayList();
+        plyCounter = 0;
+        moveCounter = 1;
+        this.setPrefWidth(170);
+        this.setHgap(10);
+        this.setVgap(10);
+        this.vgapProperty().add(5);
+        this.setPadding(new Insets(10, 10, 10, 10));
+    }
+
+    public Log() {
+        super();
         moveNumbers = new ArrayList();
         moveStrings = new ArrayList();
         plyCounter = 0;
@@ -131,21 +144,21 @@ public class Log extends GridPane {
      * <code>False</code> otherwise.
      */
     public boolean gameFinished() {
-        if (chessBoard.isStaleMate()) {
+        if (chessBoard.inStalemate()) {
             // It is stale mate
             Label staleMate = new Label("½-½");
             staleMate.setTextFill(Color.BLACK);
             this.add(staleMate, 0, moveCounter + 1, 2, 1);
             this.moveStrings.add(staleMate);
             return true;
-        } else if (chessBoard.isCheckMate(ChessColour.White)) {
+        } else if (chessBoard.inCheckmate(ChessColour.White)) {
             // Winner is black.
             Label blackIsWinner = new Label("0-1");
             blackIsWinner.setTextFill(Color.BLACK);
             this.add(blackIsWinner, 0, moveCounter + 1, 2, 1);
             this.moveStrings.add(blackIsWinner);
             return true;
-        } else if (chessBoard.isCheckMate(ChessColour.Black)) {
+        } else if (chessBoard.inCheckmate(ChessColour.Black)) {
             // Winner is white.
             Label whiteIsWinner = new Label("1-0");
             whiteIsWinner.setTextFill(Color.BLACK);
@@ -156,6 +169,10 @@ public class Log extends GridPane {
         return false;
     }
 
+
+    public void setBoard(ChessBoard chessBoard) {
+        this.chessBoard = chessBoard;
+    }
     /**
      * Undo the move.
      */
@@ -165,7 +182,12 @@ public class Log extends GridPane {
             if (chessBoard.gameIsFinished()) {
                 /*
                 Remove score label, undo last half move, lower ply counter
-                 */
+                A Quick set of moves for testing checkmate:
+                W	B
+                f4	e5
+                g4	Qh4#
+                0-1
+                */
                 Label scoreLabel = this.moveStrings.remove(moveStrings.size() - 1);
                 this.getChildren().remove(scoreLabel);
                 Label previousHalfMove = this.moveStrings.remove(moveStrings.size() - 1);
@@ -183,14 +205,14 @@ public class Log extends GridPane {
                 /*
                 This ply was the beginning of a new move, 
                 delete this half move and the move label.
-                 */
+                */
                 Label moveNumber = this.moveNumbers.remove(moveNumbers.size() - 1);
                 this.getChildren().remove(moveNumber);
                 Label previousHalfMove = this.moveStrings.remove(moveStrings.size() - 1);
                 this.getChildren().remove(previousHalfMove);
 
                 plyCounter--;
-                if (moveCounter != 1) {
+                if (moveCounter > 1) {
                     // The move counter must always be equal or greater than 1.
                     moveCounter--;
                 }

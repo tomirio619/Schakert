@@ -14,7 +14,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tomirio.schakert.chessboard;
+package com.tomirio.schakert.chesspieces;
 
 import java.util.NoSuchElementException;
 

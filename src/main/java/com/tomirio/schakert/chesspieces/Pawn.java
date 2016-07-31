@@ -18,11 +18,10 @@ package com.tomirio.schakert.chesspieces;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
 import com.tomirio.schakert.chessboard.ChessColour;
-import com.tomirio.schakert.chessboard.ChessPiece;
 import com.tomirio.schakert.chessboard.MoveDetails;
-import com.tomirio.schakert.chessboard.PieceType;
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.moves.CaptureMove;
+import com.tomirio.schakert.moves.CapturePromotionMove;
 import com.tomirio.schakert.moves.EnPassantMove;
 import com.tomirio.schakert.moves.Move;
 import com.tomirio.schakert.moves.NormalMove;
@@ -60,7 +59,7 @@ public class Pawn extends ChessPiece {
     /**
      * Get the capture moves for pawns not standing on their initial position.
      *
-     * @return  The movedetails for this pawn.
+     * @return The movedetails for this pawn.
      */
     private MoveDetails getCaptureMoves() {
         MoveDetails moveDetails = new MoveDetails();
@@ -83,9 +82,9 @@ public class Pawn extends ChessPiece {
                         switch (getColour()) {
                             case Black:
                                 if (newPos.getRow() == 7) {
-                                    // Black pawn promotes
-                                    PromotionMove promotionMove = new PromotionMove(this, newPos);
-                                    moveDetails.moves.add(promotionMove);
+                                    // Black pawn captures and promotes 
+                                    CapturePromotionMove capturePromotionMove = new CapturePromotionMove(this, newPos);
+                                    moveDetails.moves.add(capturePromotionMove);
                                 } else {
                                     // A capture move without promotion
                                     CaptureMove captureMove = new CaptureMove(this, newPos);
@@ -93,9 +92,9 @@ public class Pawn extends ChessPiece {
                                 }
                             case White:
                                 if (newPos.getRow() == 0) {
-                                    // White pawn promotes
-                                    PromotionMove promotionMove = new PromotionMove(this, newPos);
-                                    moveDetails.moves.add(promotionMove);
+                                    // White pawn captures and promotes
+                                    CapturePromotionMove capturePromotionMove = new CapturePromotionMove(this, newPos);
+                                    moveDetails.moves.add(capturePromotionMove);
                                 } else {
                                     // A capture move without promotion
                                     CaptureMove captureMove = new CaptureMove(this, newPos);
@@ -103,31 +102,30 @@ public class Pawn extends ChessPiece {
                                 }
                         }
                     }
-                }
-                else{
-                    // New position is not occupied.
+                } else // New position is not occupied.
+                {
                     if (newPos.equals(chessBoard.getEnPassantTargetSquare())) {
-                    /*
+                        /*
                     To prevent pieces of similar colours trying to execute an
                     enPassant on a friendly piece, we must check if there is an enemy
                     on the row above or below the vulnerable position.
-                     */
-                    // Inverse the rowshift, making it negative for black and positive for white pieces.
-                    rowShift = -rowShift;
-                    Position enPassantAttackSquare = chessBoard.getEnPassantTargetSquare();
-                    if (chessBoard.isOccupiedPosition(enPassantAttackSquare.getRow() + rowShift,
-                            enPassantAttackSquare.getColumn())) {
-                        // The position is occupied.
-                        ChessPiece p = chessBoard.getPiece(enPassantAttackSquare.getRow() + rowShift,
-                                enPassantAttackSquare.getColumn());
-                        if (p.getColour() != getColour() && p.getType() == PieceType.Pawn) {
-                            // Enemy pawn, we can execute enPassant on it
-                            ChessPiece chessPiece = getCapturedEnPassantPawn();
-                            EnPassantMove enPassantMove = new EnPassantMove(this, newPos, chessPiece);
-                            moveDetails.moves.add(enPassantMove);
+                         */
+                        // Inverse the rowshift, making it negative for black and positive for white pieces.
+                        rowShift = -rowShift;
+                        Position enPassantAttackSquare = chessBoard.getEnPassantTargetSquare();
+                        if (chessBoard.isOccupiedPosition(enPassantAttackSquare.getRow() + rowShift,
+                                enPassantAttackSquare.getColumn())) {
+                            // The position is occupied.
+                            ChessPiece p = chessBoard.getPiece(enPassantAttackSquare.getRow() + rowShift,
+                                    enPassantAttackSquare.getColumn());
+                            if (p.getColour() != getColour() && p.getType() == PieceType.Pawn) {
+                                // Enemy pawn, we can execute enPassant on it
+                                ChessPiece chessPiece = getCapturedEnPassantPawn();
+                                EnPassantMove enPassantMove = new EnPassantMove(this, newPos, chessPiece);
+                                moveDetails.moves.add(enPassantMove);
+                            }
                         }
                     }
-                }
                 }
             }
         }
