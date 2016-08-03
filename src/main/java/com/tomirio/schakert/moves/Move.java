@@ -17,9 +17,9 @@
 package com.tomirio.schakert.moves;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chessboard.ChessColour;
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.chesspieces.ChessPiece;
+import com.tomirio.schakert.chesspieces.Colour;
 import com.tomirio.schakert.chesspieces.King;
 import com.tomirio.schakert.chesspieces.PieceType;
 import com.tomirio.schakert.chesspieces.Rook;
@@ -162,6 +162,7 @@ public abstract class Move {
             return movedPiece.getPos().toString();
         }
     }
+
     /**
      *
      * @return <code>True</code> if the move puts the enemy player in check.
@@ -179,6 +180,7 @@ public abstract class Move {
     public boolean inCheckmateMove() {
         return movePutsEnemyKingInCheckmate();
     }
+
     /**
      *
      * @return <code>True</code> if the move is a capture move.
@@ -247,16 +249,9 @@ public abstract class Move {
      */
     protected boolean movePutsEnemyKingInCheck() {
         doMove();
-        King k = chessBoard.getKing(movedPiece.getColour().getOpposite());
-        boolean attacksEnemyKing = false;
-        for (Move move : movedPiece.getPossibleMoves()) {
-            if (move.isCaptureMove() && move.getNewPos().equals(k.getPos())) {
-                attacksEnemyKing = true;
-                break;
-            }
-        }
+        boolean inCheck = chessBoard.getKing(movedPiece.getColour().getOpposite()).inCheck();
         undoMove();
-        return attacksEnemyKing;
+        return inCheck;
     }
 
     /**
@@ -349,11 +344,15 @@ public abstract class Move {
         if (movedPiece.getType() == PieceType.Pawn) {
             if (Math.abs(newPos.getRow() - orgPos.getRow()) == 2) {
                 // This move enables enPassant.
-                int rowShift = (movedPiece.getColour() == ChessColour.White) ? 1 : -1;
+                int rowShift = (movedPiece.getColour() == Colour.White) ? 1 : -1;
                 Position vulnerableEnPassantPos = new Position(newPos.getRow() + rowShift, newPos.getColumn());
                 chessBoard.setEnPassantTargetSquare(vulnerableEnPassantPos.deepClone());
+            } else {
+                // Move did not enable enPassant.
+                chessBoard.setEnPassantTargetSquare(null);
             }
         } else {
+            // Move did not involve a pawn, so we reset enPassant square.
             chessBoard.setEnPassantTargetSquare(null);
         }
     }

@@ -42,9 +42,10 @@ public class NormalMove extends Move {
         updateCastlingValues();
         chessBoard.silentMovePiece(movedPiece, newPos);
         chessBoard.updateKingStatus();
+        chessBoard.updateTurn();
     }
 
-    ;
+    @Override
     public boolean isCaptureMove() {
         return false;
     }
@@ -84,6 +85,7 @@ public class NormalMove extends Move {
         restoreVulnerableEnPassantPosition();
         restorePreviousCastlingValues();
         chessBoard.updateKingStatus();
+        chessBoard.updateTurn();
     }
 
 }

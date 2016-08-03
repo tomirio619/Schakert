@@ -17,14 +17,11 @@
 package com.tomirio.schakert.chesspieces;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chessboard.ChessColour;
 import com.tomirio.schakert.chessboard.Direction;
-import com.tomirio.schakert.chessboard.MoveDetails;
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.moves.CaptureMove;
 import com.tomirio.schakert.moves.Move;
 import com.tomirio.schakert.moves.NormalMove;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Locale;
 import java.util.NoSuchElementException;
@@ -34,7 +31,7 @@ import java.util.Objects;
  *
  * @author Tom Sandmann
  */
-public abstract class ChessPiece implements Serializable {
+public abstract class ChessPiece {
 
     /**
      * The board, if a new chess piece is created, this board must be set with
@@ -45,7 +42,7 @@ public abstract class ChessPiece implements Serializable {
     /**
      * The colour of the chess piece.
      */
-    private final ChessColour colour;
+    private final Colour colour;
 
     /**
      * The current position of the chess piece.
@@ -65,7 +62,7 @@ public abstract class ChessPiece implements Serializable {
      * @param colour The colour of the chess piece.
      * @param pos The position of the chess piece.
      */
-    public ChessPiece(PieceType type, ChessColour colour, Position pos) {
+    public ChessPiece(PieceType type, Colour colour, Position pos) {
         this.type = type;
         this.colour = colour;
         this.pos = pos;
@@ -80,7 +77,7 @@ public abstract class ChessPiece implements Serializable {
      * @param pos The position.
      * @param board The board.
      */
-    public ChessPiece(PieceType type, ChessColour colour, Position pos,
+    public ChessPiece(PieceType type, Colour colour, Position pos,
             ChessBoard board) {
         this.type = type;
         this.colour = colour;
@@ -196,7 +193,7 @@ public abstract class ChessPiece implements Serializable {
      *
      * @return The colour of this chess piece.
      */
-    public final ChessColour getColour() {
+    public final Colour getColour() {
         return colour;
     }
 
@@ -381,10 +378,19 @@ public abstract class ChessPiece implements Serializable {
         pos.setPosition(newRow, newColumn);
     }
 
-
+    /**
+     * Following the Standard Algebraic Notation (SAN), each chess piece is
+     * identified by a single letter taken from the standard English names (pawn
+     * = "P", knight = "N", bishop = "B", rook = "R", queen = "Q" and king =
+     * "K"). White pieces are designated using upper-case letters ("PNBRQK")
+     * while black pieces use lowercase ("pnbrqk").
+     *
+     * @return The correct SAN string for this chess piece.
+     */
     public String toShortString() {
-        return (getColour() == ChessColour.White) ? type.toShortString() : type.toShortString().toLowerCase(Locale.ENGLISH);
+        return (getColour() == Colour.White) ? type.toShortString() : type.toShortString().toLowerCase(Locale.ENGLISH);
     }
+
     /**
      *
      * @return The string representation of this chess piece.

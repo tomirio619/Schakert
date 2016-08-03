@@ -27,16 +27,19 @@ import java.util.LinkedList;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.StackPane;
+import javafx.scene.paint.Color;
 import javafx.scene.paint.Paint;
 import javafx.scene.shape.SVGPath;
 import javafx.stage.Stage;
@@ -69,6 +72,7 @@ public final class View {
      * The game
      */
     public Game game;
+    public Button getFEN;
 
     /**
      * The imageloader
@@ -79,6 +83,7 @@ public final class View {
      * The labels
      */
     public LinkedList<Label> labels;
+    public Button loadFEN;
     /**
      * The log.
      */
@@ -104,6 +109,7 @@ public final class View {
      */
     public VisualTile[][] visualBoard;
 
+
     /**
      *
      * @param primaryStage The primary stage.
@@ -127,55 +133,68 @@ public final class View {
 
     }
 
-    private void createMainWindow(Stage primaryStage) {
-        // Image loader
-        ImageLoader.initialize();
-        doMoveBtn = new Button();
-        undoMoveBtn = new Button();
-        mainWindow = primaryStage;
-        visualBoard = new VisualTile[8][8];
-        chessBoard = new ChessBoard();
 
-        log = new Log();
-        game = new Game(chessBoard, this, log);
-        chessBoard = game.getBoard();
-        log.setBoard(chessBoard);
+    private void createButtons() {
+        // Set pref size
+        doMoveBtn.setPrefSize(50, 30);
+        undoMoveBtn.setPrefSize(50, 30);
+        loadFEN.setPrefSize(50, 30);
+        getFEN.setPrefSize(50, 30);
 
-        mouseListener = new MouseListener(this, game);
-
-        // Root will contain every visual aspect
-        root = new StackPane();
-        borderPane = new BorderPane();
-        chessboardGrid = new GridPane();
-        labels = new LinkedList<>();
-
-        // Initialize
-        createVisualTiles();
-        addResizeHandlers();
-        setLabels();
-
-        // Create graphical structure
-        BorderPane visualChessBoard = new BorderPane();
-        chessboardGrid.setAlignment(Pos.CENTER);
-        visualChessBoard.setCenter(chessboardGrid);
+        doMoveBtn.setTooltip(new Tooltip("Make the next move."));
+        undoMoveBtn.setTooltip(new Tooltip("Undo the last move."));
+        loadFEN.setTooltip(new Tooltip("Load a FEN string."));
+        getFEN.setTooltip(new Tooltip("Get FEN string of the current board."));
 
         // Create SVG images containg left and right arrows.
-        SVGPath doSvg = new SVGPath();
+        SVGPath doSVG = new SVGPath();
         SVGPath undoSVG = new SVGPath();
-        /* see 
-        https://www.iconfinder.com/iconsets/faticons.
-        for the used svg images.
+        SVGPath loadSVG = new SVGPath();
+        SVGPath getSVG = new SVGPath();
+        /*
+        https://skills421.wordpress.com/2014/08/05/svg-icons-in-javafx8/
          */
-        doSvg.setContent("M24.291,14.276L14.705,4.69c-0.878-0.878-2.317-0.878-3.195,0l-0.8,0.8c-0.878,0.877-0.878,2.316,0,3.194 "
-                + "L18.024,16l-7.315,7.315c-0.878,0.878-0.878,2.317,0,3.194l0.8,0.8c0.878,0.879,2.317,0.879,3.195,0l9.586-9.587 "
-                + "c0.472-0.471,0.682-1.103,0.647-1.723C24.973,15.38,24.763,14.748,24.291,14.276z");
-        undoSVG.setContent("M7.701,14.276l9.586-9.585c0.879-0.878,2.317-0.878,3.195,0l0.801,0.8c0.878,0.877,0.878,2.316,0,3.194  "
-                + "L13.968,16l7.315,7.315c0.878,0.878,0.878,2.317,0,3.194l-0.801,0.8c-0.878,0.879-2.316,0.879-3.195,0l-9.586-9.587  "
-                + "C7.229,17.252,7.02,16.62,7.054,16C7.02,15.38,7.229,14.748,7.701,14.276z");
+        undoSVG.setContent("M0.133,8.367 L6.073,13.713 C6.307,13.924 6.687,13.922 "
+                + "6.922,13.711 L6.927,9.983 L14.951,9.983 C15.504,9.983 15.951,"
+                + "9.544 15.951,9.001 L15.951,7.035 C15.951,6.492 15.504,6.053 "
+                + "14.951,6.053 L6.931,6.053 L6.936,2.243 C6.705,2.034 "
+                + "6.324,2.035 6.088,2.246 L0.134,7.603 C-0.099,7.816 -0.102,"
+                + "8.156 0.133,8.367 L0.133,8.367 Z");
+
+        doSVG.setContent("M16.818,7.646 L10.878,2.206 C10.644,1.992 10.264,1.993 "
+                + "10.029,2.208 L10.024,6.001 L2,6.001 C1.447,6.001 1,6.448 1,7.001 "
+                + "L1,9.001 C1,9.554 1.447,10.001 2,10.001 L10.019,10.001 "
+                + "L10.013,13.878 C10.245,14.091 10.626,14.09 10.862,13.875 "
+                + "L16.816,8.423 C17.049,8.206 17.052,7.859 16.818,7.646 L16.818,7.646 Z");
+        loadSVG.setContent("M14,8.047 L14,12.047 L2,12.047 L2,8.047 L0,8.047 L0,15 L15.969,15 L15.969,8.047 L14,8.047 Z"
+                + "M7.997,0 L5,3.963 L7.016,3.984 L7.016,8.969 L8.953,8.969 L8.953,3.984 L10.953,3.984 L7.997,0 Z");
+
+        getSVG.setContent("M14.031,8.016 L14.031,12.016 L2,12.016 L2,8.016 L0,8.016 L0,15 L15.938,15 L15.938,8.016 L14.031,8.016 Z"
+                + "M8.072,8.947 L10.982,5.071 L8.968,5.05 L8.968,0.065 L7.03,0.065 L7.03,5.05 L5.03,5.05 L8.072,8.947 Z");
+
+        doSVG.setFill(Color.web("#434343"));
+        undoSVG.setFill(Color.web("#434343"));
+        loadSVG.setFill(Color.web("#434343"));
+        getSVG.setFill(Color.web("#434343"));
+
+        // Properly scale the SVG image.
+        doSVG.scaleXProperty().bind(doMoveBtn.widthProperty().divide(30));
+        doSVG.scaleYProperty().bind(doMoveBtn.heightProperty().divide(20));
+
+        undoSVG.scaleXProperty().bind(undoMoveBtn.widthProperty().divide(30));
+        undoSVG.scaleYProperty().bind(undoMoveBtn.heightProperty().divide(20));
+
+        loadSVG.scaleXProperty().bind(loadFEN.widthProperty().divide(30));
+        loadSVG.scaleYProperty().bind(loadFEN.heightProperty().divide(20));
+
+        getSVG.scaleXProperty().bind(getFEN.widthProperty().divide(30));
+        getSVG.scaleYProperty().bind(getFEN.heightProperty().divide(20));
 
         // Set button images.
-        doMoveBtn.setGraphic(doSvg);
+        doMoveBtn.setGraphic(doSVG);
         undoMoveBtn.setGraphic(undoSVG);
+        loadFEN.setGraphic(loadSVG);
+        getFEN.setGraphic(getSVG);
 
         // Add mouse click listeners.
         doMoveBtn.setOnAction(new EventHandler<ActionEvent>() {
@@ -192,33 +211,83 @@ public final class View {
             }
         });
 
+        loadFEN.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                // See http://code.makery.ch/blog/javafx-dialogs-official/
+                //Alert alert new Alert(AlertType.)
+                game.doMove();
+            }
+        });
+
+    }
+    private void createMainWindow(Stage primaryStage) {
+        // Initialize Imageloader
+        ImageLoader.initialize();
+        doMoveBtn = new Button();
+        undoMoveBtn = new Button();
+        loadFEN = new Button();
+        getFEN = new Button();
+        
+        mainWindow = primaryStage;
+        visualBoard = new VisualTile[8][8];
+        chessBoard = new ChessBoard();
+        
+        game = new Game(chessBoard, this);
+        log = game.getLog();
+        chessBoard = game.getBoard();
+        
+        mouseListener = new MouseListener(this, game);
+        
+        // Root will contain every visual aspect
+        root = new StackPane();
+        borderPane = new BorderPane();
+        chessboardGrid = new GridPane();
+        labels = new LinkedList<>();
+        
+        // Initialize
+        createVisualTiles();
+        addResizeHandlers();
+        setLabels();
+        
+        // Create graphical structure
+        BorderPane visualChessBoard = new BorderPane();
+        chessboardGrid.setAlignment(Pos.CENTER);
+        visualChessBoard.setCenter(chessboardGrid);
+        visualChessBoard.setPadding(new Insets(10, 10, 10, 10));
+        
+        // Create the buttons with SVG images
+        createButtons();
+        
         // Create horizontal box with buttons
         HBox buttonBar = new HBox();
-        buttonBar.getChildren().addAll(undoMoveBtn, doMoveBtn);
+        buttonBar.getChildren().addAll(getFEN, undoMoveBtn, doMoveBtn, loadFEN);
         buttonBar.setAlignment(Pos.TOP_CENTER);
         visualChessBoard.setBottom(buttonBar);
-
+        visualChessBoard.autosize();
+        
         borderPane.setCenter(visualChessBoard);
-
+        
         // Make log scrollable
         ScrollPane scrollableLog = new ScrollPane();
         scrollableLog.setContent(log);
-        scrollableLog.setFitToHeight(true);
+        scrollableLog.heightProperty().add(chessboardGrid.getHeight());
+        scrollableLog.autosize();
         scrollableLog.setFitToWidth(true);
         scrollableLog.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         // Make sure it automatically scrolls down.
         scrollableLog.vvalueProperty().bind(log.heightProperty());
-
+        
         borderPane.setRight(scrollableLog);
         root.getChildren().add(borderPane);
         Scene mainWindowScene = new Scene(root);
-
+        
         mainWindow.getIcons().add(ImageLoader.icon);
-        mainWindow.setTitle("Chess");
+        mainWindow.setTitle("Schakert");
         mainWindow.centerOnScreen();
         mainWindow.setScene(mainWindowScene);
         mainWindow.sizeToScene();
-
+        
         // Currently resizing is disabled.
         mainWindow.setResizable(false);
         mainWindow.show();
@@ -329,43 +398,60 @@ public final class View {
      * started.
      */
     private void setLabels() {
-        Label tmp = new Label("");
-        tmp.setContentDisplay(ContentDisplay.TEXT_ONLY);
-        tmp.setStyle("-fx-background-color: #500000 ; "
-                + "-fx-border-color: lightblue ; ");
-        tmp.setTextFill(Paint.valueOf("white"));
-        tmp.setPrefSize(VisualTile.WIDTH, VisualTile.HEIGHT);
-        tmp.setMinSize(VisualTile.WIDTH, VisualTile.HEIGHT);
-        labels.add(tmp);
-        chessboardGrid.add(tmp, 0, 0);
 
-        // Adding the labels on the rows
+        Label padding = new Label("");
+        padding.setContentDisplay(ContentDisplay.TEXT_ONLY);
+        padding.setStyle("-fx-background-color: #FFFFFF; "
+                // top right bottom left
+                + "-fx-border-color: transparent transparent black black;");
+        padding.setTextFill(Paint.valueOf("white"));
+        padding.setPrefSize(VisualTile.WIDTH / 2, VisualTile.HEIGHT / 2);
+        padding.setMinSize(VisualTile.WIDTH / 2, VisualTile.HEIGHT / 2);
+        labels.add(padding);
+        chessboardGrid.add(padding, 0, 9);
+
+        // Adding the file labels
         for (int column = 0; column < ChessBoard.COLS; column++) {
             char c = Character.toChars(97 + column)[0];
-            Label l = new Label(String.valueOf(c));
-            l.setContentDisplay(ContentDisplay.TEXT_ONLY);
-            l.setAlignment(Pos.CENTER);
-            l.setPrefSize(VisualTile.WIDTH, VisualTile.HEIGHT);
-            l.setMinSize(VisualTile.WIDTH, VisualTile.HEIGHT);
-            l.setStyle("-fx-background-color: #500000 ; "
-                    + "-fx-border-color:  lightblue ; ");
-            l.setTextFill(Paint.valueOf("white"));
-            labels.add(l);
-            chessboardGrid.add(l, column + 1, 0);
+            Label file = new Label(String.valueOf(c));
+            file.setContentDisplay(ContentDisplay.TEXT_ONLY);
+            file.setAlignment(Pos.CENTER);
+            file.setPrefSize(VisualTile.WIDTH, VisualTile.HEIGHT / 2);
+            file.setMinSize(VisualTile.WIDTH, VisualTile.HEIGHT / 2);
+            if (column == 7) {
+                file.setStyle("-fx-background-color: #FFFFFF;"
+                        // top right bottom left
+                        + "-fx-border-color: transparent black black transparent;");
+            } else {
+                file.setStyle("-fx-background-color: #FFFFFF;"
+                        // top right bottom left
+                        + "-fx-border-color: transparent transparent black transparent;");
+            }
+
+            file.setTextFill(Paint.valueOf("black"));
+            labels.add(file);
+            chessboardGrid.add(file, column + 1, 9);
         }
 
-        // Adding the labels on the columns
+        // Adding the rank labels
         for (int row = 0; row < ChessBoard.ROWS; row++) {
-            Label l = new Label(Integer.toString(8 - row));
-            l.setContentDisplay(ContentDisplay.TEXT_ONLY);
-            l.setAlignment(Pos.CENTER);
-            l.setPrefSize(VisualTile.WIDTH, VisualTile.HEIGHT);
-            l.setMinSize(VisualTile.WIDTH, VisualTile.HEIGHT);
-            l.setStyle("-fx-background-color: #500000 ; "
-                    + "-fx-border-color:  lightblue ; ");
-            l.setTextFill(Paint.valueOf("white"));
-            labels.add(l);
-            chessboardGrid.add(l, 0, row + 1);
+            Label rank = new Label(Integer.toString(8 - row));
+            rank.setContentDisplay(ContentDisplay.TEXT_ONLY);
+            rank.setAlignment(Pos.CENTER);
+            rank.setPrefSize(VisualTile.WIDTH / 2, VisualTile.HEIGHT);
+            rank.setMinSize(VisualTile.WIDTH / 2, VisualTile.HEIGHT);
+            if (row == 0) {
+                rank.setStyle("-fx-background-color: #FFFFFF;"
+                        // top right bottom left
+                        + "-fx-border-color: black transparent transparent black;");
+            } else {
+                rank.setStyle("-fx-background-color: #FFFFFF;"
+                        // top right bottom left
+                        + "-fx-border-color: transparent transparent transparent black;");
+            }
+            rank.setTextFill(Paint.valueOf("black"));
+            labels.add(rank);
+            chessboardGrid.add(rank, 0, row + 1);
         }
     }
 

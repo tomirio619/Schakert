@@ -17,8 +17,8 @@
 package com.tomirio.schakert.controller;
 
 import com.tomirio.schakert.agent.AI;
-import com.tomirio.schakert.chessboard.ChessColour;
 import com.tomirio.schakert.chessboard.Position;
+import com.tomirio.schakert.chesspieces.Colour;
 import com.tomirio.schakert.game.Game;
 import com.tomirio.schakert.moves.Move;
 import com.tomirio.schakert.view.View;
@@ -194,7 +194,7 @@ public class MouseListener implements EventHandler<MouseEvent> {
         Show the possible moves of the chesspiece in this tile.
         Only do this when the player is human
          */
-        ChessColour playerColour = currentlySelectedVisualTile.getChessPiece().getColour();
+        Colour playerColour = currentlySelectedVisualTile.getChessPiece().getColour();
         if (playerColour == game.getTurnColour() && !game.weHaveAWinner()
                 && !(game.getPlayer(playerColour) instanceof AI)) {
             possibleMoves = currentlySelectedVisualTile.getChessPiece().getPossibleMoves();

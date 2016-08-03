@@ -17,8 +17,6 @@
 package com.tomirio.schakert.chesspieces;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chessboard.ChessColour;
-import com.tomirio.schakert.chessboard.MoveDetails;
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.moves.CaptureMove;
 import com.tomirio.schakert.moves.CastlingMove;
@@ -50,7 +48,7 @@ public class King extends ChessPiece {
      * @param colour The colour of the chess piece.
      * @param pos The position of the chess piece.
      */
-    public King(ChessColour colour, Position pos) {
+    public King(Colour colour, Position pos) {
         super(PieceType.King, colour, pos);
         inCheck = false;
         castlingPossible = true;
@@ -138,6 +136,7 @@ public class King extends ChessPiece {
     public void setCastlingPossible(boolean newValue) {
         castlingPossible = newValue;
     }
+
     /**
      * @param newValue Set wheter the king is check or not.
      */
@@ -211,7 +210,6 @@ public class King extends ChessPiece {
     public boolean inCheck() {
         return inCheck;
     }
-
 
     /**
      *

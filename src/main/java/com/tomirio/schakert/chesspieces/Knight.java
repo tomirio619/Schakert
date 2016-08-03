@@ -16,8 +16,6 @@
  */
 package com.tomirio.schakert.chesspieces;
 
-import com.tomirio.schakert.chessboard.ChessColour;
-import com.tomirio.schakert.chessboard.MoveDetails;
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.moves.CaptureMove;
 import com.tomirio.schakert.moves.Move;
@@ -37,7 +35,7 @@ public class Knight extends ChessPiece {
      * @param colour The colour.
      * @param pos The position.
      */
-    public Knight(ChessColour colour, Position pos) {
+    public Knight(Colour colour, Position pos) {
         super(PieceType.Knight, colour, pos);
     }
 

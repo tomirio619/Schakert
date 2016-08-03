@@ -17,9 +17,9 @@
 package com.tomirio.schakert.game;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chessboard.ChessColour;
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.chesspieces.Bishop;
+import com.tomirio.schakert.chesspieces.Colour;
 import com.tomirio.schakert.chesspieces.King;
 import com.tomirio.schakert.chesspieces.Knight;
 import com.tomirio.schakert.chesspieces.Pawn;
@@ -57,7 +57,7 @@ public class FENParser {
     /**
      * The colour having turn.
      */
-    private ChessColour hasTurn;
+    private Colour hasTurn;
 
     /**
      * The number of full moves.
@@ -69,8 +69,8 @@ public class FENParser {
      */
     private int nrOfHalfMoves;
 
-    public FENParser(String FEN) {
-        chessBoard = new ChessBoard();
+    public FENParser(String FEN, ChessBoard chessBoard) {
+        this.chessBoard = chessBoard;
         chessBoard.clearBoard();
         this.FEN = FEN;
         int row = 0;
@@ -92,6 +92,10 @@ public class FENParser {
      * <b>NOTE</b> that by default, we set "castling possible" values
      * <code>False</code>.
      *
+     * @see
+     * <a href="http://chess.stackexchange.com/questions/1482/how-to-know-when-a-fen-position-is-legal">
+     * http://chess.stackexchange.com/questions/1482/how-to-know-when-a-fen-position-is-legal</a>
+     *
      * @param c The letter representing the chess piece.
      * @param row The row of the chess piece.
      * @param column The column.
@@ -100,34 +104,34 @@ public class FENParser {
         switch (c) {
             // White pieces.
             case 'B': {
-                Bishop b = new Bishop(ChessColour.White, new Position(row, column));
+                Bishop b = new Bishop(Colour.White, new Position(row, column));
                 chessBoard.setPiece(b);
                 break;
             }
             case 'K': {
-                King k = new King(ChessColour.White, new Position(row, column));
+                King k = new King(Colour.White, new Position(row, column));
                 k.setCastlingPossible(false);
                 chessBoard.setPiece(k);
                 chessBoard.setWhiteKing(k);
                 break;
             }
             case 'N': {
-                Knight n = new Knight(ChessColour.White, new Position(row, column));
+                Knight n = new Knight(Colour.White, new Position(row, column));
                 chessBoard.setPiece(n);
                 break;
             }
             case 'P': {
-                Pawn p = new Pawn(ChessColour.White, new Position(row, column));
+                Pawn p = new Pawn(Colour.White, new Position(row, column));
                 chessBoard.setPiece(p);
                 break;
             }
             case 'Q': {
-                Queen q = new Queen(ChessColour.White, new Position(row, column));
+                Queen q = new Queen(Colour.White, new Position(row, column));
                 chessBoard.setPiece(q);
                 break;
             }
             case 'R': {
-                Rook r = new Rook(ChessColour.White, new Position(row, column));
+                Rook r = new Rook(Colour.White, new Position(row, column));
                 r.setCastlingPossible(false);
                 chessBoard.setPiece(r);
                 break;
@@ -135,34 +139,34 @@ public class FENParser {
 
             // Black pieces.
             case 'b': {
-                Bishop b = new Bishop(ChessColour.Black, new Position(row, column));
+                Bishop b = new Bishop(Colour.Black, new Position(row, column));
                 chessBoard.setPiece(b);
                 break;
             }
             case 'k': {
-                King k = new King(ChessColour.Black, new Position(row, column));
+                King k = new King(Colour.Black, new Position(row, column));
                 k.setCastlingPossible(false);
                 chessBoard.setPiece(k);
                 chessBoard.setBlackKing(k);
                 break;
             }
             case 'n': {
-                Knight n = new Knight(ChessColour.Black, new Position(row, column));
+                Knight n = new Knight(Colour.Black, new Position(row, column));
                 chessBoard.setPiece(n);
                 break;
             }
             case 'p': {
-                Pawn p = new Pawn(ChessColour.Black, new Position(row, column));
+                Pawn p = new Pawn(Colour.Black, new Position(row, column));
                 chessBoard.setPiece(p);
                 break;
             }
             case 'q': {
-                Queen q = new Queen(ChessColour.Black, new Position(row, column));
+                Queen q = new Queen(Colour.Black, new Position(row, column));
                 chessBoard.setPiece(q);
                 break;
             }
             case 'r': {
-                Rook r = new Rook(ChessColour.Black, new Position(row, column));
+                Rook r = new Rook(Colour.Black, new Position(row, column));
                 r.setCastlingPossible(false);
                 chessBoard.setPiece(r);
                 break;
@@ -188,7 +192,7 @@ public class FENParser {
         return this.FENstateString;
     }
 
-    public ChessColour getHasTurn() {
+    public Colour getHasTurn() {
         return hasTurn;
     }
 
@@ -207,23 +211,23 @@ public class FENParser {
                 switch (c) {
                     case 'K':
                         // White can castle kingside.
-                        chessBoard.getKing(ChessColour.White).setCastlingPossible(true);
-                        chessBoard.getKingSideRook(ChessColour.White).setCastlingPossible(true);
+                        chessBoard.getKing(Colour.White).setCastlingPossible(true);
+                        chessBoard.getKingSideRook(Colour.White).setCastlingPossible(true);
                         break;
                     case 'Q':
                         // White can castle queenside.
-                        chessBoard.getKing(ChessColour.White).setCastlingPossible(true);
-                        chessBoard.getQueenSideRook(ChessColour.White).setCastlingPossible(true);
+                        chessBoard.getKing(Colour.White).setCastlingPossible(true);
+                        chessBoard.getQueenSideRook(Colour.White).setCastlingPossible(true);
                         break;
                     case 'k':
                         // black can castle kingside.
-                        chessBoard.getKing(ChessColour.Black).setCastlingPossible(true);
-                        chessBoard.getKingSideRook(ChessColour.Black).setCastlingPossible(true);
+                        chessBoard.getKing(Colour.Black).setCastlingPossible(true);
+                        chessBoard.getKingSideRook(Colour.Black).setCastlingPossible(true);
                         break;
                     case 'q':
                         // Black can castle queenside.
-                        chessBoard.getKing(ChessColour.Black).setCastlingPossible(true);
-                        chessBoard.getQueenSideRook(ChessColour.Black).setCastlingPossible(true);
+                        chessBoard.getKing(Colour.Black).setCastlingPossible(true);
+                        chessBoard.getQueenSideRook(Colour.Black).setCastlingPossible(true);
                         break;
                 }
             }
@@ -364,10 +368,10 @@ public class FENParser {
         String toMove = stateInformation[0];
         switch (toMove) {
             case "b":
-                this.hasTurn = ChessColour.Black;
+                this.hasTurn = Colour.Black;
                 break;
             case "w":
-                this.hasTurn = ChessColour.White;
+                this.hasTurn = Colour.White;
                 break;
         }
 

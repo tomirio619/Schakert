@@ -14,15 +14,13 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tomirio.schakert.chessboard;
-
-import java.util.NoSuchElementException;
+package com.tomirio.schakert.chesspieces;
 
 /**
  *
  * @author Tom Sandmann
  */
-public enum ChessColour {
+public enum Colour {
 
     /**
      * The colour black.
@@ -37,15 +35,8 @@ public enum ChessColour {
      *
      * @return The opposite colour of this chess colour.
      */
-    public ChessColour getOpposite() {
-        switch (this) {
-            case Black:
-                return ChessColour.White;
-            case White:
-                return ChessColour.Black;
-            default:
-                throw new NoSuchElementException();
-        }
+    public Colour getOpposite() {
+        return (this == Black) ? White : Black;
     }
 
     /**
@@ -54,15 +45,11 @@ public enum ChessColour {
      */
     @Override
     public String toString() {
-        switch (this) {
-            case Black:
-                return "Black";
+        return (this == Black) ? "Black" : "White";
+    }
 
-            case White:
-                return "White";
-            default:
-                throw new NoSuchElementException();
-        }
+    public String toShortString() {
+        return (this == Black) ? "b" : "w";
     }
 
 }

@@ -53,7 +53,6 @@ public class CapturePromotionMove extends CaptureMove {
         return true;
     }
 
-
     @Override
     public String toString() {
         String prefix = "";
@@ -68,6 +67,7 @@ public class CapturePromotionMove extends CaptureMove {
             return prefix + "x" + newPos.toString() + "=Q";
         }
     }
+
     @Override
     public void undoMove() {
         super.undoMove();
@@ -76,7 +76,7 @@ public class CapturePromotionMove extends CaptureMove {
         Note that we cannot use orgPos here, it will give the wrong position.
         Might be due to the reference being passed to the queen, which could be
         modified if the move is done and undone multiple times.
-        */
+         */
         Pawn p = new Pawn(movedPiece.getColour(), movedPiece.getPos(), chessBoard);
         chessBoard.setPiece(p);
     }

@@ -6,7 +6,7 @@
 package com.tomirio.schakert.game;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chessboard.ChessColour;
+import com.tomirio.schakert.chesspieces.Colour;
 import com.tomirio.schakert.moves.Move;
 
 /**
@@ -22,14 +22,14 @@ public abstract class Player {
     /**
      * The colour of the player.
      */
-    public ChessColour playerColour;
+    public Colour playerColour;
 
     /**
      *
      * @param playerColour The colour.
      * @param chessBoard The chess board.
      */
-    public Player(ChessColour playerColour, ChessBoard chessBoard) {
+    public Player(Colour playerColour, ChessBoard chessBoard) {
         this.playerColour = playerColour;
         this.chessBoard = chessBoard;
     }

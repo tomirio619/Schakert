@@ -17,7 +17,7 @@
 package com.tomirio.schakert.view;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chessboard.ChessColour;
+import com.tomirio.schakert.chesspieces.Colour;
 import com.tomirio.schakert.moves.Move;
 import java.util.ArrayList;
 import javafx.geometry.Insets;
@@ -65,20 +65,7 @@ public class Log extends GridPane {
         moveStrings = new ArrayList();
         plyCounter = 0;
         moveCounter = 1;
-        this.setPrefWidth(170);
-        this.setHgap(10);
-        this.setVgap(10);
-        this.vgapProperty().add(5);
-        this.setPadding(new Insets(10, 10, 10, 10));
-    }
-
-    public Log() {
-        super();
-        moveNumbers = new ArrayList();
-        moveStrings = new ArrayList();
-        plyCounter = 0;
-        moveCounter = 1;
-        this.setPrefWidth(170);
+        this.setPrefWidth(150);
         this.setHgap(10);
         this.setVgap(10);
         this.vgapProperty().add(5);
@@ -151,14 +138,14 @@ public class Log extends GridPane {
             this.add(staleMate, 0, moveCounter + 1, 2, 1);
             this.moveStrings.add(staleMate);
             return true;
-        } else if (chessBoard.inCheckmate(ChessColour.White)) {
+        } else if (chessBoard.inCheckmate(Colour.White)) {
             // Winner is black.
             Label blackIsWinner = new Label("0-1");
             blackIsWinner.setTextFill(Color.BLACK);
             this.add(blackIsWinner, 0, moveCounter + 1, 2, 1);
             this.moveStrings.add(blackIsWinner);
             return true;
-        } else if (chessBoard.inCheckmate(ChessColour.Black)) {
+        } else if (chessBoard.inCheckmate(Colour.Black)) {
             // Winner is white.
             Label whiteIsWinner = new Label("1-0");
             whiteIsWinner.setTextFill(Color.BLACK);
@@ -169,10 +156,10 @@ public class Log extends GridPane {
         return false;
     }
 
-
     public void setBoard(ChessBoard chessBoard) {
         this.chessBoard = chessBoard;
     }
+
     /**
      * Undo the move.
      */
@@ -187,7 +174,7 @@ public class Log extends GridPane {
                 f4	e5
                 g4	Qh4#
                 0-1
-                */
+                 */
                 Label scoreLabel = this.moveStrings.remove(moveStrings.size() - 1);
                 this.getChildren().remove(scoreLabel);
                 Label previousHalfMove = this.moveStrings.remove(moveStrings.size() - 1);
@@ -205,7 +192,7 @@ public class Log extends GridPane {
                 /*
                 This ply was the beginning of a new move, 
                 delete this half move and the move label.
-                */
+                 */
                 Label moveNumber = this.moveNumbers.remove(moveNumbers.size() - 1);
                 this.getChildren().remove(moveNumber);
                 Label previousHalfMove = this.moveStrings.remove(moveStrings.size() - 1);

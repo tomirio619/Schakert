@@ -18,7 +18,7 @@ package com.tomirio.schakert.game;
 
 import com.tomirio.schakert.agent.AI;
 import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chessboard.ChessColour;
+import com.tomirio.schakert.chesspieces.Colour;
 import com.tomirio.schakert.chesspieces.King;
 import com.tomirio.schakert.moves.Move;
 import com.tomirio.schakert.view.Log;
@@ -51,11 +51,11 @@ public class Game {
     /**
      * The chess board.
      */
-    private ChessBoard chessBoard;
+    private final ChessBoard chessBoard;
     /**
      * The colour having turn.
      */
-    private ChessColour hasTurn;
+    private Colour hasTurn;
 
     /**
      * The log.
@@ -76,31 +76,27 @@ public class Game {
     /**
      * The colour of the player that wins.
      */
-    private ChessColour winner;
+    private Colour winner;
 
     /**
      * Constructor
      *
      * @param chessBoard The chessboard.
      * @param view The view.
-     * @param log The log.
      */
-    public Game(ChessBoard chessBoard, View view, Log log) {
-        this.log = log;
+    public Game(ChessBoard chessBoard, View view) {
         this.chessBoard = chessBoard;
         this.view = view;
+        log = new Log(chessBoard);
         moveList = new ArrayList<>();
         // We have not applied any move, so the index of the applied move is -1
         appliedMove = -1;
-        hasTurn = ChessColour.White;
-        whitePlayer = new HumanPlayer(ChessColour.White, chessBoard);
-        blackPlayer = new HumanPlayer(ChessColour.Black, chessBoard);
-
-        String startingPosition = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-        String behtingStudy = "8/8/7p/3KNN1k/2p4p/8/3P2p1/8 w - -";
-        loadFEN(behtingStudy);
+        hasTurn = chessBoard.getHasTurn();
+        whitePlayer = new HumanPlayer(Colour.White, chessBoard);
+        blackPlayer = new HumanPlayer(Colour.Black, chessBoard);
         notifyPlayers();
     }
+
 
     /**
      * Calls the right method if an agent has turn.
@@ -109,7 +105,7 @@ public class Game {
         // User cannot do and undo moves while agent will calculate the best move
         view.disableMoveButtons();
         ExecutorService es = Executors.newSingleThreadExecutor();
-        Future<Move> agentPlay = (hasTurn == ChessColour.Black)
+        Future<Move> agentPlay = (hasTurn == Colour.Black)
                 ? es.submit((Callable) blackPlayer) : es.submit((Callable) whitePlayer);
         new Thread() {
             @Override
@@ -147,6 +143,8 @@ public class Game {
                 view.update(chessBoard);
                 updateTurn();
                 updateGameStatus();
+                System.out.println("Het bord:" + chessBoard);
+                System.out.println("De FEN string: " + chessBoard.getFEN());
                 /**
                  * When redoing a move made in the past, and both players are
                  * AI, we do not want the AI play further. Only let them play
@@ -165,9 +163,14 @@ public class Game {
                 }
             }
         }
+        System.out.println("The board:\n" + chessBoard);
     }
+
     public ChessBoard getBoard() {
         return chessBoard;
+    }
+    public Log getLog() {
+        return log;
     }
 
     /**
@@ -176,7 +179,7 @@ public class Game {
      * @param playerColour The color of the player.
      * @return The player that plays with this color.
      */
-    public Player getPlayer(ChessColour playerColour) {
+    public Player getPlayer(Colour playerColour) {
         switch (playerColour) {
             case Black:
                 return blackPlayer;
@@ -192,7 +195,7 @@ public class Game {
      *
      * @return ChessColour having turn.
      */
-    public ChessColour getTurnColour() {
+    public Colour getTurnColour() {
         return hasTurn;
     }
 
@@ -214,16 +217,16 @@ public class Game {
      * @return <code>True</code> if the player with that colour is checkmate,
      * <code>False</code> otherwise.
      */
-    public boolean inCheckmate(ChessColour colour) {
+    public boolean inCheckmate(Colour colour) {
         return chessBoard.inCheckmate(colour);
     }
 
-
     public final void loadFEN(String FEN) {
-        FENParser fenParser = new FENParser(FEN);
-        chessBoard = fenParser.getChessBoard();
-        hasTurn = fenParser.getHasTurn();
+        chessBoard.loadFEN(FEN);
+        this.hasTurn = chessBoard.getFENParser().getHasTurn();
+//        log.setBoard(chessBoard);
     }
+
     /**
      * Notifies the right player after a move has been made. If the next player
      * is a human player, he will be able to make his move by interacting with
@@ -296,25 +299,25 @@ public class Game {
      * colour is check mate. Also sets the value for stalemate.
      */
     public void updateGameStatus() {
-        King blackKing = chessBoard.getKing(ChessColour.Black);
-        King whiteKing = chessBoard.getKing(ChessColour.White);
+        King blackKing = chessBoard.getKing(Colour.Black);
+        King whiteKing = chessBoard.getKing(Colour.White);
 
         if (whiteKing.getPossibleMoves().isEmpty()
                 && !whiteKing.inCheck()
-                && !chessBoard.canMakeAMove(ChessColour.White)
+                && !chessBoard.canMakeAMove(Colour.White)
                 || blackKing.getPossibleMoves().isEmpty()
                 && !blackKing.inCheck()
-                && !chessBoard.canMakeAMove(ChessColour.Black)) {
+                && !chessBoard.canMakeAMove(Colour.Black)) {
             log.gameFinished();
         } else if (whiteKing.inCheck()
                 && whiteKing.getPossibleMoves().isEmpty()
-                && !chessBoard.canMakeAMove(ChessColour.White)) {
-            winner = ChessColour.Black;
+                && !chessBoard.canMakeAMove(Colour.White)) {
+            winner = Colour.Black;
             log.gameFinished();
         } else if (blackKing.inCheck()
                 && blackKing.getPossibleMoves().isEmpty()
-                && !chessBoard.canMakeAMove(ChessColour.Black)) {
-            winner = ChessColour.White;
+                && !chessBoard.canMakeAMove(Colour.Black)) {
+            winner = Colour.White;
             log.gameFinished();
         }
     }
@@ -323,7 +326,7 @@ public class Game {
      * Update the colour of the player having turn.
      */
     public void updateTurn() {
-        hasTurn = (hasTurn == ChessColour.White) ? ChessColour.Black : ChessColour.White;
+        hasTurn = (hasTurn == Colour.White) ? Colour.Black : Colour.White;
     }
 
     /**
@@ -334,6 +337,5 @@ public class Game {
     public boolean weHaveAWinner() {
         return winner != null;
     }
-
 
 }

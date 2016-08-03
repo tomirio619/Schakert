@@ -17,8 +17,8 @@
 package com.tomirio.schakert.view;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chessboard.ChessColour;
 import com.tomirio.schakert.chesspieces.ChessPiece;
+import com.tomirio.schakert.chesspieces.Colour;
 import java.util.NoSuchElementException;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -64,7 +64,7 @@ public class VisualTile extends ToggleButton {
     /**
      * The colour of the visual tile.
      */
-    public final ChessColour tileColour;
+    public final Colour tileColour;
 
     /**
      * This constructor will be used when a new game is started.
@@ -210,19 +210,19 @@ public class VisualTile extends ToggleButton {
     /**
      * Set the colour of the tile.
      */
-    private ChessColour setAndGetTileColour() {
+    private Colour setAndGetTileColour() {
         if ((row + column) % 2 == 0) {
             setBackground(new Background(new BackgroundFill(
                     Paint.valueOf("BURLYWOOD"),
                     CornerRadii.EMPTY,
                     Insets.EMPTY)));
-            return ChessColour.White;
+            return Colour.White;
         } else {
             setBackground(new Background(new BackgroundFill(
                     Paint.valueOf("SADDLEBROWN"),
                     CornerRadii.EMPTY,
                     Insets.EMPTY)));
-            return ChessColour.Black;
+            return Colour.Black;
         }
     }
 

@@ -17,7 +17,7 @@
 package com.tomirio.schakert.parsing;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chessboard.ChessColour;
+import com.tomirio.schakert.chesspieces.Colour;
 import com.tomirio.schakert.chesspieces.King;
 import com.tomirio.schakert.game.FENParser;
 import java.util.Arrays;
@@ -61,8 +61,8 @@ public class FENParserTest {
 
         if (castlingAvailability.equals("-")) {
             // The kings should not be able to castle.
-            King blackKing = chessBoard.getKing(ChessColour.Black);
-            King whiteKing = chessBoard.getKing(ChessColour.White);
+            King blackKing = chessBoard.getKing(Colour.Black);
+            King whiteKing = chessBoard.getKing(Colour.White);
             return !blackKing.getCastlingPossible()
                     && !whiteKing.getCastlingPossible();
         } else {
@@ -71,21 +71,21 @@ public class FENParserTest {
                 switch (c) {
                     case 'K':
                         // White should be able to castle kingside.
-                        return chessBoard.getKing(ChessColour.White).getCastlingPossible()
-                                && chessBoard.getKingSideRook(ChessColour.White).getCastlingPossible();
+                        return chessBoard.getKing(Colour.White).getCastlingPossible()
+                                && chessBoard.getKingSideRook(Colour.White).getCastlingPossible();
                     case 'Q':
                         // White should be able to castle queenside.
-                        return chessBoard.getKing(ChessColour.White).getCastlingPossible()
-                                && chessBoard.getQueenSideRook(ChessColour.White).getCastlingPossible();
+                        return chessBoard.getKing(Colour.White).getCastlingPossible()
+                                && chessBoard.getQueenSideRook(Colour.White).getCastlingPossible();
 
                     case 'k':
                         // black should be able to castle kingside.
-                        return chessBoard.getKing(ChessColour.Black).getCastlingPossible()
-                                && chessBoard.getKingSideRook(ChessColour.Black).getCastlingPossible();
+                        return chessBoard.getKing(Colour.Black).getCastlingPossible()
+                                && chessBoard.getKingSideRook(Colour.Black).getCastlingPossible();
                     case 'q':
                         // Black should be able to castle queenside.
-                        return chessBoard.getKing(ChessColour.Black).getCastlingPossible()
-                                && chessBoard.getQueenSideRook(ChessColour.Black).getCastlingPossible();
+                        return chessBoard.getKing(Colour.Black).getCastlingPossible()
+                                && chessBoard.getQueenSideRook(Colour.Black).getCastlingPossible();
                 }
             }
         }
@@ -104,7 +104,7 @@ public class FENParserTest {
     public void testInitialFENParse() {
         System.out.println("Testing the initial FEN parse");
         String startingPositionFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-        FENParser fenParser = new FENParser(startingPositionFEN);
+        FENParser fenParser = null; // Fix this
         ChessBoard chessBoard = fenParser.getChessBoard();
         for (int row = 2; row < 6; row++) {
             for (int col = 0; col < ChessBoard.COLS; col++) {
@@ -121,7 +121,7 @@ public class FENParserTest {
     public void testKiwipeteFENParse() {
         System.out.println("Testing the Kiwipete FEN parse");
         String Kiwipete = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
-        FENParser fenParser = new FENParser(Kiwipete);
+        FENParser fenParser = null; // FIx this
         assertTrue(castlingAvailabilityIsCorrectlySet(fenParser));
     }
 

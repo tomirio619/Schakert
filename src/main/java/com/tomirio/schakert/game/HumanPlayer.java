@@ -17,7 +17,7 @@
 package com.tomirio.schakert.game;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chessboard.ChessColour;
+import com.tomirio.schakert.chesspieces.Colour;
 import com.tomirio.schakert.moves.Move;
 
 /**
@@ -31,7 +31,7 @@ public class HumanPlayer extends Player {
      * @param playerColour The colour of the player.
      * @param chessBoard The chess board.
      */
-    public HumanPlayer(ChessColour playerColour, ChessBoard chessBoard) {
+    public HumanPlayer(Colour playerColour, ChessBoard chessBoard) {
         super(playerColour, chessBoard);
     }
 

@@ -16,9 +16,7 @@
  */
 package com.tomirio.schakert.chesspieces;
 
-import com.tomirio.schakert.chessboard.ChessColour;
 import com.tomirio.schakert.chessboard.Direction;
-import com.tomirio.schakert.chessboard.MoveDetails;
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.moves.Move;
 import java.util.ArrayList;
@@ -38,7 +36,7 @@ public class Rook extends ChessPiece {
      * @param colour The colour of this chess piece
      * @param pos The position of this chess piece
      */
-    public Rook(ChessColour colour, Position pos) {
+    public Rook(Colour colour, Position pos) {
         super(PieceType.Rook, colour, pos);
         castlingPossible = true;
     }
@@ -118,4 +116,5 @@ public class Rook extends ChessPiece {
     public String toString() {
         return super.toString() + " castlingPossible: " + this.castlingPossible;
     }
+
 }

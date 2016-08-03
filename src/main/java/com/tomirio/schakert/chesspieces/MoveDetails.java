@@ -14,8 +14,9 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tomirio.schakert.chessboard;
+package com.tomirio.schakert.chesspieces;
 
+import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.moves.Move;
 import java.util.ArrayList;
 

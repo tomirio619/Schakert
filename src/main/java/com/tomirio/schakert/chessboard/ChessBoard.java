@@ -18,19 +18,15 @@ package com.tomirio.schakert.chessboard;
 
 import com.tomirio.schakert.chesspieces.Bishop;
 import com.tomirio.schakert.chesspieces.ChessPiece;
+import com.tomirio.schakert.chesspieces.Colour;
 import com.tomirio.schakert.chesspieces.King;
 import com.tomirio.schakert.chesspieces.Knight;
 import com.tomirio.schakert.chesspieces.Pawn;
 import com.tomirio.schakert.chesspieces.PieceType;
 import com.tomirio.schakert.chesspieces.Queen;
 import com.tomirio.schakert.chesspieces.Rook;
+import com.tomirio.schakert.game.FENParser;
 import com.tomirio.schakert.moves.Move;
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.NoSuchElementException;
@@ -39,7 +35,7 @@ import java.util.NoSuchElementException;
  *
  * @author Tom Sandmann
  */
-public class ChessBoard implements Serializable {
+public class ChessBoard {
 
     /**
      * The number of columns of the board.
@@ -64,7 +60,11 @@ public class ChessBoard implements Serializable {
      * such a capture.
      */
     private Position enPassantTargetSquare;
-
+    private FENParser fenParser;
+    /**
+     * Colour of the player having turn.
+     */
+    private Colour hasTurn;
     /**
      * The white king.
      */
@@ -75,7 +75,12 @@ public class ChessBoard implements Serializable {
      */
     public ChessBoard() {
         board = new ChessPiece[ROWS][COLS];
+        String startingPositionFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+        String debug = "rnbqkbnr/1ppppppp/p7/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq -";
+        fenParser = new FENParser(debug, this);
+        hasTurn = fenParser.getHasTurn();
     }
+
 
     /**
      * Determines for a specific player if it can make any move.
@@ -84,7 +89,7 @@ public class ChessBoard implements Serializable {
      * @return <code>True</code> if the player with the specified colour can
      * make a legal move. <code>False</code> otherwise.
      */
-    public boolean canMakeAMove(ChessColour colour) {
+    public boolean canMakeAMove(Colour colour) {
         for (int r = 0; r < ROWS; r++) {
             for (int c = 0; c < COLS; c++) {
                 if (isOccupiedPosition(r, c)) {
@@ -110,25 +115,6 @@ public class ChessBoard implements Serializable {
     }
 
     /**
-     * Creates a deep copy of the instance of this class.
-     *
-     * @return A deep copy of this instance.
-     */
-    public ChessBoard deepClone() {
-        try {
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ObjectOutputStream oos = new ObjectOutputStream(baos);
-            oos.writeObject(this);
-            ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
-            ObjectInputStream ois = new ObjectInputStream(bais);
-            return (ChessBoard) ois.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
-    /**
      * Delete a chess piece on a specified position
      *
      * @param pos The position of the chess piece that has to be deleted.
@@ -143,7 +129,7 @@ public class ChessBoard implements Serializable {
      * otherwise.
      */
     public boolean gameIsFinished() {
-        return inCheckmate(ChessColour.Black) || inCheckmate(ChessColour.White)
+        return inCheckmate(Colour.Black) || inCheckmate(Colour.White)
                 || inStalemate();
     }
 
@@ -155,6 +141,35 @@ public class ChessBoard implements Serializable {
     public void setBlackKing(King k) {
         this.blackKing = k;
     }
+    private String getCastlingAvailability() {
+        ArrayList<Rook> blackRooks = this.getRooks(Colour.Black);
+        ArrayList<Rook> whiteRooks = this.getRooks(Colour.White);
+        ArrayList<Rook> rooks = new ArrayList();
+        rooks.addAll(whiteRooks);
+        rooks.addAll(blackRooks);
+        StringBuilder castlingAvailability = new StringBuilder();
+        for (Rook rook : rooks) {
+            if (rook.getCastlingPossible()) {
+                // Rook was able to perform castling
+                King k = this.getKing(rook.getColour());
+                if (k.getCastlingPossible()) {
+                    // King was able to perform castling
+                    if (rook.getColumn() > k.getColumn()) {
+                        // King side rook
+                        castlingAvailability.append(k.toShortString());
+                    } else {
+                        // Queen side rook
+                        String queenSide = (k.getColour() == Colour.White) ? "Q" : "q";
+                        castlingAvailability.append(queenSide);
+                    }
+                }
+            }
+        }
+        if (castlingAvailability.length() == 0) {
+            return "-";
+        }
+        return castlingAvailability.toString();
+    }
 
     /**
      *
@@ -163,7 +178,7 @@ public class ChessBoard implements Serializable {
      * contain a chess piece, otherwise this will generate a null pointer
      * exception.
      */
-    public ChessColour getColour(Position pos) {
+    public Colour getColour(Position pos) {
         return (board[pos.getRow()][pos.getColumn()]).getColour();
     }
 
@@ -175,8 +190,15 @@ public class ChessBoard implements Serializable {
      * @param column The column of the chess piece.
      * @return The colour of the chess piece on <code>board[row][column]</code>.
      */
-    public ChessColour getColour(int row, int column) {
+    public Colour getColour(int row, int column) {
         return (board[row][column]).getColour();
+    }
+    private String getEnPassantFile() {
+        if (this.enPassantTargetSquare == null) {
+            return "-";
+        } else {
+            return enPassantTargetSquare.toString();
+        }
     }
 
     /**
@@ -198,6 +220,48 @@ public class ChessBoard implements Serializable {
     public void setEnPassantTargetSquare(Position newPos) {
         enPassantTargetSquare = newPos;
     }
+    public String getFEN() {
+        StringBuilder FEN = new StringBuilder();
+        for (int row = 0; row < ChessBoard.ROWS; row++) {
+            for (int col = 0; col < ChessBoard.COLS; col++) {
+                if (isOccupiedPosition(row, col)) {
+                    // Add SAN string of chess piece on this position.
+                    ChessPiece p = this.getPiece(row, col);
+                    FEN.append(p.toShortString());
+                } else {
+                    // Add number of free squares.
+                    int nrOfEmptySquares = nrOfEmptySquares(row, col, 0);
+                    FEN.append(nrOfEmptySquares);
+                    // Col will be incremented after this iteration, adjust with - 1
+                    col += nrOfEmptySquares - 1;
+                }
+            }
+            if (row != ChessBoard.ROWS - 1) {
+                FEN.append("/");
+            }
+        }
+        
+        FEN.append(" ").append(hasTurn.toShortString());
+        FEN.append(" ").append(getCastlingAvailability());
+        FEN.append(" ").append(getEnPassantFile());
+        
+        return FEN.toString();
+    }
+    /**
+     * Get the FEN parser.
+     *
+     * @return The FEN parser.
+     */
+    public FENParser getFENParser() {
+        return fenParser;
+    }
+    /**
+     *
+     * @return The colour of the player having turn.
+     */
+    public Colour getHasTurn() {
+        return hasTurn;
+    }
 
     /**
      * Create a hash for the current representation of the chess board.
@@ -214,8 +278,8 @@ public class ChessBoard implements Serializable {
      * @param colour The colour.
      * @return The king that has the specified colour.
      */
-    public King getKing(ChessColour colour) {
-        return (colour == ChessColour.White) ? whiteKing : blackKing;
+    public King getKing(Colour colour) {
+        return (colour == Colour.White) ? whiteKing : blackKing;
     }
 
     /**
@@ -225,7 +289,7 @@ public class ChessBoard implements Serializable {
      * @param colour The colour of the rook.
      * @return The kingside rook with the given colour.
      */
-    public Rook getKingSideRook(ChessColour colour) {
+    public Rook getKingSideRook(Colour colour) {
         switch (colour) {
             case Black:
                 return (Rook) board[0][7];
@@ -272,7 +336,7 @@ public class ChessBoard implements Serializable {
      * @param colour The colour of the pieces to retrieve.
      * @return An ArrayList with all the chess pieces of the given color.
      */
-    public ArrayList<ChessPiece> getPieces(ChessColour colour) {
+    public ArrayList<ChessPiece> getPieces(Colour colour) {
         ArrayList<ChessPiece> pieces = new ArrayList<>();
         for (int row = 0; row < ROWS; row++) {
             for (int col = 0; col < COLS; col++) {
@@ -294,7 +358,7 @@ public class ChessBoard implements Serializable {
      * @param colour The colour of the rook.
      * @return The queenside rook with the given colour.
      */
-    public Rook getQueenSideRook(ChessColour colour) {
+    public Rook getQueenSideRook(Colour colour) {
         switch (colour) {
             case Black:
                 return (Rook) board[0][0];
@@ -310,7 +374,7 @@ public class ChessBoard implements Serializable {
      * @param colour The colour of the queen to get.
      * @return List containing the current Queen on the board.
      */
-    public ArrayList<Queen> getQueens(ChessColour colour) {
+    public ArrayList<Queen> getQueens(Colour colour) {
         ArrayList<Queen> q = new ArrayList<>();
         for (int r = 0; r < ROWS; r++) {
             for (int c = 0; c < COLS; c++) {
@@ -331,7 +395,7 @@ public class ChessBoard implements Serializable {
      * @param colour The colour of rooks to get.
      * @return All rooks on the current board.
      */
-    public ArrayList<Rook> getRooks(ChessColour colour) {
+    public ArrayList<Rook> getRooks(Colour colour) {
         ArrayList<Rook> rooks = new ArrayList<>();
         for (int r = 0; r < ROWS; r++) {
             for (int c = 0; c < COLS; c++) {
@@ -355,28 +419,28 @@ public class ChessBoard implements Serializable {
         this.whiteKing = k;
     }
 
-
     /**
      *
      * @param playerColour The colour of the player
      * @return  <code>True</code> if the colour of the player is check mate,
      * <code>False</code> otherwise.
      */
-    public boolean inCheckmate(ChessColour playerColour) {
+    public boolean inCheckmate(Colour playerColour) {
         switch (playerColour) {
             case Black:
                 return blackKing.inCheck()
                         && blackKing.getPossibleMoves().isEmpty()
-                        && !canMakeAMove(ChessColour.Black);
+                        && !canMakeAMove(Colour.Black);
 
             case White:
                 return whiteKing.inCheck()
                         && whiteKing.getPossibleMoves().isEmpty()
-                        && !canMakeAMove(ChessColour.White);
+                        && !canMakeAMove(Colour.White);
             default:
                 throw new NoSuchElementException();
         }
     }
+
     /**
      * @see
      * <a href="http://chess.stackexchange.com/questions/6048/is-there-an-easy-way-to-detect-draw-in-king-pawn-vs-king-endgame">
@@ -387,57 +451,58 @@ public class ChessBoard implements Serializable {
     public boolean inStalemate() {
         return whiteKing.getPossibleMoves().isEmpty()
                 && !whiteKing.inCheck()
-                && !canMakeAMove(ChessColour.White)
+                && !canMakeAMove(Colour.White)
                 || blackKing.getPossibleMoves().isEmpty()
                 && !blackKing.inCheck()
-                && !canMakeAMove(ChessColour.Black);
+                && !canMakeAMove(Colour.Black);
     }
+
     /**
      * Initializes the chess board with all its pieces.
      */
     private void initializeBoard() {
         // Black pawns
         for (int col = 0; col < COLS; col++) {
-            board[1][col] = new Pawn(ChessColour.Black, new Position(1, col));
+            board[1][col] = new Pawn(Colour.Black, new Position(1, col));
         }
 
         // Black rooks
-        board[0][0] = new Rook(ChessColour.Black, new Position(0, 0));
-        board[0][7] = new Rook(ChessColour.Black, new Position(0, 7));
+        board[0][0] = new Rook(Colour.Black, new Position(0, 0));
+        board[0][7] = new Rook(Colour.Black, new Position(0, 7));
 
         // Black knights
-        board[0][1] = new Knight(ChessColour.Black, new Position(0, 1));
-        board[0][6] = new Knight(ChessColour.Black, new Position(0, 6));
+        board[0][1] = new Knight(Colour.Black, new Position(0, 1));
+        board[0][6] = new Knight(Colour.Black, new Position(0, 6));
 
         // Black bishops
-        board[0][2] = new Bishop(ChessColour.Black, new Position(0, 2));
-        board[0][5] = new Bishop(ChessColour.Black, new Position(0, 5));
+        board[0][2] = new Bishop(Colour.Black, new Position(0, 2));
+        board[0][5] = new Bishop(Colour.Black, new Position(0, 5));
 
         // Black King and Queen
-        board[0][3] = new Queen(ChessColour.Black, new Position(0, 3));
-        blackKing = new King(ChessColour.Black, new Position(0, 4));
+        board[0][3] = new Queen(Colour.Black, new Position(0, 3));
+        blackKing = new King(Colour.Black, new Position(0, 4));
         board[0][4] = blackKing;
 
         // White pawns
         for (int col = 0; col < COLS; col++) {
-            board[6][col] = new Pawn(ChessColour.White, new Position(6, col));
+            board[6][col] = new Pawn(Colour.White, new Position(6, col));
         }
 
         // White rooks
-        board[7][0] = new Rook(ChessColour.White, new Position(7, 0));
-        board[7][7] = new Rook(ChessColour.White, new Position(7, 7));
+        board[7][0] = new Rook(Colour.White, new Position(7, 0));
+        board[7][7] = new Rook(Colour.White, new Position(7, 7));
 
         // White knights
-        board[7][1] = new Knight(ChessColour.White, new Position(7, 1));
-        board[7][6] = new Knight(ChessColour.White, new Position(7, 6));
+        board[7][1] = new Knight(Colour.White, new Position(7, 1));
+        board[7][6] = new Knight(Colour.White, new Position(7, 6));
 
         // White bishops
-        board[7][2] = new Bishop(ChessColour.White, new Position(7, 2));
-        board[7][5] = new Bishop(ChessColour.White, new Position(7, 5));
+        board[7][2] = new Bishop(Colour.White, new Position(7, 2));
+        board[7][5] = new Bishop(Colour.White, new Position(7, 5));
 
         // White King and Queen
-        board[7][3] = new Queen(ChessColour.White, new Position(7, 3));
-        whiteKing = new King(ChessColour.White, new Position(7, 4));
+        board[7][3] = new Queen(Colour.White, new Position(7, 3));
+        whiteKing = new King(Colour.White, new Position(7, 4));
         board[7][4] = whiteKing;
     }
 
@@ -492,7 +557,6 @@ public class ChessBoard implements Serializable {
         return (board[row][column] != null);
     }
 
-
     /**
      * Check if a given coordinate is within the chess board.
      *
@@ -521,26 +585,36 @@ public class ChessBoard implements Serializable {
         // Apply the move.
         move.doMove();
         // Check whether the move puts his king in check.
-        ChessColour pieceColour = move.getInvolvedPiece().getColour();
+        Colour pieceColour = move.getInvolvedPiece().getColour();
         King k = getKing(pieceColour);
         boolean inCheck = k.inCheck();
         // Undo the move.
         move.undoMove();
         return !inCheck;
     }
-
     /**
-     * Makes sure all the chess pieces have a instance of this class.
+     * Load a FEN string.
+     *
+     * @param FEN The FEN string.
      */
-    private void setChessBoardForPieces() {
-        for (int row = 0; row < ROWS; row++) {
-            for (int col = 0; col < COLS; col++) {
-                if (isOccupiedPosition(row, col)) {
-                    ChessPiece p = getPiece(row, col);
-                    p.setChessBoard(this);
-                }
-            }
+    public void loadFEN(String FEN) {
+        fenParser = new FENParser(FEN, this);
+        hasTurn = fenParser.getHasTurn();
+    }
+    /**
+     * Get the number of succesive empty squares in a given row from a specified
+     * column.
+     *
+     * @param row The row.
+     * @param col The column.
+     * @param nrOfEmptySquares The number of empty squares.
+     * @return The number of succesive empty squares.
+     */
+    private int nrOfEmptySquares(int row, int col, int nrOfEmptySquares) {
+        if (col == ChessBoard.COLS || isOccupiedPosition(row, col)) {
+            return nrOfEmptySquares;
         }
+        return nrOfEmptySquares(row, col + 1, nrOfEmptySquares + 1);
     }
 
     /**
@@ -564,7 +638,7 @@ public class ChessBoard implements Serializable {
     @Override
     public String toString() {
         StringBuilder bld = new StringBuilder();
-        bld.append("  +------------------------+\n");
+        bld.append("\n").append("  +------------------------+").append("\n");
         for (int r = 0; r < ROWS; r++) {
             bld.append(8 - r).append(" |");
             for (int c = 0; c < COLS; c++) {
@@ -577,18 +651,23 @@ public class ChessBoard implements Serializable {
             }
             bld.append("|\n");
         }
-        bld.append("  +------------------------+\n");
-        bld.append("    a  b  c  d  e  f  g  h");
+        bld.append("  +------------------------+").append("\n");
+        bld.append("    a  b  c  d  e  f  g  h").append("\n");
+        bld.append("Turn: ").append(hasTurn).append("\n");
+        bld.append("Castling: ").append(getCastlingAvailability()).append("\n");
+        bld.append("E.p. file: ").append(getEnPassantFile()).append("\n");
+        // bld.append("FEN: ").append(this.getFEN()).append("\n");
         return bld.toString();
     }
+
 
     /**
      * Updates the check status of both kings.
      */
     public void updateKingStatus() {
         ArrayList<ChessPiece> allPieces = new ArrayList();
-        allPieces.addAll(getPieces(ChessColour.Black));
-        allPieces.addAll(getPieces(ChessColour.White));
+        allPieces.addAll(getPieces(Colour.Black));
+        allPieces.addAll(getPieces(Colour.White));
         boolean whiteKingChanged = false;
         boolean blackKingChanged = false;
         for (ChessPiece piece : allPieces) {
@@ -620,6 +699,13 @@ public class ChessBoard implements Serializable {
                 blackKing.setCheck(false);
             }
         }
+    }
+
+    /**
+     * Update the turn
+     */
+    public void updateTurn() {
+        hasTurn = (hasTurn == Colour.White) ? Colour.Black : Colour.White;
     }
 
 }

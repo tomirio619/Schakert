@@ -17,8 +17,8 @@
 package com.tomirio.schakert.agent;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chessboard.ChessColour;
 import com.tomirio.schakert.chesspieces.ChessPiece;
+import com.tomirio.schakert.chesspieces.Colour;
 import com.tomirio.schakert.game.Player;
 import com.tomirio.schakert.moves.Move;
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class AI extends Player implements Callable<Move> {
      * @param playerColour The colour the AI plays with.
      * @param chessBoard The chess board.
      */
-    public AI(ChessColour playerColour, ChessBoard chessBoard) {
+    public AI(Colour playerColour, ChessBoard chessBoard) {
         super(playerColour, chessBoard);
         visitedNodes = new HashSet();
         searchDepth = 3;
@@ -75,7 +75,7 @@ public class AI extends Player implements Callable<Move> {
      * @param hasTurn The colour for which we want to generate the moves.
      * @return ArrayList containing all the future chess boards.
      */
-    private ArrayList<Node> generateChildNodes(Node parentNode, ChessColour hasTurn) {
+    private ArrayList<Node> generateChildNodes(Node parentNode, Colour hasTurn) {
         ArrayList<Node> childNodes = new ArrayList<>();
         ArrayList<ChessPiece> pieces = chessBoard.getPieces(hasTurn);
         for (ChessPiece piece : pieces) {
@@ -155,10 +155,10 @@ public class AI extends Player implements Callable<Move> {
      * @return The best value possible See
      * http://stackoverflow.com/questions/25615312/negamax-chess-algorithm-how-to-use-final-return
      */
-    public Pair<Node, Double> negaMax(Node node, int depth, double alpha, double beta, ChessColour hasTurn) {
+    public Pair<Node, Double> negaMax(Node node, int depth, double alpha, double beta, Colour hasTurn) {
         if (depth == 0 || chessBoard.inStalemate()
-                || chessBoard.inCheckmate(ChessColour.Black)
-                || chessBoard.inCheckmate(ChessColour.White)) {
+                || chessBoard.inCheckmate(Colour.Black)
+                || chessBoard.inCheckmate(Colour.White)) {
             return new Pair<>(node, eval.evaluate(chessBoard, playerColour, hasTurn));
         }
         ArrayList<Node> childNodes = generateChildNodes(node, hasTurn);

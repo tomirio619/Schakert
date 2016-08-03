@@ -17,8 +17,6 @@
 package com.tomirio.schakert.chesspieces;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chessboard.ChessColour;
-import com.tomirio.schakert.chessboard.MoveDetails;
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.moves.CaptureMove;
 import com.tomirio.schakert.moves.CapturePromotionMove;
@@ -42,7 +40,7 @@ public class Pawn extends ChessPiece {
      * @param colour The colour of the chess piece.
      * @param pos The position of the chess piece.
      */
-    public Pawn(ChessColour colour, Position pos) {
+    public Pawn(Colour colour, Position pos) {
         super(PieceType.Pawn, colour, pos);
     }
 
@@ -52,7 +50,7 @@ public class Pawn extends ChessPiece {
      * @param pos The positon on the board.
      * @param chessBoard The chess board.
      */
-    public Pawn(ChessColour colour, Position pos, ChessBoard chessBoard) {
+    public Pawn(Colour colour, Position pos, ChessBoard chessBoard) {
         super(PieceType.Pawn, colour, pos, chessBoard);
     }
 
@@ -63,7 +61,7 @@ public class Pawn extends ChessPiece {
      */
     private MoveDetails getCaptureMoves() {
         MoveDetails moveDetails = new MoveDetails();
-        int rowShift = (getColour() == ChessColour.Black) ? 1 : -1;
+        int rowShift = (getColour() == Colour.Black) ? 1 : -1;
         Position left = new Position(getRow() + rowShift, getColumn() - 1);
         Position right = new Position(getRow() + rowShift, getColumn() + 1);
 
@@ -154,7 +152,7 @@ public class Pawn extends ChessPiece {
      */
     private ArrayList<Move> getInitialNonCaptureMoves() {
         ArrayList<Move> initialMoves = new ArrayList();
-        int direction = (getColour() == ChessColour.Black) ? 1 : -1;
+        int direction = (getColour() == Colour.Black) ? 1 : -1;
         Position singleStep = new Position(getRow() + direction, getColumn());
         if (chessBoard.isOccupiedPosition(singleStep)) {
             return initialMoves;
@@ -180,7 +178,7 @@ public class Pawn extends ChessPiece {
      */
     private ArrayList<Move> getNonCaptureMoves() {
         ArrayList<Move> initialMoves = new ArrayList();
-        int direction = (getColour() == ChessColour.Black) ? 1 : -1;
+        int direction = (getColour() == Colour.Black) ? 1 : -1;
         Position singleStep = new Position(getRow() + direction, getColumn());
         if (!singleStep.isValid() || chessBoard.isOccupiedPosition(singleStep)) {
             // Position in front of pawn is occupied or position is not valid.
@@ -255,7 +253,7 @@ public class Pawn extends ChessPiece {
 
     @Override
     public boolean posCanBeCaptured(Position p) {
-        int rowShift = (getColour() == ChessColour.Black) ? 1 : -1;
+        int rowShift = (getColour() == Colour.Black) ? 1 : -1;
         Position left = new Position(getRow() + rowShift, getColumn() - 1);
         Position right = new Position(getRow() + rowShift, getColumn() + 1);
         return (p.equals(left) || p.equals(right));

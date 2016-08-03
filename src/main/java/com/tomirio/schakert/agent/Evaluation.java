@@ -19,9 +19,9 @@ package com.tomirio.schakert.agent;
 import com.tomirio.schakert.chessboard.ChessBoard;
 import static com.tomirio.schakert.chessboard.ChessBoard.COLS;
 import static com.tomirio.schakert.chessboard.ChessBoard.ROWS;
-import com.tomirio.schakert.chessboard.ChessColour;
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.chesspieces.ChessPiece;
+import com.tomirio.schakert.chesspieces.Colour;
 import java.util.NoSuchElementException;
 
 /**
@@ -86,7 +86,7 @@ public class Evaluation {
      * @return Value indicating the 'goodness' of the current board for the
      * given colour of the player.
      */
-    public double evaluate(ChessBoard chessBoard, ChessColour playerColour, ChessColour hasTurn) {
+    public double evaluate(ChessBoard chessBoard, Colour playerColour, Colour hasTurn) {
         double myEvaluationScore = evaluateBoard(chessBoard, playerColour);
         double enemyEvaluationScore = evaluateBoard(chessBoard, playerColour.getOpposite());
         double heuristicValue = myEvaluationScore - enemyEvaluationScore;
@@ -101,7 +101,7 @@ public class Evaluation {
      * @return An approximation of the relative score of the position of the
      * pieces for the player with the given colour on the given chess board.
      */
-    private int evaluateBoard(ChessBoard chessBoard, ChessColour colour) {
+    private int evaluateBoard(ChessBoard chessBoard, Colour colour) {
         int sum = 0;
         for (int row = 0; row < ROWS; row++) {
             for (int col = 0; col < COLS; col++) {
@@ -120,7 +120,7 @@ public class Evaluation {
      * Methods for looking up the bonus for specific chess types based on the
      * position on a given chess board.
      */
-    private int getBishopBonus(ChessColour colour, Position pos) {
+    private int getBishopBonus(Colour colour, Position pos) {
         int weight = 0;
         switch (colour) {
             case White:
@@ -137,13 +137,13 @@ public class Evaluation {
 
     }
 
-    private int getKingBonus(ChessColour colour, Position pos, ChessBoard chessBoard) {
+    private int getKingBonus(Colour colour, Position pos, ChessBoard chessBoard) {
         int weight = 0;
         int[][] king_table;
 
         // Determine if we need to use middle game or endgame tables.
-        if (chessBoard.getQueens(ChessColour.White).isEmpty()
-                && chessBoard.getQueens(ChessColour.Black).isEmpty()) {
+        if (chessBoard.getQueens(Colour.White).isEmpty()
+                && chessBoard.getQueens(Colour.Black).isEmpty()) {
             // We are in end game
             king_table = PieceSquareTables.KING_TABLE_END;
         } else {
@@ -168,7 +168,7 @@ public class Evaluation {
         }
     }
 
-    private int getKnightBonus(ChessColour colour, Position pos) {
+    private int getKnightBonus(Colour colour, Position pos) {
         int weight = 0;
         switch (colour) {
             case White:
@@ -184,7 +184,7 @@ public class Evaluation {
         return weight;
     }
 
-    private int getPawnBonus(ChessColour colour, Position pos) {
+    private int getPawnBonus(Colour colour, Position pos) {
         int weight = 0;
         switch (colour) {
             case White:
@@ -225,7 +225,7 @@ public class Evaluation {
         }
     }
 
-    private int getQueenBonus(ChessColour colour, Position pos) {
+    private int getQueenBonus(Colour colour, Position pos) {
         int weight = 0;
         switch (colour) {
             case White:
@@ -241,7 +241,7 @@ public class Evaluation {
         return weight;
     }
 
-    private int getRookBonus(ChessColour colour, Position pos) {
+    private int getRookBonus(Colour colour, Position pos) {
         int weight = 0;
         switch (colour) {
             case White:

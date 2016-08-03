@@ -17,9 +17,7 @@
 package com.tomirio.schakert.chesspieces;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chessboard.ChessColour;
 import com.tomirio.schakert.chessboard.Direction;
-import com.tomirio.schakert.chessboard.MoveDetails;
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.moves.Move;
 import java.util.ArrayList;
@@ -38,7 +36,7 @@ public class Queen extends ChessPiece {
      * @param pos The position.
      * @param board The board.
      */
-    public Queen(ChessColour colour, Position pos, ChessBoard board) {
+    public Queen(Colour colour, Position pos, ChessBoard board) {
         super(PieceType.Queen, colour, pos, board);
     }
 
@@ -48,7 +46,7 @@ public class Queen extends ChessPiece {
      * @param colour The colour.
      * @param pos The position.
      */
-    public Queen(ChessColour colour, Position pos) {
+    public Queen(Colour colour, Position pos) {
         super(PieceType.Queen, colour, pos);
     }
 
