@@ -97,7 +97,6 @@ public class Game {
         notifyPlayers();
     }
 
-
     /**
      * Calls the right method if an agent has turn.
      */
@@ -169,6 +168,7 @@ public class Game {
     public ChessBoard getBoard() {
         return chessBoard;
     }
+
     public Log getLog() {
         return log;
     }
@@ -224,7 +224,7 @@ public class Game {
     public final void loadFEN(String FEN) {
         chessBoard.loadFEN(FEN);
         this.hasTurn = chessBoard.getFENParser().getHasTurn();
-//        log.setBoard(chessBoard);
+        view.update(chessBoard);
     }
 
     /**

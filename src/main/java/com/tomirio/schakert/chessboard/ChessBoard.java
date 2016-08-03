@@ -45,6 +45,8 @@ public class ChessBoard {
      * The number of rows of the board.
      */
     public static final int ROWS = 8;
+    public static final String START_POSITION
+            = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
     /**
      * The black king.
      */
@@ -54,12 +56,12 @@ public class ChessBoard {
      */
     private final ChessPiece[][] board;
     /**
-     * Note that during a chess game, the maximum number of pawns that could be
-     * captured with an enPassant move is 1. Therefore we use a single variable
-     * to indicate the position of the pawn that currently is vulnerable for
-     * such a capture.
+     * The enPassant target square.
      */
     private Position enPassantTargetSquare;
+    /**
+     * FEN parser.
+     */
     private FENParser fenParser;
     /**
      * Colour of the player having turn.
@@ -75,12 +77,9 @@ public class ChessBoard {
      */
     public ChessBoard() {
         board = new ChessPiece[ROWS][COLS];
-        String startingPositionFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-        String debug = "rnbqkbnr/1ppppppp/p7/8/P7/8/1PPPPPPP/RNBQKBNR b KQkq -";
-        fenParser = new FENParser(debug, this);
+        fenParser = new FENParser(START_POSITION, this);
         hasTurn = fenParser.getHasTurn();
     }
-
 
     /**
      * Determines for a specific player if it can make any move.
@@ -141,6 +140,7 @@ public class ChessBoard {
     public void setBlackKing(King k) {
         this.blackKing = k;
     }
+
     private String getCastlingAvailability() {
         ArrayList<Rook> blackRooks = this.getRooks(Colour.Black);
         ArrayList<Rook> whiteRooks = this.getRooks(Colour.White);
@@ -193,6 +193,7 @@ public class ChessBoard {
     public Colour getColour(int row, int column) {
         return (board[row][column]).getColour();
     }
+
     private String getEnPassantFile() {
         if (this.enPassantTargetSquare == null) {
             return "-";
@@ -220,6 +221,7 @@ public class ChessBoard {
     public void setEnPassantTargetSquare(Position newPos) {
         enPassantTargetSquare = newPos;
     }
+
     public String getFEN() {
         StringBuilder FEN = new StringBuilder();
         for (int row = 0; row < ChessBoard.ROWS; row++) {
@@ -240,13 +242,14 @@ public class ChessBoard {
                 FEN.append("/");
             }
         }
-        
+
         FEN.append(" ").append(hasTurn.toShortString());
         FEN.append(" ").append(getCastlingAvailability());
         FEN.append(" ").append(getEnPassantFile());
-        
+
         return FEN.toString();
     }
+
     /**
      * Get the FEN parser.
      *
@@ -255,6 +258,7 @@ public class ChessBoard {
     public FENParser getFENParser() {
         return fenParser;
     }
+
     /**
      *
      * @return The colour of the player having turn.
@@ -592,6 +596,7 @@ public class ChessBoard {
         move.undoMove();
         return !inCheck;
     }
+
     /**
      * Load a FEN string.
      *
@@ -601,6 +606,7 @@ public class ChessBoard {
         fenParser = new FENParser(FEN, this);
         hasTurn = fenParser.getHasTurn();
     }
+
     /**
      * Get the number of succesive empty squares in a given row from a specified
      * column.
@@ -660,7 +666,6 @@ public class ChessBoard {
         return bld.toString();
     }
 
-
     /**
      * Updates the check status of both kings.
      */
@@ -705,7 +710,7 @@ public class ChessBoard {
      * Update the turn
      */
     public void updateTurn() {
-        hasTurn = (hasTurn == Colour.White) ? Colour.Black : Colour.White;
+        this.hasTurn = (hasTurn == Colour.White) ? Colour.Black : Colour.White;
     }
 
 }

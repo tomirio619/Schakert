@@ -70,13 +70,15 @@ public class Knight extends ChessPiece {
                             NormalMove normalMove = new NormalMove(this, p);
                             moveDetails.moves.add(normalMove);
                         } else // Position is occupied
-                         if (chessBoard.getColour(p) != getColour()) {
+                        {
+                            if (chessBoard.getColour(p) != getColour()) {
                                 // Capture move
                                 CaptureMove captureMove = new CaptureMove(this, p);
                                 moveDetails.moves.add(captureMove);
                             } else {
                                 moveDetails.coveredFriendlyPieces.add(p);
                             }
+                        }
                     }
                 }
             }

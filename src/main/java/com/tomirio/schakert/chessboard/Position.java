@@ -71,7 +71,7 @@ public class Position {
             throw new IllegalArgumentException("The file should not be a numerical value!");
         }
 
-        int fileASCII = (int) file;
+        int fileASCII = file;
 
         if (fileASCII < 97 || fileASCII > 104) {
             throw new IllegalArgumentException("The file should lie between 'a' and 'h'!");

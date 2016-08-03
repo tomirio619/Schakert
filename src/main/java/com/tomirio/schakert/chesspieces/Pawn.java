@@ -64,7 +64,6 @@ public class Pawn extends ChessPiece {
         int rowShift = (getColour() == Colour.Black) ? 1 : -1;
         Position left = new Position(getRow() + rowShift, getColumn() - 1);
         Position right = new Position(getRow() + rowShift, getColumn() + 1);
-
         ArrayList<Position> positions = new ArrayList();
         positions.add(left);
         positions.add(right);
@@ -88,6 +87,7 @@ public class Pawn extends ChessPiece {
                                     CaptureMove captureMove = new CaptureMove(this, newPos);
                                     moveDetails.moves.add(captureMove);
                                 }
+                                break;
                             case White:
                                 if (newPos.getRow() == 0) {
                                     // White pawn captures and promotes
@@ -98,6 +98,7 @@ public class Pawn extends ChessPiece {
                                     CaptureMove captureMove = new CaptureMove(this, newPos);
                                     moveDetails.moves.add(captureMove);
                                 }
+                                break;
                         }
                     }
                 } else // New position is not occupied.
@@ -152,15 +153,15 @@ public class Pawn extends ChessPiece {
      */
     private ArrayList<Move> getInitialNonCaptureMoves() {
         ArrayList<Move> initialMoves = new ArrayList();
-        int direction = (getColour() == Colour.Black) ? 1 : -1;
-        Position singleStep = new Position(getRow() + direction, getColumn());
+        int rowShift = (getColour() == Colour.Black) ? 1 : -1;
+        Position singleStep = new Position(getRow() + rowShift, getColumn());
         if (chessBoard.isOccupiedPosition(singleStep)) {
             return initialMoves;
         } else {
             NormalMove singleStepMove = new NormalMove(this, singleStep);
             initialMoves.add(singleStepMove);
 
-            Position doubleStep = new Position(getRow() + direction * 2, getColumn());
+            Position doubleStep = new Position(getRow() + rowShift * 2, getColumn());
             if (chessBoard.isOccupiedPosition(doubleStep)) {
                 return initialMoves;
             } else {

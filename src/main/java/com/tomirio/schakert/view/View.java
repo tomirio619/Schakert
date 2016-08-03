@@ -24,16 +24,21 @@ import com.tomirio.schakert.game.Game;
 import com.tomirio.schakert.moves.Move;
 import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.Optional;
 import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ContentDisplay;
 import javafx.scene.control.Label;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextField;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -109,7 +114,6 @@ public final class View {
      */
     public VisualTile[][] visualBoard;
 
-
     /**
      *
      * @param primaryStage The primary stage.
@@ -132,7 +136,6 @@ public final class View {
         });
 
     }
-
 
     private void createButtons() {
         // Set pref size
@@ -215,12 +218,50 @@ public final class View {
             @Override
             public void handle(ActionEvent event) {
                 // See http://code.makery.ch/blog/javafx-dialogs-official/
-                //Alert alert new Alert(AlertType.)
-                game.doMove();
+                Alert alert = new Alert(AlertType.CONFIRMATION);
+                alert.setTitle("Load custom FEN");
+                alert.setHeaderText("Enter the FEN string in the textbox below.");
+
+                Label label = new Label("FEN:");
+                TextField textField = new TextField();
+                textField.setPrefWidth(450);
+
+                HBox content = new HBox();
+                content.setSpacing(10);
+                content.getChildren().addAll(label, textField);
+                alert.getDialogPane().setExpandableContent(content);
+                alert.getDialogPane().setExpanded(true);
+
+                Optional<ButtonType> result = alert.showAndWait();
+                if (result.get() == ButtonType.OK) {
+                    String FEN = textField.getText();
+                    if (!"".equals(FEN)) {
+                        game.loadFEN(FEN);
+                    }
+                } else {
+                    // user chose CANCEL or closed the dialog
+                }
+            }
+        });
+
+        getFEN.setOnAction(new EventHandler<ActionEvent>() {
+            @Override
+            public void handle(ActionEvent event) {
+                // See http://code.makery.ch/blog/javafx-dialogs-official/
+                Alert alert = new Alert(AlertType.INFORMATION);
+                alert.setTitle("Get current FEN");
+                alert.setHeaderText("In the textfield below you find the FEN string for the current board.");
+                TextField textField = new TextField();
+                textField.setText(chessBoard.getFEN());
+                textField.setPrefWidth(450);
+                alert.getDialogPane().setExpandableContent(textField);
+                alert.getDialogPane().setExpanded(true);
+                alert.showAndWait();
             }
         });
 
     }
+
     private void createMainWindow(Stage primaryStage) {
         // Initialize Imageloader
         ImageLoader.initialize();
@@ -228,46 +269,46 @@ public final class View {
         undoMoveBtn = new Button();
         loadFEN = new Button();
         getFEN = new Button();
-        
+
         mainWindow = primaryStage;
         visualBoard = new VisualTile[8][8];
         chessBoard = new ChessBoard();
-        
+
         game = new Game(chessBoard, this);
         log = game.getLog();
         chessBoard = game.getBoard();
-        
+
         mouseListener = new MouseListener(this, game);
-        
+
         // Root will contain every visual aspect
         root = new StackPane();
         borderPane = new BorderPane();
         chessboardGrid = new GridPane();
         labels = new LinkedList<>();
-        
+
         // Initialize
         createVisualTiles();
         addResizeHandlers();
         setLabels();
-        
+
         // Create graphical structure
         BorderPane visualChessBoard = new BorderPane();
         chessboardGrid.setAlignment(Pos.CENTER);
         visualChessBoard.setCenter(chessboardGrid);
         visualChessBoard.setPadding(new Insets(10, 10, 10, 10));
-        
+
         // Create the buttons with SVG images
         createButtons();
-        
+
         // Create horizontal box with buttons
         HBox buttonBar = new HBox();
         buttonBar.getChildren().addAll(getFEN, undoMoveBtn, doMoveBtn, loadFEN);
         buttonBar.setAlignment(Pos.TOP_CENTER);
         visualChessBoard.setBottom(buttonBar);
         visualChessBoard.autosize();
-        
+
         borderPane.setCenter(visualChessBoard);
-        
+
         // Make log scrollable
         ScrollPane scrollableLog = new ScrollPane();
         scrollableLog.setContent(log);
@@ -277,17 +318,17 @@ public final class View {
         scrollableLog.setVbarPolicy(ScrollPane.ScrollBarPolicy.ALWAYS);
         // Make sure it automatically scrolls down.
         scrollableLog.vvalueProperty().bind(log.heightProperty());
-        
+
         borderPane.setRight(scrollableLog);
         root.getChildren().add(borderPane);
         Scene mainWindowScene = new Scene(root);
-        
+
         mainWindow.getIcons().add(ImageLoader.icon);
         mainWindow.setTitle("Schakert");
         mainWindow.centerOnScreen();
         mainWindow.setScene(mainWindowScene);
         mainWindow.sizeToScene();
-        
+
         // Currently resizing is disabled.
         mainWindow.setResizable(false);
         mainWindow.show();
@@ -472,6 +513,7 @@ public final class View {
      * @param chessBoard The chess board.
      */
     public void update(ChessBoard chessBoard) {
+        System.out.println("Update meth drawBoard:" + chessBoard);
         drawBoard();
     }
 

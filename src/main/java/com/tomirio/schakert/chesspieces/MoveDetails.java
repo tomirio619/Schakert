@@ -89,9 +89,6 @@ public class MoveDetails {
     public String toString() {
         String movesString = "";
         for (Move move : moves) {
-            if (!isUniqueMove(move, moves)) {
-                System.out.println("A move was not unique");
-            }
             movesString += "Move: " + move.getInvolvedPiece() + " to " + move.getNewPos() + "\n";
         }
         return "Number of moves:" + moves.size() + "\n" + movesString;

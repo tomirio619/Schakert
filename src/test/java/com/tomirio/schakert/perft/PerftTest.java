@@ -18,14 +18,16 @@ package com.tomirio.schakert.perft;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
 import com.tomirio.schakert.chesspieces.ChessPiece;
+import com.tomirio.schakert.chesspieces.Colour;
 import com.tomirio.schakert.moves.EnPassantMove;
 import com.tomirio.schakert.moves.Move;
 import com.tomirio.schakert.moves.PromotionMove;
+import com.tomirio.schakert.utils.NaturalOrderComparator;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
-import org.junit.After;
 import org.junit.AfterClass;
-import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -34,6 +36,8 @@ import org.junit.Test;
  * @author S4ndmann
  */
 public class PerftTest {
+
+    private static final boolean DEBUG = false;
 
     @BeforeClass
     public static void setUpClass() {
@@ -124,38 +128,54 @@ public class PerftTest {
      */
     private int dividePerft(int depth) {
         int nodes = 0;
+        ArrayList<String> results = new ArrayList();
         System.out.println("\n Divide Perft: " + depth + "\n");
-        for (ChessPiece piece : chessBoard.getPieces(chessBoard.getHasTurn())) {
+        ArrayList<ChessPiece> pieces = chessBoard.getPieces(chessBoard.getHasTurn());
+        for (ChessPiece piece : pieces) {
             for (Move move : piece.getPossibleMoves()) {
                 String position = move.getInvolvedPiece().getPos().toString() + move.getNewPos().toString();
                 // doMove also updates hasTurn
-                System.out.println("Divide perft board:" + chessBoard);
                 move.doMove();
-                int intermediatePerft = perft(depth - 1);
-                System.out.println(position + " " + intermediatePerft);
+                int intermediatePerft = perft(depth - 1, chessBoard.getHasTurn());
+                results.add(position + " " + intermediatePerft);
                 nodes += intermediatePerft;
                 move.undoMove();
             }
         }
+        Collections.sort(results, new NaturalOrderComparator());
+        results.stream().forEach((result) -> {
+            System.out.println(result);
+        });
         return nodes;
     }
 
-    private int perft(int depth) {
+    /**
+     * Perft algorithm.
+     *
+     * @param depth The depth.
+     * @param colour The colour of the player
+     * @return Number of leaf nodes in the game tree.
+     */
+    private int perft(int depth, Colour colour) {
         int nodes = 0;
-        if (chessBoard.inStalemate() || chessBoard.inCheckmate(chessBoard.getHasTurn())) {
+        if (chessBoard.inStalemate() || chessBoard.inCheckmate(colour)) {
             // Mate and stale mate moves are not counted
             return 0;
         }
         if (depth == 0) {
             return 1;
         }
-        for (ChessPiece piece : chessBoard.getPieces(chessBoard.getHasTurn())) {
+        ArrayList<ChessPiece> pieces = chessBoard.getPieces(colour);
+        for (ChessPiece piece : pieces) {
             for (Move move : piece.getPossibleMoves()) {
-//                System.out.println("Perft board:" + chessBoard);
-//                System.out.println("Move: " + move + "\n");
+                if (DEBUG) {
+                    System.out.println("Before move:" + chessBoard);
+                }
                 move.doMove();
-//                System.out.println("After the move:" + chessBoard);
-                nodes += perft(depth - 1);
+                if (DEBUG) {
+                    System.out.println("After move:" + chessBoard);
+                }
+                nodes += perft(depth - 1, colour.getOpposite());
                 move.undoMove();
             }
         }
@@ -163,9 +183,8 @@ public class PerftTest {
 
     }
 
-    private void printPerftResults(String FEN, int perftSearchDepth, int expectedNodeCount) {
-        System.out.println("FEN string: " + FEN);
-        System.out.println("ChessBoard:\n" + chessBoard + "\n");
+    private void printPerftResults(int perftSearchDepth) {
+        System.out.println("FEN string: " + chessBoard.getFEN());
         int result = dividePerft(perftSearchDepth);
         System.out.println("Number of nodes:" + result);
         System.out.println("\n");
@@ -176,7 +195,7 @@ public class PerftTest {
 //        System.out.println("Number of checks:" + nrOfChecks);
 //        System.out.println("Number of en Passant captures:" + nrOfEnPassantMoves);
 //        System.out.println("Number of promotions:" + nrOfPromotions);
-        System.out.println("\n");
+//        System.out.println("\n");
         resetCount();
     }
 
@@ -189,50 +208,14 @@ public class PerftTest {
         nrOfNodes = 0;
     }
 
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
-    /**
-     * Test of getChessBoard method, of class FENParser.
-     */
     @Test
-    public void testPerft() {
-        for (String FEN : FENtestingStrings) {
-            // Split at the whitespaces.
-            String[] splittedAtWhiteSpace = FEN.split(" ");
-            int length = splittedAtWhiteSpace.length;
-
-            /**
-             * Get search depth and expected node count from FEN string.
-             */
-            String searchDepth = splittedAtWhiteSpace[length - 2];
-            String nodeCount = splittedAtWhiteSpace[length - 1];
-            int perftSearchDepth = Integer.parseInt(searchDepth);
-            int expectedNodeCount = Integer.parseInt(nodeCount);
-            chessBoard = new ChessBoard();
-            /**
-             * Calculate leaf nodes.
-             */
-            if (expectedNodeCount < 200000) {
-                //printPerftResults(FEN, perftSearchDepth, expectedNodeCount);
-            }
-
-        }
-    }
-
-    @Test
-    public void testPerftFromInitialPosition() {
-        String FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
+    public void testPerftFromCustomInitialPosition() {
+        String FEN = "rnbqkbnr/2pppppp/p7/1P6/8/8/1PPPPPPP/RNBQKBNR b QKqk -";
         //String behtingStudy = "8/8/7p/3KNN1k/2p4p/8/3P2p1/8 w - -";
         chessBoard = new ChessBoard();
-        chessBoard.loadFEN(FEN);
+        chessBoard.loadFEN(ChessBoard.START_POSITION);
         int depth = 4;
-        printPerftResults(FEN, depth, 0);
+        printPerftResults(depth);
 
     }
 

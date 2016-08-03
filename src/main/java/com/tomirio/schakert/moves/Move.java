@@ -66,14 +66,14 @@ public abstract class Move {
 
     /**
      *
-     * @param piece The chess piece involved in this move.
+     * @param movedPiece The chess piece involved in this move.
      * @param newPos The new position of the chess piece.
      */
-    public Move(ChessPiece piece, Position newPos) {
-        this.movedPiece = piece;
-        this.orgPos = piece.getPos().deepClone();
+    public Move(ChessPiece movedPiece, Position newPos) {
+        this.movedPiece = movedPiece;
+        this.orgPos = movedPiece.getPos().deepClone();
         this.newPos = newPos.deepClone();
-        this.chessBoard = piece.getChessBoard();
+        this.chessBoard = movedPiece.getChessBoard();
 
         if (chessBoard.getEnPassantTargetSquare() != null) {
             this.orgVulnerableEnPassantPos = chessBoard.getEnPassantTargetSquare().deepClone();
@@ -342,7 +342,8 @@ public abstract class Move {
      */
     protected void updateVulnerableEnPassantPosition() {
         if (movedPiece.getType() == PieceType.Pawn) {
-            if (Math.abs(newPos.getRow() - orgPos.getRow()) == 2) {
+            int rowDist = Math.abs(newPos.getRow() - orgPos.getRow());
+            if (rowDist == 2) {
                 // This move enables enPassant.
                 int rowShift = (movedPiece.getColour() == Colour.White) ? 1 : -1;
                 Position vulnerableEnPassantPos = new Position(newPos.getRow() + rowShift, newPos.getColumn());

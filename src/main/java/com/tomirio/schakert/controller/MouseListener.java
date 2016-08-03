@@ -123,7 +123,8 @@ public class MouseListener implements EventHandler<MouseEvent> {
             // The move is not a capture move
             checkNonCaptureMove();
         } else // The move could be a capture move
-         if (possibleMoves.isEmpty()) {
+        {
+            if (possibleMoves.isEmpty()) {
                 // The move is not a capture move
                 showNewPossibleMoves();
             } else {
@@ -148,6 +149,7 @@ public class MouseListener implements EventHandler<MouseEvent> {
                     }
                 }
             }
+        }
 
     }
 

@@ -98,7 +98,8 @@ public class Log extends GridPane {
 
             plyCounter++;
         } else // Non base case.
-         if (plyCounter % 2 == 0) {
+        {
+            if (plyCounter % 2 == 0) {
                 // Enemy made half-move, so we are in a new move.
                 moveCounter++;
 
@@ -121,6 +122,7 @@ public class Log extends GridPane {
                 this.moveStrings.add(newMove);
                 plyCounter++;
             }
+        }
     }
 
     /**

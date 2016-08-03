@@ -43,6 +43,7 @@ public class EnPassantMove extends CaptureMove {
         chessBoard.silentMovePiece(movedPiece, newPos);
         chessBoard.deletePieceOnPos(capturedPiece.getPos());
         chessBoard.updateKingStatus();
+        chessBoard.updateTurn();
     }
 
     @Override
