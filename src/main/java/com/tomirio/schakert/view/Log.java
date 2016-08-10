@@ -75,9 +75,10 @@ public class Log extends GridPane {
     /**
      * Add a move to the log
      *
-     * @param move
+     * @param move  The move.
+     * @param SAN   The SAN of the move.
      */
-    public void addMove(Move move) {
+    public void addMove(Move move, String SAN) {
         if (plyCounter == 0) {
             /*
             Base case.
@@ -90,7 +91,7 @@ public class Log extends GridPane {
             this.add(moveNumber, 0, moveCounter);
             this.moveNumbers.add(moveNumber);
 
-            Label newMove = new Label(move.toString());
+            Label newMove = new Label(SAN);
             newMove.setTextFill(Color.BLACK);
 
             this.add(newMove, 1, moveCounter);
@@ -98,8 +99,7 @@ public class Log extends GridPane {
 
             plyCounter++;
         } else // Non base case.
-        {
-            if (plyCounter % 2 == 0) {
+         if (plyCounter % 2 == 0) {
                 // Enemy made half-move, so we are in a new move.
                 moveCounter++;
 
@@ -108,7 +108,7 @@ public class Log extends GridPane {
                 this.add(moveNumber, 0, moveCounter);
                 this.moveNumbers.add(moveNumber);
 
-                Label newMove = new Label(move.toString());
+                Label newMove = new Label(SAN);
                 newMove.setTextFill(Color.BLACK);
                 this.add(newMove, 1, moveCounter);
                 this.moveStrings.add(newMove);
@@ -116,13 +116,12 @@ public class Log extends GridPane {
                 plyCounter++;
             } else {
                 // I'm making the second half-move
-                Label newMove = new Label(move.toString());
+                Label newMove = new Label(SAN);
                 newMove.setTextFill(Color.BLACK);
                 this.add(newMove, 2, moveCounter);
                 this.moveStrings.add(newMove);
                 plyCounter++;
             }
-        }
     }
 
     /**

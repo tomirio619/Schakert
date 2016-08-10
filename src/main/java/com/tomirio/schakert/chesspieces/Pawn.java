@@ -25,12 +25,20 @@ import com.tomirio.schakert.moves.Move;
 import com.tomirio.schakert.moves.NormalMove;
 import com.tomirio.schakert.moves.PromotionMove;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
  * @author Tom Sandmann
  */
 public class Pawn extends ChessPiece {
+
+    private final List<PieceType> typesOfPromotion = Arrays.asList(
+            PieceType.Queen,
+            PieceType.Knight,
+            PieceType.Rook,
+            PieceType.Bishop);
 
     /**
      * This constructor <b>MUST</b> be used when the chessboard is not known
@@ -79,9 +87,12 @@ public class Pawn extends ChessPiece {
                         switch (getColour()) {
                             case Black:
                                 if (newPos.getRow() == 7) {
-                                    // Black pawn captures and promotes 
-                                    CapturePromotionMove capturePromotionMove = new CapturePromotionMove(this, newPos);
-                                    moveDetails.moves.add(capturePromotionMove);
+                                    // Black pawn captures and promotes
+                                    typesOfPromotion.stream().map((promotionType)
+                                            -> new CapturePromotionMove(this, newPos, promotionType)).
+                                            forEach((capturePromotionMove) -> {
+                                                moveDetails.moves.add(capturePromotionMove);
+                                            });
                                 } else {
                                     // A capture move without promotion
                                     CaptureMove captureMove = new CaptureMove(this, newPos);
@@ -91,8 +102,11 @@ public class Pawn extends ChessPiece {
                             case White:
                                 if (newPos.getRow() == 0) {
                                     // White pawn captures and promotes
-                                    CapturePromotionMove capturePromotionMove = new CapturePromotionMove(this, newPos);
-                                    moveDetails.moves.add(capturePromotionMove);
+                                    typesOfPromotion.stream().map((promotionType)
+                                            -> new CapturePromotionMove(this, newPos, promotionType))
+                                            .forEach((capturePromotionMove) -> {
+                                                moveDetails.moves.add(capturePromotionMove);
+                                            });
                                 } else {
                                     // A capture move without promotion
                                     CaptureMove captureMove = new CaptureMove(this, newPos);
@@ -190,8 +204,11 @@ public class Pawn extends ChessPiece {
                 case Black:
                     if (singleStep.getRow() == 7) {
                         // A black pawn promotes.
-                        PromotionMove blackPromotionMove = new PromotionMove(this, singleStep);
-                        initialMoves.add(blackPromotionMove);
+                        typesOfPromotion.stream().map((promotionType)
+                                -> new PromotionMove(this, singleStep, promotionType))
+                                .forEach((blackPromotionMove) -> {
+                                    initialMoves.add(blackPromotionMove);
+                                });
                     } else {
                         // Normal move black pawn.
                         NormalMove normalMove = new NormalMove(this, singleStep);
@@ -201,8 +218,11 @@ public class Pawn extends ChessPiece {
                 case White:
                     if (singleStep.getRow() == 0) {
                         // A white pawn promotes.
-                        PromotionMove whitePromotionMove = new PromotionMove(this, singleStep);
-                        initialMoves.add(whitePromotionMove);
+                        typesOfPromotion.stream().map((promotionType)
+                                -> new PromotionMove(this, singleStep, promotionType))
+                                .forEach((whitePromotionMove) -> {
+                                    initialMoves.add(whitePromotionMove);
+                                });
                     } else {
                         // Normal move white pawn.
                         NormalMove normalMove = new NormalMove(this, singleStep);

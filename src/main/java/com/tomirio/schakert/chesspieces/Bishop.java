@@ -16,6 +16,7 @@
  */
 package com.tomirio.schakert.chesspieces;
 
+import com.tomirio.schakert.chessboard.ChessBoard;
 import com.tomirio.schakert.chessboard.Direction;
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.moves.Move;
@@ -36,6 +37,10 @@ public class Bishop extends ChessPiece {
      */
     public Bishop(Colour colour, Position pos) {
         super(PieceType.Bishop, colour, pos);
+    }
+
+    public Bishop(Colour colour, Position pos, ChessBoard chessBoard) {
+        super(PieceType.Bishop, colour, pos, chessBoard);
     }
 
     /**

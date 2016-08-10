@@ -163,7 +163,7 @@ public abstract class ChessPiece {
     protected final ArrayList<Move> filterMoves(ArrayList<Move> moves) {
         ArrayList<Move> validMoves = new ArrayList<>();
         for (Move move : moves) {
-            if (chessBoard.isValidMove(move)) {
+            if (chessBoard.doesNotPutOwnKingInCheck(move)) {
                 validMoves.add(move);
             }
         }

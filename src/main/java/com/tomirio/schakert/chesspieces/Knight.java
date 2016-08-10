@@ -16,6 +16,7 @@
  */
 package com.tomirio.schakert.chesspieces;
 
+import com.tomirio.schakert.chessboard.ChessBoard;
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.moves.CaptureMove;
 import com.tomirio.schakert.moves.Move;
@@ -37,6 +38,10 @@ public class Knight extends ChessPiece {
      */
     public Knight(Colour colour, Position pos) {
         super(PieceType.Knight, colour, pos);
+    }
+
+    public Knight(Colour colour, Position pos, ChessBoard chessBoard) {
+        super(PieceType.Knight, colour, pos, chessBoard);
     }
 
     @Override
@@ -70,15 +75,13 @@ public class Knight extends ChessPiece {
                             NormalMove normalMove = new NormalMove(this, p);
                             moveDetails.moves.add(normalMove);
                         } else // Position is occupied
-                        {
-                            if (chessBoard.getColour(p) != getColour()) {
+                         if (chessBoard.getColour(p) != getColour()) {
                                 // Capture move
                                 CaptureMove captureMove = new CaptureMove(this, p);
                                 moveDetails.moves.add(captureMove);
                             } else {
                                 moveDetails.coveredFriendlyPieces.add(p);
                             }
-                        }
                     }
                 }
             }

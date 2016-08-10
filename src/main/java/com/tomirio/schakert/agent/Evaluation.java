@@ -87,6 +87,7 @@ public class Evaluation {
      * given colour of the player.
      */
     public double evaluate(ChessBoard chessBoard, Colour playerColour, Colour hasTurn) {
+
         double myEvaluationScore = evaluateBoard(chessBoard, playerColour);
         double enemyEvaluationScore = evaluateBoard(chessBoard, playerColour.getOpposite());
         double heuristicValue = myEvaluationScore - enemyEvaluationScore;
@@ -101,7 +102,10 @@ public class Evaluation {
      * @return An approximation of the relative score of the position of the
      * pieces for the player with the given colour on the given chess board.
      */
-    private int evaluateBoard(ChessBoard chessBoard, Colour colour) {
+    private double evaluateBoard(ChessBoard chessBoard, Colour colour) {
+        if (chessBoard.inCheckmate(colour)) {
+            return Double.NEGATIVE_INFINITY;
+        }
         int sum = 0;
         for (int row = 0; row < ROWS; row++) {
             for (int col = 0; col < COLS; col++) {
@@ -140,7 +144,6 @@ public class Evaluation {
     private int getKingBonus(Colour colour, Position pos, ChessBoard chessBoard) {
         int weight = 0;
         int[][] king_table;
-
         // Determine if we need to use middle game or endgame tables.
         if (chessBoard.getQueens(Colour.White).isEmpty()
                 && chessBoard.getQueens(Colour.Black).isEmpty()) {
@@ -151,7 +154,6 @@ public class Evaluation {
         }
         switch (colour) {
             case White:
-
                 weight = king_table[pos.getRow()][pos.getColumn()];
                 break;
             case Black:
@@ -161,11 +163,11 @@ public class Evaluation {
             default:
                 throw new NoSuchElementException();
         }
-        if (chessBoard.inCheckmate(colour)) {
-            return -20000;
-        } else {
-            return weight;
+        if (chessBoard.getKing(colour).inCheck()) {
+            // If the king is in check, we substract a penalty of 100
+            return weight - 100;
         }
+        return weight;
     }
 
     private int getKnightBonus(Colour colour, Position pos) {

@@ -17,7 +17,6 @@
 package com.tomirio.schakert;
 
 import com.tomirio.schakert.view.View;
-import de.codecentric.centerdevice.javafxsvg.SvgImageLoaderFactory;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -36,7 +35,6 @@ public class Schakert extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        SvgImageLoaderFactory.install();
         View view = new View(primaryStage);
     }
 

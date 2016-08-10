@@ -127,32 +127,32 @@ public class VisualTile extends ToggleButton {
             case Black:
                 switch (p.getType()) {
                     case Bishop:
-                        return ImageLoader.blackBishop;
+                        return ImageLoader.BLACK_BISHOP;
                     case Rook:
-                        return ImageLoader.blackRook;
+                        return ImageLoader.BLACK_ROOK;
                     case King:
-                        return ImageLoader.blackKing;
+                        return ImageLoader.BLACK_KING;
                     case Knight:
-                        return ImageLoader.blackKnight;
+                        return ImageLoader.BLACK_KNIGHT;
                     case Pawn:
-                        return ImageLoader.blackPawn;
+                        return ImageLoader.BLACK_PAWN;
                     case Queen:
-                        return ImageLoader.blackQueen;
+                        return ImageLoader.BLACK_QUEEN;
                 }
             case White:
                 switch (p.getType()) {
                     case Bishop:
-                        return ImageLoader.whiteBishop;
+                        return ImageLoader.WHITE_BISHOP;
                     case Rook:
-                        return ImageLoader.whiteRook;
+                        return ImageLoader.WHITE_ROOK;
                     case King:
-                        return ImageLoader.whiteKing;
+                        return ImageLoader.WHITE_KING;
                     case Knight:
-                        return ImageLoader.whiteKnight;
+                        return ImageLoader.WHITE_KNIGHT;
                     case Pawn:
-                        return ImageLoader.whitePawn;
+                        return ImageLoader.WHITE_PAWN;
                     case Queen:
-                        return ImageLoader.whiteQueen;
+                        return ImageLoader.WHITE_QUEEN;
                 }
             default:
                 throw new NoSuchElementException();
@@ -233,7 +233,9 @@ public class VisualTile extends ToggleButton {
         for (int row = 0; row < ChessBoard.ROWS; row++) {
             for (int col = 0; col < ChessBoard.COLS; col++) {
                 if (chessPiece != null) {
-                    setGraphic(new ImageView(getChessIcon(chessPiece)));
+                    ImageView imageView = new ImageView(getChessIcon(chessPiece));
+                    setGraphic(imageView);
+                    this.setPrefSize(WIDTH, HEIGHT);
                 }
             }
         }
@@ -279,8 +281,9 @@ public class VisualTile extends ToggleButton {
     public void updateTileImage(double newSize) {
         setGraphic(null);
         if (chessPiece != null) {
-            setGraphic(new ImageView(getChessIcon(chessPiece)));
-            setMinSize(WIDTH, HEIGHT);
+            ImageView svgView = new ImageView(getChessIcon(chessPiece));
+            setGraphic(svgView);
+            this.setMinSize(WIDTH, HEIGHT);
             setPrefSize(newSize, newSize);
         }
         setPrefSize(newSize, newSize);

@@ -77,15 +77,13 @@ public class CastlingMove extends NormalMove {
             }
 
         } else // Queen side rook, castling long.
-        {
-            if (this.movePutsEnemyKingInCheckmate()) {
+         if (this.movePutsEnemyKingInCheckmate()) {
                 return "O-O-O" + "#";
             } else if (this.movePutsEnemyKingInCheck()) {
                 return "O-O-O" + "+";
             } else {
                 return "O-O-O";
             }
-        }
     }
 
     @Override

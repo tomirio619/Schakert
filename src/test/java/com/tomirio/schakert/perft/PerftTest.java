@@ -19,6 +19,7 @@ package com.tomirio.schakert.perft;
 import com.tomirio.schakert.chessboard.ChessBoard;
 import com.tomirio.schakert.chesspieces.ChessPiece;
 import com.tomirio.schakert.chesspieces.Colour;
+import com.tomirio.schakert.moves.CapturePromotionMove;
 import com.tomirio.schakert.moves.EnPassantMove;
 import com.tomirio.schakert.moves.Move;
 import com.tomirio.schakert.moves.PromotionMove;
@@ -28,6 +29,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertTrue;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
@@ -111,7 +113,7 @@ public class PerftTest {
 
     /**
      * Perform perft test. For perft divide: A good chess engine to compare the
-     * results with is "Roce"
+     * results with is "Stockfish"
      *
      * @see
      * <a href="http://www.open-aurec.com/wbforum/viewtopic.php?f=4&t=53226">
@@ -127,26 +129,66 @@ public class PerftTest {
      * @return The number of leaf nodes for the given depth.
      */
     private int dividePerft(int depth) {
+        if (depth == 0) {
+            return 1;
+        }
         int nodes = 0;
         ArrayList<String> results = new ArrayList();
-        System.out.println("\n Divide Perft: " + depth + "\n");
         ArrayList<ChessPiece> pieces = chessBoard.getPieces(chessBoard.getHasTurn());
         for (ChessPiece piece : pieces) {
             for (Move move : piece.getPossibleMoves()) {
                 String position = move.getInvolvedPiece().getPos().toString() + move.getNewPos().toString();
+                String suffix = getPromotionSuffix(move);
+                position += suffix;
                 // doMove also updates hasTurn
                 move.doMove();
+                if (suffix.length() > 0) {
+//                    System.out.println(chessBoard);
+//                    System.out.println(chessBoard.getFEN());
+                }
                 int intermediatePerft = perft(depth - 1, chessBoard.getHasTurn());
                 results.add(position + " " + intermediatePerft);
                 nodes += intermediatePerft;
                 move.undoMove();
             }
         }
+        System.out.println("\n");
+        System.out.println("Results of divide perft at depth " + depth);
+        System.out.println("The FEN was as follows: " + chessBoard.getFEN());
         Collections.sort(results, new NaturalOrderComparator());
         results.stream().forEach((result) -> {
             System.out.println(result);
         });
+        System.out.println("\n");
+        System.out.println("Number of nodes: " + nodes);
         return nodes;
+    }
+
+    private String getPromotionSuffix(Move move) {
+        if (!(move instanceof PromotionMove || move instanceof CapturePromotionMove)) {
+            return "";
+        }
+
+        if (move instanceof PromotionMove) {
+            PromotionMove promotionMove = (PromotionMove) move;
+            switch (move.getInvolvedPiece().getColour()) {
+                case Black:
+                    return promotionMove.getPromotionType().toShortString().toLowerCase();
+                default:
+                    // White
+                    return promotionMove.getPromotionType().toShortString();
+            }
+        } else {
+            // move instanceof CapturePromotionMove
+            CapturePromotionMove promotionMove = (CapturePromotionMove) move;
+            switch (move.getInvolvedPiece().getColour()) {
+                case Black:
+                    return promotionMove.getPromotionType().toShortString().toLowerCase();
+                default:
+                    // White
+                    return promotionMove.getPromotionType().toShortString();
+            }
+        }
     }
 
     /**
@@ -158,12 +200,11 @@ public class PerftTest {
      */
     private int perft(int depth, Colour colour) {
         int nodes = 0;
-        if (chessBoard.inStalemate() || chessBoard.inCheckmate(colour)) {
-            // Mate and stale mate moves are not counted
-            return 0;
-        }
         if (depth == 0) {
             return 1;
+        } else if (chessBoard.inStalemate() || chessBoard.inCheckmate(colour)) {
+            // We do not count terminal nodes!
+            return 0;
         }
         ArrayList<ChessPiece> pieces = chessBoard.getPieces(colour);
         for (ChessPiece piece : pieces) {
@@ -183,19 +224,10 @@ public class PerftTest {
 
     }
 
-    private void printPerftResults(int perftSearchDepth) {
-        System.out.println("FEN string: " + chessBoard.getFEN());
-        int result = dividePerft(perftSearchDepth);
-        System.out.println("Number of nodes:" + result);
-        System.out.println("\n");
-//        System.out.println("Number of nodes:" + this.nrOfNodes);
-//        System.out.println("Expected number of nodes:" + expectedNodeCount);
-//        System.out.println("Number of captures:" + nrOfCaptureMoves);
-//        System.out.println("Number of checkmates:" + nrOfCheckmates);
-//        System.out.println("Number of checks:" + nrOfChecks);
-//        System.out.println("Number of en Passant captures:" + nrOfEnPassantMoves);
-//        System.out.println("Number of promotions:" + nrOfPromotions);
-//        System.out.println("\n");
+    private void printPerftResults(String FEN, int perftSearchDepth) {
+        chessBoard = new ChessBoard();
+        chessBoard.loadFEN(FEN);
+        dividePerft(perftSearchDepth);
         resetCount();
     }
 
@@ -209,13 +241,10 @@ public class PerftTest {
     }
 
     @Test
-    public void testPerftFromCustomInitialPosition() {
-        String FEN = "rnbqkbnr/2pppppp/p7/1P6/8/8/1PPPPPPP/RNBQKBNR b QKqk -";
-        //String behtingStudy = "8/8/7p/3KNN1k/2p4p/8/3P2p1/8 w - -";
-        chessBoard = new ChessBoard();
-        chessBoard.loadFEN(ChessBoard.START_POSITION);
-        int depth = 4;
-        printPerftResults(depth);
+    public void perftFromCustomFEN() {
+        String FEN = "5B2/6P1/1p6/8/1N6/kP6/2K5/8 w - -";
+        int depth = 7;
+        printPerftResults(FEN, depth);
 
     }
 
@@ -235,7 +264,105 @@ public class PerftTest {
         if (move instanceof PromotionMove) {
             nrOfPromotions++;
         }
+    }
 
+    @Test
+    public void InitialPosition() {
+        String FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - ";
+        int[] results = {1, 20, 400, 8902, 197281, 4865609, 119060324};
+        assertTrue(verify(results, FEN, 0));
+    }
+
+    @Test
+    public void Position2() {
+        String FEN = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
+        int[] results = {48, 2039, 97862, 4085603};
+        assertTrue(verify(results, FEN, 1));
+    }
+
+    @Test
+    public void Position3() {
+        String FEN = "8/2p5/3p4/KP5r/1R3p1k/8/4P1P1/8 w - -";
+        int[] results = {14, 191, 2812, 43238, 674624};
+        assertTrue(verify(results, FEN, 1));
+    }
+
+    @Test
+    public void Position4() {
+        String FEN = "r3k2r/Pppp1ppp/1b3nbN/nP6/BBP1P3/q4N2/Pp1P2PP/R2Q1RK1 w kq - 0 1";
+        String mirroredFEN = "r2q1rk1/pP1p2pp/Q4n2/bbp1p3/Np6/1B3NBn/pPPP1PPP/R3K2R b KQ - 0 1";
+        int[] results = {6, 264, 9467, 422333};
+        assertTrue(verify(results, FEN, 1));
+        assertTrue(verify(results, mirroredFEN, 1));
+    }
+
+    @Test
+    public void Position5() {
+        String FEN = "rnbq1k1r/pp1Pbppp/2p5/8/2B5/8/PPP1NnPP/RNBQK2R w KQ -";
+        int[] results = {44, 1486, 62379, 2103487};
+        assertTrue(verify(results, FEN, 1));
+    }
+
+    @Test
+    public void Position6() {
+        String FEN = "r4rk1/1pp1qppp/p1np1n2/2b1p1B1/2B1P1b1/P1NP1N2/1PP1QPPP/R4RK1 w - -";
+        int[] results = {1, 46, 2079, 89890, 3894594};
+        assertTrue(verify(results, FEN, 0));
+    }
+
+    @Test
+    public void Position7() {
+        // The so-called "Behting Study"
+        String FEN = "8/8/7p/3KNN1k/2p4p/8/3P2p1/8 w - -";
+        int[] results = {25, 180, 4098, 46270, 936094};
+        assertTrue(verify(results, FEN, 1));
+    }
+
+    @Test
+    public void Position8() {
+        // The so-called "Djaja Study"
+        String FEN = "6R1/P2k4/r7/5N1P/r7/p7/7K/8 w - -";
+        int[] results = {32, 657, 18238, 419717};
+        assertTrue(verify(results, FEN, 1));
+    }
+
+    @Test
+    public void Position9() {
+        // HAKMEM 70
+        /**
+         * stale mate not correctly shown in log,
+         * https://chessprogramming.wikispaces.com/Bill+Gosper
+         */
+        String FEN = "5B2/6P1/1p6/8/1N6/kP6/2K5/8 w - -";
+        int[] results = {18, 27, 524, 1347, 28021, 107618, 2446328};
+        assertTrue(verify(results, FEN, 1));
+    }
+
+    /**
+     * Verifies a FEN string with this chess engine.
+     *
+     * @param results The perft results for the given FEN.
+     * @param FEN The FEN.
+     * @param startingDepth The starting depth.
+     * @return
+     */
+    private boolean verify(int[] results, String FEN, int startingDepth) {
+        chessBoard = new ChessBoard();
+        chessBoard.loadFEN(FEN);
+        int depth = startingDepth;
+        for (int expectedResult : results) {
+            int result = dividePerft(depth);
+            if (result != expectedResult) {
+                System.out.println("The FEN was as follows: " + FEN);
+                System.out.println("At depth " + depth + " , the expected result was " + expectedResult);
+                System.out.println("However, divide perft gave us the following result at this depth: " + result);
+                resetCount();
+                return false;
+            }
+            depth++;
+        }
+        resetCount();
+        return true;
     }
 
 }

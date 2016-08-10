@@ -89,14 +89,9 @@ public class ChessBoard {
      * make a legal move. <code>False</code> otherwise.
      */
     public boolean canMakeAMove(Colour colour) {
-        for (int r = 0; r < ROWS; r++) {
-            for (int c = 0; c < COLS; c++) {
-                if (isOccupiedPosition(r, c)) {
-                    ChessPiece piece = getPiece(r, c);
-                    if (piece.getColour() == colour && !piece.getPossibleMoves().isEmpty()) {
-                        return true;
-                    }
-                }
+        for (ChessPiece p: getPieces(colour)){
+            if (!p.getPossibleMoves().isEmpty()){
+                return true;
             }
         }
         return false;
@@ -446,19 +441,21 @@ public class ChessBoard {
     }
 
     /**
-     * @see
-     * <a href="http://chess.stackexchange.com/questions/6048/is-there-an-easy-way-to-detect-draw-in-king-pawn-vs-king-endgame">
-     * http://chess.stackexchange.com/questions/6048/is-there-an-easy-way-to-detect-draw-in-king-pawn-vs-king-endgame</a>
      * @return <code>True</code> if the current state of the chess board is
      * stalemate. <code>False</code> otherwise.
      */
     public boolean inStalemate() {
-        return whiteKing.getPossibleMoves().isEmpty()
-                && !whiteKing.inCheck()
-                && !canMakeAMove(Colour.White)
-                || blackKing.getPossibleMoves().isEmpty()
+        switch(hasTurn){
+            case Black:
+                return blackKing.getPossibleMoves().isEmpty()
                 && !blackKing.inCheck()
                 && !canMakeAMove(Colour.Black);
+            default: 
+                //White:
+                return whiteKing.getPossibleMoves().isEmpty()
+                && !whiteKing.inCheck()
+                && !canMakeAMove(Colour.White);
+        }
     }
 
     /**
@@ -574,18 +571,12 @@ public class ChessBoard {
     }
 
     /**
-     * Determines for a given chess piece if a new position
-     * <code>(row, col)</code> is a valid move for this chess piece. We assume
-     * this new position is in the set of possible moves for the given chess
-     * piece. Note that we <b>MUST</b> make a copy of our previous board before
-     * making this test move. A move can also make other pieces captured, which
-     * are not restored when just calling <code>silentRestorePiece()</code>.
-     *
+     * Checks whether a move puts the own king in check, which would be illegal.
      * @param move The move.
-     * @return <code>True</code> if this position is a valid move for the given
-     * chess piece. <code>False</code> otherwise.
+     * @return <code>True</code> if the move puts the own king in check,
+     * <code>False</code> otherwise.
      */
-    public boolean isValidMove(Move move) {
+    public boolean doesNotPutOwnKingInCheck(Move move) {
         // Apply the move.
         move.doMove();
         // Check whether the move puts his king in check.

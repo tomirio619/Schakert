@@ -19,7 +19,6 @@ package com.tomirio.schakert.game;
 import com.tomirio.schakert.agent.AI;
 import com.tomirio.schakert.chessboard.ChessBoard;
 import com.tomirio.schakert.chesspieces.Colour;
-import com.tomirio.schakert.chesspieces.King;
 import com.tomirio.schakert.moves.Move;
 import com.tomirio.schakert.view.Log;
 import com.tomirio.schakert.view.View;
@@ -56,7 +55,6 @@ public class Game {
      * The colour having turn.
      */
     private Colour hasTurn;
-
     /**
      * The log.
      */
@@ -73,10 +71,6 @@ public class Game {
      * White player
      */
     public Player whitePlayer;
-    /**
-     * The colour of the player that wins.
-     */
-    private Colour winner;
 
     /**
      * Constructor
@@ -131,19 +125,15 @@ public class Game {
             if (appliedMove + 1 < moveList.size()) {
                 // There is a next move in the list we can apply
                 Move move = moveList.get(appliedMove + 1);
-                /*
-                We need to add the move before it is applied.
-                This due to toString() using doMove() and undoMove() to determine
-                the PGN notaton of the move.
-                 */
-                log.addMove(move);
+                String SAN = move.toString();
                 move.doMove();
+                log.addMove(move, SAN);
                 appliedMove++;
                 view.update(chessBoard);
                 updateTurn();
                 updateGameStatus();
-                System.out.println("Het bord:" + chessBoard);
-                System.out.println("De FEN string: " + chessBoard.getFEN());
+//                System.out.println("Het bord:" + chessBoard);
+//                System.out.println("De FEN string: " + chessBoard.getFEN());
                 /**
                  * When redoing a move made in the past, and both players are
                  * AI, we do not want the AI play further. Only let them play
@@ -233,7 +223,8 @@ public class Game {
      * the GUI.
      */
     public final void notifyPlayers() {
-        if (weHaveAWinner() || chessBoard.inStalemate()) {
+        if (chessBoard.inStalemate() || chessBoard.inCheckmate(hasTurn) || 
+                chessBoard.inCheckmate(hasTurn.getOpposite())) {
             // The game has ended
         } else {
             switch (hasTurn) {
@@ -285,9 +276,8 @@ public class Game {
                  */
                 log.undoMove();
                 move.undoMove();
-
+                
                 appliedMove--;
-
                 updateTurn();
                 view.update(chessBoard);
             }
@@ -299,25 +289,7 @@ public class Game {
      * colour is check mate. Also sets the value for stalemate.
      */
     public void updateGameStatus() {
-        King blackKing = chessBoard.getKing(Colour.Black);
-        King whiteKing = chessBoard.getKing(Colour.White);
-
-        if (whiteKing.getPossibleMoves().isEmpty()
-                && !whiteKing.inCheck()
-                && !chessBoard.canMakeAMove(Colour.White)
-                || blackKing.getPossibleMoves().isEmpty()
-                && !blackKing.inCheck()
-                && !chessBoard.canMakeAMove(Colour.Black)) {
-            log.gameFinished();
-        } else if (whiteKing.inCheck()
-                && whiteKing.getPossibleMoves().isEmpty()
-                && !chessBoard.canMakeAMove(Colour.White)) {
-            winner = Colour.Black;
-            log.gameFinished();
-        } else if (blackKing.inCheck()
-                && blackKing.getPossibleMoves().isEmpty()
-                && !chessBoard.canMakeAMove(Colour.Black)) {
-            winner = Colour.White;
+        if (chessBoard.gameIsFinished()){
             log.gameFinished();
         }
     }
@@ -327,15 +299,6 @@ public class Game {
      */
     public void updateTurn() {
         hasTurn = (hasTurn == Colour.White) ? Colour.Black : Colour.White;
-    }
-
-    /**
-     *
-     * @return <code>True</code> if the current chess game has a winner.
-     * <code>False</code> otherwise.
-     */
-    public boolean weHaveAWinner() {
-        return winner != null;
     }
 
 }

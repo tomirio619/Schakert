@@ -25,90 +25,72 @@ import javafx.scene.image.Image;
 public final class ImageLoader {
 
     /**
+     * Path resources.
+     */
+    static final String PATH = "images/chess_icons/png";
+
+    static final String IMAGETYPE = ".png";
+
+    /**
+     * application icon.
+     */
+    public static Image ICON = new Image("images/program_icon/chess_icon.png");
+
+    /**
      * black bishop image.
      */
-    protected static Image blackBishop;
+    protected static Image BLACK_BISHOP = new Image(PATH + "/black/bishop" + IMAGETYPE);
 
     /**
      * black king image.
      */
-    public static Image blackKing;
+    public static Image BLACK_KING = new Image(PATH + "/black/king" + IMAGETYPE);
 
     /**
      * black knight image.
      */
-    public static Image blackKnight;
+    public static Image BLACK_KNIGHT = new Image(PATH + "/black/knight" + IMAGETYPE);
 
     /**
      * black pawn image.
      */
-    public static Image blackPawn;
+    public static Image BLACK_PAWN = new Image(PATH + "/black/pawn" + IMAGETYPE);
 
     /**
      * black queen image.
      */
-    public static Image blackQueen;
+    public static Image BLACK_QUEEN = new Image(PATH + "/black/queen" + IMAGETYPE);
     /**
      * black rook image.
      */
-    public static Image blackRook;
-    /**
-     * application icon.
-     */
-    public static Image icon;
-    /**
-     * Path resources.
-     */
-    static String path = "images";
-
+    public static Image BLACK_ROOK = new Image(PATH + "/black/rook" + IMAGETYPE);
     /**
      * black bishop image.
      */
-    public static Image whiteBishop;
+    public static Image WHITE_BISHOP = new Image(PATH + "/white/bishop" + IMAGETYPE);
 
     /**
      * white king image.
      */
-    public static Image whiteKing;
+    public static Image WHITE_KING = new Image(PATH + "/white/king" + IMAGETYPE);
 
     /**
      * white knight image.
      */
-    public static Image whiteKnight;
+    public static Image WHITE_KNIGHT = new Image(PATH + "/white/knight" + IMAGETYPE);
 
     /**
      * white pawn image.
      */
-    public static Image whitePawn;
+    public static Image WHITE_PAWN = new Image(PATH + "/white/pawn" + IMAGETYPE);
 
     /**
      * white queen image.
      */
-    public static Image whiteQueen;
+    public static Image WHITE_QUEEN = new Image(PATH + "/white/queen" + IMAGETYPE);
     /**
      * white rook image.
      */
-    public static Image whiteRook;
-
-    /**
-     * Initialize
-     */
-    public final static void initialize() {
-        icon = new Image(path + "/chess_icon.png");
-
-        blackBishop = new Image(path + "/black/bishop.png");
-        blackRook = new Image(path + "/black/rook.png");
-        blackKing = new Image(path + "/black/king.png");
-        blackKnight = new Image(path + "/black/knight.png");
-        blackPawn = new Image(path + "/black/pawn.png");
-        blackQueen = new Image(path + "/black/queen.png");
-
-        whiteBishop = new Image(path + "/white/bishop.png");
-        whiteRook = new Image(path + "/white/rook.png");
-        whiteKing = new Image(path + "/white/king.png");
-        whiteKnight = new Image(path + "/white/knight.png");
-        whitePawn = new Image(path + "/white/pawn.png");
-        whiteQueen = new Image(path + "/white/queen.png");
-    }
+    public static Image WHITE_ROOK = new Image(PATH + "/white/rook" + IMAGETYPE);
 
 }

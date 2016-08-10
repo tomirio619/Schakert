@@ -16,6 +16,7 @@
  */
 package com.tomirio.schakert.chesspieces;
 
+import com.tomirio.schakert.chessboard.ChessBoard;
 import com.tomirio.schakert.chessboard.Direction;
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.moves.Move;
@@ -38,6 +39,11 @@ public class Rook extends ChessPiece {
      */
     public Rook(Colour colour, Position pos) {
         super(PieceType.Rook, colour, pos);
+        castlingPossible = true;
+    }
+
+    public Rook(Colour colour, Position pos, ChessBoard chessBoard) {
+        super(PieceType.Rook, colour, pos, chessBoard);
         castlingPossible = true;
     }
 

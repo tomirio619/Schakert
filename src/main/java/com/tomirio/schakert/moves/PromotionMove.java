@@ -17,9 +17,14 @@
 package com.tomirio.schakert.moves;
 
 import com.tomirio.schakert.chessboard.Position;
+import com.tomirio.schakert.chesspieces.Bishop;
 import com.tomirio.schakert.chesspieces.ChessPiece;
+import com.tomirio.schakert.chesspieces.Knight;
 import com.tomirio.schakert.chesspieces.Pawn;
+import com.tomirio.schakert.chesspieces.PieceType;
 import com.tomirio.schakert.chesspieces.Queen;
+import com.tomirio.schakert.chesspieces.Rook;
+import java.util.NoSuchElementException;
 
 /**
  *
@@ -28,24 +33,50 @@ import com.tomirio.schakert.chesspieces.Queen;
 public class PromotionMove extends NormalMove {
 
     /**
+     * Type of chess piece the pawn will promoto into.
+     */
+    private final PieceType typeToPromoteTo;
+
+    /**
      * A promotion move. Note that this move also keeps in mind a possible
      * capture.
      *
      * @param movedPawn The moved pawn.
      * @param newPos The new position.
+     * @param typeToPromoteTo
      */
-    public PromotionMove(ChessPiece movedPawn, Position newPos) {
+    public PromotionMove(ChessPiece movedPawn, Position newPos, PieceType typeToPromoteTo) {
         super(movedPawn, newPos);
+        this.typeToPromoteTo = typeToPromoteTo;
     }
 
     @Override
     public void doMove() {
         super.doMove();
-        // Create a queen with the same colour and position of the pawn we just moved.
-        Queen q = new Queen(movedPiece.getColour(), movedPiece.getPos(), chessBoard);
-        chessBoard.setPiece(q);
+        // Create a chess piece of the correct type with the same colour and position of the pawn we just moved.
+        ChessPiece p;
+        switch (typeToPromoteTo) {
+            case Queen:
+                p = new Queen(movedPiece.getColour(), movedPiece.getPos(), chessBoard);
+                break;
+            case Rook:
+                Rook r = new Rook(movedPiece.getColour(), movedPiece.getPos(), chessBoard);
+                // Castling is only possible with one of the original rooks.
+                r.setCastlingPossible(false);
+                p = r;
+                break;
+            case Knight:
+                p = new Knight(movedPiece.getColour(), movedPiece.getPos(), chessBoard);
+                break;
+            case Bishop:
+                p = new Bishop(movedPiece.getColour(), movedPiece.getPos(), chessBoard);
+                break;
+            default:
+                throw new NoSuchElementException();
+        }
+        chessBoard.setPiece(p);
         // Set piece to the queen we just created
-        movedPiece = q;
+        movedPiece = p;
         chessBoard.setEnPassantTargetSquare(null);
         chessBoard.updateKingStatus();
     }
@@ -86,6 +117,10 @@ public class PromotionMove extends NormalMove {
         movedPiece = p;
         restoreVulnerableEnPassantPosition();
         chessBoard.updateKingStatus();
+    }
+    
+    public PieceType getPromotionType(){
+        return typeToPromoteTo;
     }
 
 }

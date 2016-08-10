@@ -123,8 +123,7 @@ public class MouseListener implements EventHandler<MouseEvent> {
             // The move is not a capture move
             checkNonCaptureMove();
         } else // The move could be a capture move
-        {
-            if (possibleMoves.isEmpty()) {
+         if (possibleMoves.isEmpty()) {
                 // The move is not a capture move
                 showNewPossibleMoves();
             } else {
@@ -141,15 +140,13 @@ public class MouseListener implements EventHandler<MouseEvent> {
                     // There was no move with this end position
                     removeAvailableMoves(possibleMoves);
                     previousSelectedVisualTile = currentlySelectedVisualTile;
-                    if (currentlySelectedVisualTile.getChessPiece().getColour() == game.getTurnColour()
-                            && !game.weHaveAWinner()) {
+                    if (currentlySelectedVisualTile.getChessPiece().getColour() == game.getTurnColour()) {
                         currentlySelectedVisualTile.highLightTile();
                         possibleMoves = currentlySelectedVisualTile.getChessPiece().getPossibleMoves();
                         showAvailableMoves(possibleMoves);
                     }
                 }
             }
-        }
 
     }
 
@@ -197,8 +194,7 @@ public class MouseListener implements EventHandler<MouseEvent> {
         Only do this when the player is human
          */
         Colour playerColour = currentlySelectedVisualTile.getChessPiece().getColour();
-        if (playerColour == game.getTurnColour() && !game.weHaveAWinner()
-                && !(game.getPlayer(playerColour) instanceof AI)) {
+        if (playerColour == game.getTurnColour() && !(game.getPlayer(playerColour) instanceof AI)) {
             possibleMoves = currentlySelectedVisualTile.getChessPiece().getPossibleMoves();
             previousSelectedVisualTile = currentlySelectedVisualTile;
             currentlySelectedVisualTile.highLightTile();

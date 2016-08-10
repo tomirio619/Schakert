@@ -77,6 +77,10 @@ public final class View {
      * The game
      */
     public Game game;
+
+    /**
+     * Get the current FEN.
+     */
     public Button getFEN;
 
     /**
@@ -264,7 +268,6 @@ public final class View {
 
     private void createMainWindow(Stage primaryStage) {
         // Initialize Imageloader
-        ImageLoader.initialize();
         doMoveBtn = new Button();
         undoMoveBtn = new Button();
         loadFEN = new Button();
@@ -323,7 +326,7 @@ public final class View {
         root.getChildren().add(borderPane);
         Scene mainWindowScene = new Scene(root);
 
-        mainWindow.getIcons().add(ImageLoader.icon);
+        mainWindow.getIcons().add(ImageLoader.ICON);
         mainWindow.setTitle("Schakert");
         mainWindow.centerOnScreen();
         mainWindow.setScene(mainWindowScene);
@@ -513,7 +516,6 @@ public final class View {
      * @param chessBoard The chess board.
      */
     public void update(ChessBoard chessBoard) {
-        System.out.println("Update meth drawBoard:" + chessBoard);
         drawBoard();
     }
 
