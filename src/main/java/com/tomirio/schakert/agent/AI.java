@@ -17,8 +17,8 @@
 package com.tomirio.schakert.agent;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chesspieces.ChessPiece;
-import com.tomirio.schakert.chesspieces.Colour;
+import com.tomirio.schakert.chessboard.ChessPiece;
+import com.tomirio.schakert.chessboard.Colour;
 import com.tomirio.schakert.game.Player;
 import com.tomirio.schakert.moves.Move;
 import java.util.ArrayList;

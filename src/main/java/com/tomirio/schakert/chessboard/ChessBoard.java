@@ -16,13 +16,7 @@
  */
 package com.tomirio.schakert.chessboard;
 
-import com.tomirio.schakert.chesspieces.Bishop;
-import com.tomirio.schakert.chesspieces.ChessPiece;
-import com.tomirio.schakert.chesspieces.Colour;
 import com.tomirio.schakert.chesspieces.King;
-import com.tomirio.schakert.chesspieces.Knight;
-import com.tomirio.schakert.chesspieces.Pawn;
-import com.tomirio.schakert.chesspieces.PieceType;
 import com.tomirio.schakert.chesspieces.Queen;
 import com.tomirio.schakert.chesspieces.Rook;
 import com.tomirio.schakert.game.FENParser;
@@ -78,6 +72,7 @@ public class ChessBoard {
     public ChessBoard() {
         board = new ChessPiece[ROWS][COLS];
         fenParser = new FENParser(START_POSITION, this);
+        fenParser.parse();
         hasTurn = fenParser.getHasTurn();
     }
 
@@ -89,8 +84,8 @@ public class ChessBoard {
      * make a legal move. <code>False</code> otherwise.
      */
     public boolean canMakeAMove(Colour colour) {
-        for (ChessPiece p: getPieces(colour)){
-            if (!p.getPossibleMoves().isEmpty()){
+        for (ChessPiece p : getPieces(colour)) {
+            if (!p.getPossibleMoves().isEmpty()) {
                 return true;
             }
         }
@@ -445,66 +440,17 @@ public class ChessBoard {
      * stalemate. <code>False</code> otherwise.
      */
     public boolean inStalemate() {
-        switch(hasTurn){
+        switch (hasTurn) {
             case Black:
                 return blackKing.getPossibleMoves().isEmpty()
-                && !blackKing.inCheck()
-                && !canMakeAMove(Colour.Black);
-            default: 
+                        && !blackKing.inCheck()
+                        && !canMakeAMove(Colour.Black);
+            default:
                 //White:
                 return whiteKing.getPossibleMoves().isEmpty()
-                && !whiteKing.inCheck()
-                && !canMakeAMove(Colour.White);
+                        && !whiteKing.inCheck()
+                        && !canMakeAMove(Colour.White);
         }
-    }
-
-    /**
-     * Initializes the chess board with all its pieces.
-     */
-    private void initializeBoard() {
-        // Black pawns
-        for (int col = 0; col < COLS; col++) {
-            board[1][col] = new Pawn(Colour.Black, new Position(1, col));
-        }
-
-        // Black rooks
-        board[0][0] = new Rook(Colour.Black, new Position(0, 0));
-        board[0][7] = new Rook(Colour.Black, new Position(0, 7));
-
-        // Black knights
-        board[0][1] = new Knight(Colour.Black, new Position(0, 1));
-        board[0][6] = new Knight(Colour.Black, new Position(0, 6));
-
-        // Black bishops
-        board[0][2] = new Bishop(Colour.Black, new Position(0, 2));
-        board[0][5] = new Bishop(Colour.Black, new Position(0, 5));
-
-        // Black King and Queen
-        board[0][3] = new Queen(Colour.Black, new Position(0, 3));
-        blackKing = new King(Colour.Black, new Position(0, 4));
-        board[0][4] = blackKing;
-
-        // White pawns
-        for (int col = 0; col < COLS; col++) {
-            board[6][col] = new Pawn(Colour.White, new Position(6, col));
-        }
-
-        // White rooks
-        board[7][0] = new Rook(Colour.White, new Position(7, 0));
-        board[7][7] = new Rook(Colour.White, new Position(7, 7));
-
-        // White knights
-        board[7][1] = new Knight(Colour.White, new Position(7, 1));
-        board[7][6] = new Knight(Colour.White, new Position(7, 6));
-
-        // White bishops
-        board[7][2] = new Bishop(Colour.White, new Position(7, 2));
-        board[7][5] = new Bishop(Colour.White, new Position(7, 5));
-
-        // White King and Queen
-        board[7][3] = new Queen(Colour.White, new Position(7, 3));
-        whiteKing = new King(Colour.White, new Position(7, 4));
-        board[7][4] = whiteKing;
     }
 
     /**
@@ -572,6 +518,7 @@ public class ChessBoard {
 
     /**
      * Checks whether a move puts the own king in check, which would be illegal.
+     *
      * @param move The move.
      * @return <code>True</code> if the move puts the own king in check,
      * <code>False</code> otherwise.
@@ -595,6 +542,7 @@ public class ChessBoard {
      */
     public void loadFEN(String FEN) {
         fenParser = new FENParser(FEN, this);
+        fenParser.parse();
         hasTurn = fenParser.getHasTurn();
     }
 

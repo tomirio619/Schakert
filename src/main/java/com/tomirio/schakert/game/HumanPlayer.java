@@ -17,7 +17,7 @@
 package com.tomirio.schakert.game;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chesspieces.Colour;
+import com.tomirio.schakert.chessboard.Colour;
 import com.tomirio.schakert.moves.Move;
 
 /**

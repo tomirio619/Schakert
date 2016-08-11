@@ -17,8 +17,8 @@
 package com.tomirio.schakert.controller;
 
 import com.tomirio.schakert.agent.AI;
+import com.tomirio.schakert.chessboard.Colour;
 import com.tomirio.schakert.chessboard.Position;
-import com.tomirio.schakert.chesspieces.Colour;
 import com.tomirio.schakert.game.Game;
 import com.tomirio.schakert.moves.Move;
 import com.tomirio.schakert.view.View;
@@ -123,7 +123,8 @@ public class MouseListener implements EventHandler<MouseEvent> {
             // The move is not a capture move
             checkNonCaptureMove();
         } else // The move could be a capture move
-         if (possibleMoves.isEmpty()) {
+        {
+            if (possibleMoves.isEmpty()) {
                 // The move is not a capture move
                 showNewPossibleMoves();
             } else {
@@ -147,6 +148,7 @@ public class MouseListener implements EventHandler<MouseEvent> {
                     }
                 }
             }
+        }
 
     }
 

@@ -17,16 +17,12 @@
 package com.tomirio.schakert.parsing;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chesspieces.Colour;
+import com.tomirio.schakert.chessboard.Colour;
 import com.tomirio.schakert.chesspieces.King;
 import com.tomirio.schakert.game.FENParser;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.After;
-import org.junit.AfterClass;
 import static org.junit.Assert.*;
-import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -34,14 +30,6 @@ import org.junit.Test;
  * @author S4ndmann
  */
 public class FENParserTest {
-
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
 
     List<String> FENtestingStrings;
 
@@ -53,6 +41,14 @@ public class FENParserTest {
 
     }
 
+    /**
+     * Checks whether castlig availability is correctly set for a given
+     * fenparser.
+     *
+     * @param fenParser The FEN parser.
+     * @return <code>True</code> if castling availability is correctly set,
+     * <code>False</code> otherwise.
+     */
     private boolean castlingAvailabilityIsCorrectlySet(FENParser fenParser) {
         ChessBoard chessBoard = fenParser.getChessBoard();
         String state = fenParser.getFENstateString();
@@ -92,20 +88,10 @@ public class FENParserTest {
         return true;
     }
 
-    @Before
-    public void setUp() {
-    }
-
-    @After
-    public void tearDown() {
-    }
-
     @Test
     public void testInitialFENParse() {
-        System.out.println("Testing the initial FEN parse");
-        String startingPositionFEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1";
-        FENParser fenParser = null; // Fix this
-        ChessBoard chessBoard = fenParser.getChessBoard();
+        ChessBoard chessBoard = new ChessBoard();
+        FENParser fenParser = new FENParser(ChessBoard.START_POSITION, chessBoard);
         for (int row = 2; row < 6; row++) {
             for (int col = 0; col < ChessBoard.COLS; col++) {
                 assertEquals(chessBoard.isOccupiedPosition(row, col), false);
@@ -113,16 +99,4 @@ public class FENParserTest {
         }
         assertTrue(castlingAvailabilityIsCorrectlySet(fenParser));
     }
-
-    /**
-     * Test of getChessBoard method, of class FENParser.
-     */
-    @Test
-    public void testKiwipeteFENParse() {
-        System.out.println("Testing the Kiwipete FEN parse");
-        String Kiwipete = "r3k2r/p1ppqpb1/bn2pnp1/3PN3/1p2P3/2N2Q1p/PPPBBPPP/R3K2R w KQkq -";
-        FENParser fenParser = null; // FIx this
-        assertTrue(castlingAvailabilityIsCorrectlySet(fenParser));
-    }
-
 }

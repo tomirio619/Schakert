@@ -14,11 +14,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-package com.tomirio.schakert.chesspieces;
+package com.tomirio.schakert.chessboard;
 
-import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chessboard.Direction;
-import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.moves.CaptureMove;
 import com.tomirio.schakert.moves.Move;
 import com.tomirio.schakert.moves.NormalMove;

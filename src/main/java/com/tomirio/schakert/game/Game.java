@@ -18,7 +18,7 @@ package com.tomirio.schakert.game;
 
 import com.tomirio.schakert.agent.AI;
 import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chesspieces.Colour;
+import com.tomirio.schakert.chessboard.Colour;
 import com.tomirio.schakert.moves.Move;
 import com.tomirio.schakert.view.Log;
 import com.tomirio.schakert.view.View;
@@ -152,7 +152,6 @@ public class Game {
                 }
             }
         }
-        System.out.println("The board:\n" + chessBoard);
     }
 
     public ChessBoard getBoard() {
@@ -217,14 +216,18 @@ public class Game {
         view.update(chessBoard);
     }
 
+    public boolean isValidFEN(String FEN) {
+        return chessBoard.getFENParser().isValidFEN(FEN);
+    }
+
     /**
      * Notifies the right player after a move has been made. If the next player
      * is a human player, he will be able to make his move by interacting with
      * the GUI.
      */
     public final void notifyPlayers() {
-        if (chessBoard.inStalemate() || chessBoard.inCheckmate(hasTurn) || 
-                chessBoard.inCheckmate(hasTurn.getOpposite())) {
+        if (chessBoard.inStalemate() || chessBoard.inCheckmate(hasTurn)
+                || chessBoard.inCheckmate(hasTurn.getOpposite())) {
             // The game has ended
         } else {
             switch (hasTurn) {
@@ -276,7 +279,7 @@ public class Game {
                  */
                 log.undoMove();
                 move.undoMove();
-                
+
                 appliedMove--;
                 updateTurn();
                 view.update(chessBoard);
@@ -289,7 +292,7 @@ public class Game {
      * colour is check mate. Also sets the value for stalemate.
      */
     public void updateGameStatus() {
-        if (chessBoard.gameIsFinished()){
+        if (chessBoard.gameIsFinished()) {
             log.gameFinished();
         }
     }

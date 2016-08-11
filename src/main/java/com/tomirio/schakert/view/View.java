@@ -17,8 +17,8 @@
 package com.tomirio.schakert.view;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
+import com.tomirio.schakert.chessboard.ChessPiece;
 import com.tomirio.schakert.chessboard.Position;
-import com.tomirio.schakert.chesspieces.ChessPiece;
 import com.tomirio.schakert.controller.MouseListener;
 import com.tomirio.schakert.game.Game;
 import com.tomirio.schakert.moves.Move;
@@ -148,7 +148,7 @@ public final class View {
         loadFEN.setPrefSize(50, 30);
         getFEN.setPrefSize(50, 30);
 
-        doMoveBtn.setTooltip(new Tooltip("Make the next move."));
+        doMoveBtn.setTooltip(new Tooltip("Redo the current move."));
         undoMoveBtn.setTooltip(new Tooltip("Undo the last move."));
         loadFEN.setTooltip(new Tooltip("Load a FEN string."));
         getFEN.setTooltip(new Tooltip("Get FEN string of the current board."));
@@ -239,7 +239,7 @@ public final class View {
                 Optional<ButtonType> result = alert.showAndWait();
                 if (result.get() == ButtonType.OK) {
                     String FEN = textField.getText();
-                    if (!"".equals(FEN)) {
+                    if (game.isValidFEN(FEN)) {
                         game.loadFEN(FEN);
                     }
                 } else {

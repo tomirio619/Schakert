@@ -17,7 +17,11 @@
 package com.tomirio.schakert.chesspieces;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
+import com.tomirio.schakert.chessboard.ChessPiece;
+import com.tomirio.schakert.chessboard.Colour;
 import com.tomirio.schakert.chessboard.Direction;
+import com.tomirio.schakert.chessboard.MoveDetails;
+import com.tomirio.schakert.chessboard.PieceType;
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.moves.Move;
 import java.util.ArrayList;

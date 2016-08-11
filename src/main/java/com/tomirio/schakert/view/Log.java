@@ -17,7 +17,7 @@
 package com.tomirio.schakert.view;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chesspieces.Colour;
+import com.tomirio.schakert.chessboard.Colour;
 import com.tomirio.schakert.moves.Move;
 import java.util.ArrayList;
 import javafx.geometry.Insets;
@@ -75,8 +75,8 @@ public class Log extends GridPane {
     /**
      * Add a move to the log
      *
-     * @param move  The move.
-     * @param SAN   The SAN of the move.
+     * @param move The move.
+     * @param SAN The SAN of the move.
      */
     public void addMove(Move move, String SAN) {
         if (plyCounter == 0) {
@@ -99,7 +99,8 @@ public class Log extends GridPane {
 
             plyCounter++;
         } else // Non base case.
-         if (plyCounter % 2 == 0) {
+        {
+            if (plyCounter % 2 == 0) {
                 // Enemy made half-move, so we are in a new move.
                 moveCounter++;
 
@@ -122,6 +123,7 @@ public class Log extends GridPane {
                 this.moveStrings.add(newMove);
                 plyCounter++;
             }
+        }
     }
 
     /**

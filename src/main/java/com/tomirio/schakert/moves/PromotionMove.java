@@ -16,12 +16,12 @@
  */
 package com.tomirio.schakert.moves;
 
+import com.tomirio.schakert.chessboard.ChessPiece;
+import com.tomirio.schakert.chessboard.PieceType;
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.chesspieces.Bishop;
-import com.tomirio.schakert.chesspieces.ChessPiece;
 import com.tomirio.schakert.chesspieces.Knight;
 import com.tomirio.schakert.chesspieces.Pawn;
-import com.tomirio.schakert.chesspieces.PieceType;
 import com.tomirio.schakert.chesspieces.Queen;
 import com.tomirio.schakert.chesspieces.Rook;
 import java.util.NoSuchElementException;
@@ -118,8 +118,8 @@ public class PromotionMove extends NormalMove {
         restoreVulnerableEnPassantPosition();
         chessBoard.updateKingStatus();
     }
-    
-    public PieceType getPromotionType(){
+
+    public PieceType getPromotionType() {
         return typeToPromoteTo;
     }
 

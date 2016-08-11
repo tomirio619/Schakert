@@ -17,8 +17,8 @@
 package com.tomirio.schakert.perft;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
-import com.tomirio.schakert.chesspieces.ChessPiece;
-import com.tomirio.schakert.chesspieces.Colour;
+import com.tomirio.schakert.chessboard.ChessPiece;
+import com.tomirio.schakert.chessboard.Colour;
 import com.tomirio.schakert.moves.CapturePromotionMove;
 import com.tomirio.schakert.moves.EnPassantMove;
 import com.tomirio.schakert.moves.Move;
@@ -28,9 +28,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.junit.AfterClass;
 import static org.junit.Assert.assertTrue;
-import org.junit.BeforeClass;
 import org.junit.Test;
 
 /**
@@ -41,13 +39,6 @@ public class PerftTest {
 
     private static final boolean DEBUG = false;
 
-    @BeforeClass
-    public static void setUpClass() {
-    }
-
-    @AfterClass
-    public static void tearDownClass() {
-    }
     private final List<String> FENtestingStrings;
 
     private ChessBoard chessBoard;

@@ -16,9 +16,9 @@
  */
 package com.tomirio.schakert.moves;
 
+import com.tomirio.schakert.chessboard.ChessPiece;
+import com.tomirio.schakert.chessboard.PieceType;
 import com.tomirio.schakert.chessboard.Position;
-import com.tomirio.schakert.chesspieces.ChessPiece;
-import com.tomirio.schakert.chesspieces.PieceType;
 
 /**
  *

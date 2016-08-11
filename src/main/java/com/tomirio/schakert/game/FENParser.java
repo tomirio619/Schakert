@@ -17,14 +17,16 @@
 package com.tomirio.schakert.game;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
+import com.tomirio.schakert.chessboard.Colour;
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.chesspieces.Bishop;
-import com.tomirio.schakert.chesspieces.Colour;
 import com.tomirio.schakert.chesspieces.King;
 import com.tomirio.schakert.chesspieces.Knight;
 import com.tomirio.schakert.chesspieces.Pawn;
 import com.tomirio.schakert.chesspieces.Queen;
 import com.tomirio.schakert.chesspieces.Rook;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -41,13 +43,13 @@ public class FENParser {
      * We call the board string the part in front of the first occuring white
      * space in a valid FEN string.
      */
-    private final String FENboardString;
+    private String FENboardString;
 
     /**
      * We call the state string the part after the first occuring white space in
      * a valid FEN string.
      */
-    private final String FENstateString;
+    private String FENstateString;
 
     /**
      * The chess board.
@@ -63,24 +65,118 @@ public class FENParser {
      * The number of full moves.
      */
     private int nrOfFullMoves;
-
     /**
      * The number of half moves.
      */
     private int nrOfHalfMoves;
 
+    private final List<Character> ACN = Arrays.asList('p', 'n', 'b', 'r', 'q', 'k',
+            'P', 'N', 'B', 'R', 'Q', 'K');
+    private final List<Character> sideToMove = Arrays.asList('w', 'b');
+    private final List<Character> digits = Arrays.asList('1', '2', '3', '4', '5', '6', '7');
+    private final List<Character> castlingAbility = Arrays.asList('-', 'K', 'Q', 'k', 'q');
+    private final List<Character> epFileLetter = Arrays.asList('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h');
+    private final List<Character> epRank = Arrays.asList('3', '6');
+
+    /**
+     *
+     * @param FEN The FEN string.
+     * @param chessBoard The chess board.
+     */
     public FENParser(String FEN, ChessBoard chessBoard) {
         this.chessBoard = chessBoard;
         chessBoard.clearBoard();
         this.FEN = FEN;
-        int row = 0;
-        parseFEN(FEN, row);
+    }
 
-        int firstOccuringWhitespace = FEN.indexOf(" ");
-        FENboardString = FEN.substring(0, firstOccuringWhitespace);
-        FENstateString = FEN.substring(firstOccuringWhitespace + 1);
-
+    /**
+     * Parses the FEN string, assuming it is valid.
+     */
+    public void parse() {
+        FENboardString = FEN.substring(0, FEN.indexOf(" "));
+        FENstateString = FEN.substring(FEN.indexOf(" ") + 1);
+        // Parse the fen
+        parseFEN(FEN, 0);
+        // Update the status of both kings.
         chessBoard.updateKingStatus();
+    }
+
+    public boolean isValidFEN(String newFEN) {
+        int forwardSlashCount = newFEN.length() - newFEN.replace("/", "").length();
+        if (forwardSlashCount != 7) {
+            // There should be 7 forward slashes in a FEN string
+            return false;
+        }
+        String board = newFEN.substring(0, newFEN.indexOf(" "));
+        String[] ranks = board.split("/");
+        for (String rank : ranks) {
+            boolean validSquareCount = isValidEmptySquareCount(rank);
+            if (!validSquareCount) {
+                return false;
+            }
+            for (int i = 0; i < rank.length(); i++) {
+                char c = rank.charAt(i);
+                if (!Character.isDigit(c)) {
+                    if (!ACN.contains(c)) {
+                        return false;
+                    }
+                }
+            }
+
+        }
+        // There should be one black king and one white king
+        if (!isValidKingAmount(board)) {
+            return false;
+        }
+
+        return isValidPawnAmount(board);
+    }
+
+    /**
+     * Checks whether both sides only have one king.
+     *
+     * @param board The board.
+     * @return <code>True</code> if both sides have exactly one king,
+     * <code>False</code> otherwise.
+     */
+    private boolean isValidKingAmount(String board) {
+        if (board.indexOf('k') != board.lastIndexOf('k') || board.indexOf('k') == -1) {
+            return false;
+        }
+        return board.indexOf('K') == board.lastIndexOf('K') && board.indexOf('K') != -1;
+    }
+
+    /**
+     * Checks whether the amount of pawns is below 8 for both sides.
+     *
+     * @param board The board.
+     * @return <code>True</code> if the pawn amount is below or equal to 8 for
+     * each of the players. <code>False</code> otherwise.
+     */
+    private boolean isValidPawnAmount(String board) {
+        int blackPawnCount = board.length() - board.replace("p", "").length();
+        int whitePawnCount = board.length() - board.replace("P", "").length();
+        return blackPawnCount <= 8 && whitePawnCount <= 8;
+    }
+
+    /**
+     * Checks whether empty square count and pieces add up to 8.
+     *
+     * @param rank The rank.
+     * @return <code>True</code> if the rank and the empty squares add up to 8,
+     * <code>False</code> otherwise.
+     */
+    private boolean isValidEmptySquareCount(String rank) {
+        int count = 0;
+        for (int i = 0; i < rank.length(); i++) {
+            char c = rank.charAt(i);
+            if (Character.isDigit(c)) {
+                count += Character.getNumericValue(c);
+            } else {
+                count++;
+            }
+        }
+        return count == 8;
     }
 
     /**
@@ -100,7 +196,7 @@ public class FENParser {
      * @param row The row of the chess piece.
      * @param column The column.
      */
-    private void createPiece(Character c, int row, int column) {
+    private void createPiece(char c, int row, int column) {
         switch (c) {
             // White pieces.
             case 'B': {
@@ -207,7 +303,7 @@ public class FENParser {
     private void parseCastlingAvailability(String castlingAvailability) {
         if (!castlingAvailability.equals("-")) {
             for (int i = 0; i < castlingAvailability.length(); i++) {
-                Character c = castlingAvailability.charAt(i);
+                char c = castlingAvailability.charAt(i);
                 switch (c) {
                     case 'K':
                         // White can castle kingside.
@@ -312,7 +408,7 @@ public class FENParser {
 
         int column = 0;
         for (int i = 0; i < rank.length(); i++) {
-            Character c = rank.charAt(i);
+            char c = rank.charAt(i);
             if (Character.isDigit(c)) {
                 // The character specifies the number of empty squares.
                 column += Character.getNumericValue(c);

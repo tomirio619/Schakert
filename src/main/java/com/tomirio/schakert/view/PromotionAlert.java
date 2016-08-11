@@ -16,7 +16,7 @@
  */
 package com.tomirio.schakert.view;
 
-import com.tomirio.schakert.chesspieces.Colour;
+import com.tomirio.schakert.chessboard.Colour;
 import javafx.scene.control.Alert;
 import javafx.scene.layout.HBox;
 import javafx.scene.shape.SVGPath;

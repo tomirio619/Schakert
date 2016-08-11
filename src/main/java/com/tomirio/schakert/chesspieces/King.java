@@ -17,6 +17,10 @@
 package com.tomirio.schakert.chesspieces;
 
 import com.tomirio.schakert.chessboard.ChessBoard;
+import com.tomirio.schakert.chessboard.ChessPiece;
+import com.tomirio.schakert.chessboard.Colour;
+import com.tomirio.schakert.chessboard.MoveDetails;
+import com.tomirio.schakert.chessboard.PieceType;
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.moves.CaptureMove;
 import com.tomirio.schakert.moves.CastlingMove;
@@ -62,7 +66,6 @@ public class King extends ChessPiece {
             return false;
         } else {
             King otherKing = (King) otherObject;
-
             return (otherKing.getColour() == getColour()
                     && otherKing.getPos().equals(getPos())
                     && getCastlingPossible() == otherKing.getCastlingPossible());
@@ -159,14 +162,13 @@ public class King extends ChessPiece {
             for (int column = getColumn() - 1; column <= getColumn() + 1; column++) {
                 Position newPos = new Position(row, column);
                 if (newPos.isValid() && !getPos().equals(newPos)) {
-                    // Position is valid, not equal to our initial position and does not put king in check.
+                    // Position is valid and not equal to our initial position
                     if (!chessBoard.isOccupiedPosition(newPos)) {
                         // Normal move
                         NormalMove normalMove = new NormalMove(this, newPos);
                         moveDetails.moves.add(normalMove);
                     } else // Position is occupied
-                    {
-                        if (chessBoard.getColour(newPos) != getColour()) {
+                     if (chessBoard.getColour(newPos) != getColour()) {
                             // Capture move
                             CaptureMove captureMove = new CaptureMove(this, newPos);
                             moveDetails.moves.add(captureMove);
@@ -174,7 +176,6 @@ public class King extends ChessPiece {
                             // Covered friendly piece.
                             moveDetails.coveredFriendlyPieces.add(newPos);
                         }
-                    }
                 }
 
             }
