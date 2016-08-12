@@ -120,7 +120,8 @@ public class Pawn extends ChessPiece {
                         }
                     }
                 } else // New position is not occupied.
-                 if (newPos.equals(chessBoard.getEnPassantTargetSquare())) {
+                {
+                    if (newPos.equals(chessBoard.getEnPassantTargetSquare())) {
                         /*
                     To prevent pieces of similar colours trying to execute an
                     enPassant on a friendly piece, we must check if there is an enemy
@@ -142,6 +143,7 @@ public class Pawn extends ChessPiece {
                             }
                         }
                     }
+                }
             }
         }
         return moveDetails;

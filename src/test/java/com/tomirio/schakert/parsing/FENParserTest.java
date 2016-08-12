@@ -92,6 +92,7 @@ public class FENParserTest {
     public void testInitialFENParse() {
         ChessBoard chessBoard = new ChessBoard();
         FENParser fenParser = new FENParser(ChessBoard.START_POSITION, chessBoard);
+        fenParser.parse();
         for (int row = 2; row < 6; row++) {
             for (int col = 0; col < ChessBoard.COLS; col++) {
                 assertEquals(chessBoard.isOccupiedPosition(row, col), false);

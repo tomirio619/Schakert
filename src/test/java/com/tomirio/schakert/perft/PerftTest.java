@@ -52,9 +52,9 @@ public class PerftTest {
 
     public PerftTest() {
         /**
-         * See http://www.chessprogramming.net/perfect-perft/ The last numbers
-         * repsectively mean the search depth (numbers of plies) and the correct
-         * number of leaf nodes.
+         * See <a>http://www.chessprogramming.net/perfect-perft/</a>
+         * The last numbers respectively mean the search depth (numbers of
+         * plies) and the correct number of leaf nodes.
          *
          */
         FENtestingStrings = Arrays.asList(
@@ -133,10 +133,6 @@ public class PerftTest {
                 position += suffix;
                 // doMove also updates hasTurn
                 move.doMove();
-                if (suffix.length() > 0) {
-//                    System.out.println(chessBoard);
-//                    System.out.println(chessBoard.getFEN());
-                }
                 int intermediatePerft = perft(depth - 1, chessBoard.getHasTurn());
                 results.add(position + " " + intermediatePerft);
                 nodes += intermediatePerft;
@@ -159,7 +155,6 @@ public class PerftTest {
         if (!(move instanceof PromotionMove || move instanceof CapturePromotionMove)) {
             return "";
         }
-
         if (move instanceof PromotionMove) {
             PromotionMove promotionMove = (PromotionMove) move;
             switch (move.getInvolvedPiece().getColour()) {
@@ -200,13 +195,7 @@ public class PerftTest {
         ArrayList<ChessPiece> pieces = chessBoard.getPieces(colour);
         for (ChessPiece piece : pieces) {
             for (Move move : piece.getPossibleMoves()) {
-                if (DEBUG) {
-                    System.out.println("Before move:" + chessBoard);
-                }
                 move.doMove();
-                if (DEBUG) {
-                    System.out.println("After move:" + chessBoard);
-                }
                 nodes += perft(depth - 1, colour.getOpposite());
                 move.undoMove();
             }
@@ -260,7 +249,7 @@ public class PerftTest {
     @Test
     public void InitialPosition() {
         String FEN = "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - ";
-        int[] results = {1, 20, 400, 8902, 197281, 4865609, 119060324};
+        int[] results = {1, 20, 400, 8902, 197281, 4865609};
         assertTrue(verify(results, FEN, 0));
     }
 
@@ -320,10 +309,7 @@ public class PerftTest {
     @Test
     public void Position9() {
         // HAKMEM 70
-        /**
-         * stale mate not correctly shown in log,
-         * https://chessprogramming.wikispaces.com/Bill+Gosper
-         */
+        // <a>https://chessprogramming.wikispaces.com/Bill+Gosper</a>
         String FEN = "5B2/6P1/1p6/8/1N6/kP6/2K5/8 w - -";
         int[] results = {18, 27, 524, 1347, 28021, 107618, 2446328};
         assertTrue(verify(results, FEN, 1));
@@ -342,6 +328,7 @@ public class PerftTest {
         chessBoard.loadFEN(FEN);
         int depth = startingDepth;
         for (int expectedResult : results) {
+            long startTime = System.nanoTime();
             int result = dividePerft(depth);
             if (result != expectedResult) {
                 System.out.println("The FEN was as follows: " + FEN);
@@ -350,6 +337,9 @@ public class PerftTest {
                 resetCount();
                 return false;
             }
+            long endTime = System.nanoTime();
+            long elapsedTime = endTime - startTime;
+            System.out.println("Elapsed time: " + elapsedTime / 1000000000.0 + " s");
             depth++;
         }
         resetCount();
