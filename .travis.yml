@@ -9,5 +9,9 @@ addons:
   apt:
     packages:
       - oracle-java8-installer
+      
+# Enable sudo
+sudo: true
 # Build command
+install: travis_wait mvn innstall
 script: "mvn clean -DskipTests=false verify"
