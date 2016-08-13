@@ -1,4 +1,6 @@
 language: java
+# Enable caching
+cache: bundler
 # Build command
 script: "mvn -DskipTests=false jfx:jar"
 # Version numbers
