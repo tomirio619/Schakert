@@ -1,3 +1,6 @@
 language: java
+# Disable email notification
+notifications:
+  email: false
 # Build command
 script: "mvn clean -DskipTests=false verify"
