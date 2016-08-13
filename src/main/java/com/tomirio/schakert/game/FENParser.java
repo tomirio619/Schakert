@@ -30,7 +30,7 @@ import java.util.List;
 
 /**
  *
- * @author S4ndmann
+ * @author Tom Sandmann
  */
 public class FENParser {
 

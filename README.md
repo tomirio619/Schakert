@@ -15,7 +15,7 @@ Also a list of new features which are planned to be implemented is shown.
 * FEN strings can be exported and loaded
 * Detection of stalemate, check and checkmate
 * A very basic AI, which will definitely be improved in upcomming commits
-* When a pawn promotes, the user is able to select the new type of the pawn (almost done)
+* When a pawn promotes, the user is able to select the new type of the pawn
 * Perft divide
 * Negamax search
 * Piece-square tables

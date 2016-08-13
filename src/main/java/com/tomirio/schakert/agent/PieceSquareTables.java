@@ -18,13 +18,14 @@ package com.tomirio.schakert.agent;
 
 /**
  *
- * @author Tomirio
+ * @author Tom Sandmann
  */
 public final class PieceSquareTables {
 
     /*
     Tables retrieved from:
     http://chessprogramming.wikispaces.com/Simplified+evaluation+function
+    All tables are from the perspective of white.
      */
     /**
      * Bishop values.

@@ -22,7 +22,7 @@ import com.tomirio.schakert.chesspieces.Rook;
 
 /**
  *
- * @author S4ndmann
+ * @author Tom Sandmann
  */
 public class CastlingMove extends NormalMove {
 
@@ -77,13 +77,15 @@ public class CastlingMove extends NormalMove {
             }
 
         } else // Queen side rook, castling long.
-         if (this.movePutsEnemyKingInCheckmate()) {
+        {
+            if (this.movePutsEnemyKingInCheckmate()) {
                 return "O-O-O" + "#";
             } else if (this.movePutsEnemyKingInCheck()) {
                 return "O-O-O" + "+";
             } else {
                 return "O-O-O";
             }
+        }
     }
 
     @Override

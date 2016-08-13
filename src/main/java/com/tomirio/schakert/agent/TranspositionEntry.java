@@ -18,7 +18,7 @@ package com.tomirio.schakert.agent;
 
 /**
  *
- * @author S4ndmann
+ * @author Tom Sandmann
  */
 public class TranspositionEntry {
 

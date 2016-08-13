@@ -22,7 +22,7 @@ import com.tomirio.schakert.chessboard.Position;
 
 /**
  *
- * @author S4ndmann
+ * @author Tom Sandmann
  */
 public class NormalMove extends Move {
 

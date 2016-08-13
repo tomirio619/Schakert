@@ -22,7 +22,7 @@ import com.tomirio.schakert.chessboard.Colour;
 import java.util.NoSuchElementException;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
-import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.Background;
@@ -36,7 +36,7 @@ import javafx.scene.paint.Paint;
  * http://stackoverflow.com/questions/24082063/chessboard-with-automatic-resizing
  *
  */
-public class VisualTile extends ToggleButton {
+public class VisualTile extends Button {
 
     /**
      * The HEIGHT of the visual tile.

@@ -28,14 +28,14 @@ import java.util.NoSuchElementException;
 
 /**
  *
- * @author S4ndmann
+ * @author Tom Sandmann
  */
 public class PromotionMove extends NormalMove {
 
     /**
      * Type of chess piece the pawn will promoto into.
      */
-    private final PieceType typeToPromoteTo;
+    private PieceType typeToPromoteTo;
 
     /**
      * A promotion move. Note that this move also keeps in mind a possible
@@ -121,6 +121,10 @@ public class PromotionMove extends NormalMove {
 
     public PieceType getPromotionType() {
         return typeToPromoteTo;
+    }
+
+    public void setPromotionType(PieceType typeToPromoteTo) {
+        this.typeToPromoteTo = typeToPromoteTo;
     }
 
 }

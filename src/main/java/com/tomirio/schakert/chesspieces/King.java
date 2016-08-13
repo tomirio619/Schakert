@@ -168,8 +168,7 @@ public class King extends ChessPiece {
                         NormalMove normalMove = new NormalMove(this, newPos);
                         moveDetails.moves.add(normalMove);
                     } else // Position is occupied
-                    {
-                        if (chessBoard.getColour(newPos) != getColour()) {
+                     if (chessBoard.getColour(newPos) != getColour()) {
                             // Capture move
                             CaptureMove captureMove = new CaptureMove(this, newPos);
                             moveDetails.moves.add(captureMove);
@@ -177,7 +176,6 @@ public class King extends ChessPiece {
                             // Covered friendly piece.
                             moveDetails.coveredFriendlyPieces.add(newPos);
                         }
-                    }
                 }
 
             }

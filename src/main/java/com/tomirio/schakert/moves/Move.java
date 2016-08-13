@@ -27,7 +27,7 @@ import java.util.ArrayList;
 
 /**
  *
- * @author S4ndmann
+ * @author Tom Sandmann
  */
 public abstract class Move {
 

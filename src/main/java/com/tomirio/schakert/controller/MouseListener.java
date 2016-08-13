@@ -18,12 +18,17 @@ package com.tomirio.schakert.controller;
 
 import com.tomirio.schakert.agent.AI;
 import com.tomirio.schakert.chessboard.Colour;
+import com.tomirio.schakert.chessboard.PieceType;
 import com.tomirio.schakert.chessboard.Position;
 import com.tomirio.schakert.game.Game;
+import com.tomirio.schakert.moves.CapturePromotionMove;
 import com.tomirio.schakert.moves.Move;
+import com.tomirio.schakert.moves.PromotionMove;
+import com.tomirio.schakert.view.PromotionAlert;
 import com.tomirio.schakert.view.View;
 import com.tomirio.schakert.view.VisualTile;
 import java.util.ArrayList;
+import java.util.Optional;
 import javafx.event.EventHandler;
 import javafx.scene.input.MouseEvent;
 
@@ -85,8 +90,21 @@ public class MouseListener implements EventHandler<MouseEvent> {
                  */
                 removeAvailableMoves(possibleMoves);
                 possibleMoves.clear();
-                game.humanPlay(move);
+                /**
+                 * Check whether the move is a promotion move
+                 */
+                if (move instanceof PromotionMove) {
+                    PromotionAlert promotionAlert = new PromotionAlert(move.getInvolvedPiece().getColour());
+                    Optional<PieceType> result = promotionAlert.showAndWait();
+                    promotionAlert.close();
+                    PieceType pieceType = result.get();
+                    PromotionMove promotionMove = (PromotionMove) move;
+                    promotionMove.setPromotionType(pieceType);
+                    game.humanPlay(promotionMove);
 
+                } else {
+                    game.humanPlay(move);
+                }
             } else {
 
                 removeAvailableMoves(possibleMoves);
@@ -123,18 +141,30 @@ public class MouseListener implements EventHandler<MouseEvent> {
             // The move is not a capture move
             checkNonCaptureMove();
         } else // The move could be a capture move
-         if (possibleMoves.isEmpty()) {
+        {
+            if (possibleMoves.isEmpty()) {
                 // The move is not a capture move
                 showNewPossibleMoves();
             } else {
                 // The move could still be a capture move
                 Move move = getMove(new Position(currentlySelectedVisualTile.row, currentlySelectedVisualTile.column));
                 if (move != null) {
-                    // The move did exists, apply the move
+                    // The move was a capture move
                     previousSelectedVisualTile = null;
                     removeAvailableMoves(possibleMoves);
                     possibleMoves.clear();
-                    game.humanPlay(move);
+
+                    if (move instanceof CapturePromotionMove) {
+                        PromotionAlert promotionAlert = new PromotionAlert(move.getInvolvedPiece().getColour());
+                        Optional<PieceType> result = promotionAlert.showAndWait();
+                        promotionAlert.close();
+                        PieceType pieceType = result.get();
+                        CapturePromotionMove capturePromotionMove = (CapturePromotionMove) move;
+                        capturePromotionMove.setPromotionType(pieceType);
+                        game.humanPlay(capturePromotionMove);
+                    } else {
+                        game.humanPlay(move);
+                    }
 
                 } else {
                     // There was no move with this end position
@@ -147,6 +177,7 @@ public class MouseListener implements EventHandler<MouseEvent> {
                     }
                 }
             }
+        }
 
     }
 

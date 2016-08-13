@@ -17,37 +17,98 @@
 package com.tomirio.schakert.view;
 
 import com.tomirio.schakert.chessboard.Colour;
-import javafx.scene.control.Alert;
+import com.tomirio.schakert.chessboard.PieceType;
+import javafx.geometry.Pos;
+import javafx.scene.control.ButtonBar.ButtonData;
+import javafx.scene.control.ButtonType;
+import javafx.scene.control.Dialog;
+import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
-import javafx.scene.shape.SVGPath;
+import javafx.stage.Stage;
 
 /**
  *
- * @author S4ndmann
+ * @author Tom Sandmann
  */
-public class PromotionAlert extends Alert {
+public class PromotionAlert extends Dialog<PieceType> {
 
     private final Colour colour;
-    SVGPath blackRook = new SVGPath();
-    SVGPath blackKnight = new SVGPath();
-    SVGPath blackBishop = new SVGPath();
-    SVGPath blackQueen = new SVGPath();
-
-    SVGPath whiteRook = new SVGPath();
-    SVGPath whiteKnight = new SVGPath();
-    SVGPath whiteBishop = new SVGPath();
-    SVGPath whiteQueen = new SVGPath();
+    ButtonType queen;
+    ButtonType knight;
+    ButtonType bishop;
+    ButtonType rook;
 
     public PromotionAlert(Colour colour) {
-        super(AlertType.NONE);
+        super();
+
+        // Get the Stage.
+        Stage stage = (Stage) this.getDialogPane().getScene().getWindow();
+        // Add a custom icon.
+        stage.getIcons().add(ImageLoader.ICON);
+
         this.colour = colour;
         this.setTitle("Promotion");
         this.setHeaderText("Choose the type for the pawn to promote into.");
 
-        HBox options = new HBox();
-        switch (colour) {
+        /**
+         * Black button types buttons.
+         */
+        queen = new ButtonType("Q", ButtonData.OK_DONE);
+        rook = new ButtonType("R", ButtonData.OK_DONE);
+        knight = new ButtonType("N", ButtonData.OK_DONE);
+        bishop = new ButtonType("B", ButtonData.OK_DONE);
+        /**
+         * White promotion buttons.
+         */
 
+        /**
+         * Add the possible images along with the buttons to the dialog.
+         */
+        HBox options = new HBox(35);
+        switch (this.colour) {
+            case Black:
+                this.getDialogPane().getButtonTypes().addAll(queen, rook, knight, bishop);
+                getDialogPane().autosize();
+                // Add images.
+                options.getChildren().addAll(new ImageView(
+                        ImageLoader.BLACK_QUEEN),
+                        new ImageView(ImageLoader.BLACK_KNIGHT),
+                        new ImageView(ImageLoader.BLACK_ROOK),
+                        new ImageView(ImageLoader.BLACK_BISHOP));
+                break;
+            default:
+                //White
+                this.getDialogPane().getButtonTypes().addAll(queen, rook, knight, bishop);
+                // Add images.
+                options.getChildren().addAll(new ImageView(
+                        ImageLoader.WHITE_QUEEN),
+                        new ImageView(ImageLoader.WHITE_KNIGHT),
+                        new ImageView(ImageLoader.WHITE_ROOK),
+                        new ImageView(ImageLoader.WHITE_BISHOP));
+                break;
         }
+        options.setAlignment(Pos.CENTER);
+        options.setLayoutX(getDialogPane().getInsets().getLeft());
+        this.getDialogPane().setContent(options);
+        options.widthProperty().add(getDialogPane().widthProperty());
+
+        /**
+         * Specify the result when a button is pressed.
+         */
+        setResultConverter((ButtonType param) -> {
+            switch (param.getText()) {
+                case "Q":
+                    return PieceType.Queen;
+                case "R":
+                    return PieceType.Rook;
+                case "N":
+                    return PieceType.Knight;
+                case "B":
+                    return PieceType.Bishop;
+                default:
+                    return null;
+            }
+        });
     }
 
 }

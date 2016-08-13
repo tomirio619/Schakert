@@ -99,7 +99,8 @@ public class Log extends GridPane {
 
             plyCounter++;
         } else // Non base case.
-         if (plyCounter % 2 == 0) {
+        {
+            if (plyCounter % 2 == 0) {
                 // Enemy made half-move, so we are in a new move.
                 moveCounter++;
 
@@ -122,6 +123,7 @@ public class Log extends GridPane {
                 this.moveStrings.add(newMove);
                 plyCounter++;
             }
+        }
     }
 
     /**
@@ -171,9 +173,8 @@ public class Log extends GridPane {
                 /*
                 Remove score label, undo last half move, lower ply counter
                 A Quick set of moves for testing checkmate:
-                W	B
-                f4	e5
-                g4	Qh4#
+                1. f4 e5
+                2. g4 Qh4#
                 0-1
                  */
                 Label scoreLabel = this.moveStrings.remove(moveStrings.size() - 1);

@@ -24,6 +24,7 @@ import com.tomirio.schakert.moves.Move;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.concurrent.Callable;
+import javafx.util.Pair;
 
 /**
  *
@@ -106,7 +107,7 @@ public class AI extends Player implements Callable<Move> {
         System.out.println("Nodes per second:" + skippedNodes / elapsedTime + "\n");
         visitedNodes.clear();
         skippedNodes = 0;
-        Move move = toPlay.first.getRootMove();
+        Move move = toPlay.getKey().getRootMove();
         return move;
     }
 
@@ -174,7 +175,7 @@ public class AI extends Player implements Callable<Move> {
              */
             Pair<Node, Double> result = negaMax(child, depth - 1, -beta, -alpha, hasTurn.getOpposite());
             child.move.undoMove();
-            double v = -result.second;
+            double v = -result.getValue();
 //            if (child.move.isCaptureMove()) {
 //                System.out.println("Het stuk dat werd gecaptured was:" + child.move.getNewPos());
 //                System.out.println("De waarde van eval was " + v + " met de volgende kleur aan zet:" + hasTurn);
@@ -182,7 +183,7 @@ public class AI extends Player implements Callable<Move> {
 //            }
             if (v >= bestValue) {
                 bestValue = v;
-                bestNode = result.first;
+                bestNode = result.getKey();
             }
             alpha = Math.max(alpha, v);
             if (alpha >= beta) {

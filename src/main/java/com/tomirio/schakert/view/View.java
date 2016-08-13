@@ -222,9 +222,14 @@ public final class View {
             @Override
             public void handle(ActionEvent event) {
                 // See http://code.makery.ch/blog/javafx-dialogs-official/
-                Alert alert = new Alert(AlertType.CONFIRMATION);
-                alert.setTitle("Load custom FEN");
-                alert.setHeaderText("Enter the FEN string in the textbox below.");
+                Alert loadFenAlert = new Alert(AlertType.CONFIRMATION);
+                // Get the Stage.
+                Stage stage = (Stage) loadFenAlert.getDialogPane().getScene().getWindow();
+                // Add a custom icon.
+                stage.getIcons().add(ImageLoader.ICON);
+
+                loadFenAlert.setTitle("Load custom FEN");
+                loadFenAlert.setHeaderText("Enter the FEN string in the textbox below.");
 
                 Label label = new Label("FEN:");
                 TextField textField = new TextField();
@@ -233,10 +238,9 @@ public final class View {
                 HBox content = new HBox();
                 content.setSpacing(10);
                 content.getChildren().addAll(label, textField);
-                alert.getDialogPane().setExpandableContent(content);
-                alert.getDialogPane().setExpanded(true);
+                loadFenAlert.getDialogPane().setContent(textField);
 
-                Optional<ButtonType> result = alert.showAndWait();
+                Optional<ButtonType> result = loadFenAlert.showAndWait();
                 if (result.get() == ButtonType.OK) {
                     String FEN = textField.getText();
                     if (game.isValidFEN(FEN)) {
@@ -252,15 +256,21 @@ public final class View {
             @Override
             public void handle(ActionEvent event) {
                 // See http://code.makery.ch/blog/javafx-dialogs-official/
-                Alert alert = new Alert(AlertType.INFORMATION);
-                alert.setTitle("Get current FEN");
-                alert.setHeaderText("In the textfield below you find the FEN string for the current board.");
+                Alert getFenAlert = new Alert(AlertType.INFORMATION);
+                // Get the Stage.
+                Stage stage = (Stage) getFenAlert.getDialogPane().getScene().getWindow();
+                // Add a custom icon.
+                stage.getIcons().add(ImageLoader.ICON);
+
+                getFenAlert.setTitle("Get current FEN");
+                getFenAlert.setHeaderText("In the textfield below you find the FEN string for the current board.");
+
                 TextField textField = new TextField();
+                textField.setEditable(false);
                 textField.setText(chessBoard.getFEN());
                 textField.setPrefWidth(450);
-                alert.getDialogPane().setExpandableContent(textField);
-                alert.getDialogPane().setExpanded(true);
-                alert.showAndWait();
+                getFenAlert.getDialogPane().setContent(textField);
+                getFenAlert.showAndWait();
             }
         });
 

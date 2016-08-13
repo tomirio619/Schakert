@@ -33,7 +33,7 @@ import org.junit.Test;
 
 /**
  *
- * @author S4ndmann
+ * @author Tom Sandmann
  */
 public class PerftTest {
 

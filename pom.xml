@@ -4,7 +4,7 @@
 
     <groupId>com.tomirio</groupId>
     <artifactId>Schakert</artifactId>
-    <version>1.0</version>
+    <version>0.1</version>
     <packaging>jar</packaging>
 
     <name>Schakert</name>
@@ -12,6 +12,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <mainClass>com.tomirio.schakert.Schakert</mainClass>
+        <skipTests>true</skipTests>
     </properties>
 
     <organization>
@@ -21,13 +22,28 @@
 
     <build>
         <plugins>
+            <!--Version eye-->
+            <plugin>
+                <groupId>com.versioneye</groupId>
+                <artifactId>versioneye-maven-plugin</artifactId>
+                <version>3.10.2</version>
+            </plugin>
+            <!--JavaFX Maven Plugin-->
             <plugin>
                 <groupId>com.zenjava</groupId>
                 <artifactId>javafx-maven-plugin</artifactId>
                 <version>8.5.0</version>
                 <configuration>
+                    <vendor>Tom Sandmann</vendor>
+                    <archive>
+                        <manifest>
+                            <addClasspath>true</addClasspath>
+                            <classpathPrefix>lib/</classpathPrefix>
+                            <mainClass>com.tomirio.schakert.Schakert</mainClass>
+                        </manifest>
+                    </archive>
                     <mainClass>com.tomirio.schakert.Schakert</mainClass>
-                    <updateExistingJar>true</updateExistingJar>
+                    <updateExistingJar>false</updateExistingJar>
                 </configuration>
                 <executions>
                     <execution>
@@ -54,9 +70,9 @@
                 <version>2.19.1</version>
                 <configuration>
                     <testFailureIgnore>true</testFailureIgnore>
+                    <skipTests>${skipTests}</skipTests>
                 </configuration>
             </plugin>
-            
         </plugins>
     </build>
     
@@ -66,22 +82,6 @@
             <artifactId>junit</artifactId>
             <version>4.12</version>
             <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-            <version>19.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.4</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
-            <groupId>de.codecentric.centerdevice</groupId>
-            <artifactId>javafxsvg</artifactId>
-            <version>1.2.1</version>
         </dependency>
         <dependency>
             <groupId>org.seleniumhq.selenium</groupId>
@@ -101,6 +101,31 @@
                 </exclusion>
             </exclusions>
         </dependency>
+        <!--The display-dependency-updates goal will check all the 
+        dependencies used in your project and display a list of those 
+        dependencies with newer versions available.-->
+        <dependency>
+            <groupId>org.codehaus.mojo</groupId>
+            <artifactId>versions-maven-plugin</artifactId>
+            <version>2.3</version>
+        </dependency>
     </dependencies>
-   
+    <reporting>
+        <plugins>
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>versions-maven-plugin</artifactId>
+                <version>2.3</version>
+                <reportSets>
+                    <reportSet>
+                        <reports>
+                            <report>dependency-updates-report</report>
+                            <report>plugin-updates-report</report>
+                            <report>property-updates-report</report>
+                        </reports>
+                    </reportSet>
+                </reportSets>
+            </plugin>
+        </plugins>
+    </reporting>
 </project>

@@ -26,7 +26,7 @@ import java.util.NoSuchElementException;
 
 /**
  *
- * @author S4ndmann
+ * @author Tom Sandmann
  */
 public class Evaluation {
 

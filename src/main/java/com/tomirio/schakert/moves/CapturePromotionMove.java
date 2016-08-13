@@ -29,14 +29,14 @@ import java.util.NoSuchElementException;
 
 /**
  *
- * @author S4ndmann
+ * @author Tom Sandmann
  */
 public class CapturePromotionMove extends CaptureMove {
 
     /**
      * Type of chess piece the pawn will promoto into.
      */
-    private final PieceType typeToPromoteTo;
+    private PieceType typeToPromoteTo;
 
     /**
      *
@@ -116,6 +116,10 @@ public class CapturePromotionMove extends CaptureMove {
 
     public PieceType getPromotionType() {
         return typeToPromoteTo;
+    }
+
+    public void setPromotionType(PieceType typeToPromoteTo) {
+        this.typeToPromoteTo = typeToPromoteTo;
     }
 
 }

@@ -21,7 +21,7 @@ import com.tomirio.schakert.chessboard.Position;
 
 /**
  *
- * @author S4ndmann
+ * @author Tom Sandmann
  */
 public class EnPassantMove extends CaptureMove {
 
