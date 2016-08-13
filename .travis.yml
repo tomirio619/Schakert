@@ -8,7 +8,5 @@ jdk:
 - oraclejdk8
 
 # Use JDK 8u45. The above line just causes the use of a minor version of Java 8.
-  addons:
-  apt:
-  packages:
-  - oracle-java8-installer
+packages:
+- oracle-java8-installer
