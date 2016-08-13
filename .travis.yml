@@ -13,5 +13,4 @@ addons:
 # Enable sudo
 sudo: true
 # Build command
-install: travis_wait mvn install
-script: "mvn clean -DskipTests=false verify"
+script: "travis_wait mvn clean -DskipTests=false verify"
