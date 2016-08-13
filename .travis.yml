@@ -2,5 +2,12 @@ language: java
 # Disable email notification
 notifications:
   email: false
+  
+jdk:
+  - oraclejdk8
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
 # Build command
 script: "mvn clean -DskipTests=false verify"
