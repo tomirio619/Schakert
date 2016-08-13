@@ -32,11 +32,10 @@ import javafx.stage.Stage;
  */
 public class PromotionAlert extends Dialog<PieceType> {
 
-    private final Colour colour;
-    ButtonType queen;
-    ButtonType knight;
-    ButtonType bishop;
-    ButtonType rook;
+    private final ButtonType queen;
+    private final ButtonType knight;
+    private final ButtonType bishop;
+    private final ButtonType rook;
 
     public PromotionAlert(Colour colour) {
         super();
@@ -46,7 +45,6 @@ public class PromotionAlert extends Dialog<PieceType> {
         // Add a custom icon.
         stage.getIcons().add(ImageLoader.ICON);
 
-        this.colour = colour;
         this.setTitle("Promotion");
         this.setHeaderText("Choose the type for the pawn to promote into.");
 
@@ -65,7 +63,7 @@ public class PromotionAlert extends Dialog<PieceType> {
          * Add the possible images along with the buttons to the dialog.
          */
         HBox options = new HBox(35);
-        switch (this.colour) {
+        switch (colour) {
             case Black:
                 this.getDialogPane().getButtonTypes().addAll(queen, rook, knight, bishop);
                 getDialogPane().autosize();

@@ -27,7 +27,7 @@ import java.util.*;
 
 public class NaturalOrderComparator implements Comparator {
 
-    static char charAt(String s, int i) {
+    private static char charAt(String s, int i) {
         if (i >= s.length()) {
             return 0;
         } else {
@@ -35,7 +35,7 @@ public class NaturalOrderComparator implements Comparator {
         }
     }
 
-    int compareRight(String a, String b) {
+    private int compareRight(String a, String b) {
         int bias = 0;
         int ia = 0;
         int ib = 0;
@@ -74,8 +74,10 @@ public class NaturalOrderComparator implements Comparator {
         String b = o2.toString();
 
         int ia = 0, ib = 0;
-        int nza = 0, nzb = 0;
-        char ca, cb;
+        int nza = 0;
+        int nzb = 0;
+        char ca;
+        char cb;
         int result;
 
         while (true) {

@@ -117,10 +117,13 @@ public class Pawn extends ChessPiece {
                                     moveDetails.moves.add(captureMove);
                                 }
                                 break;
+                            default:
+                                break;
                         }
                     }
                 } else // New position is not occupied.
-                 if (newPos.equals(chessBoard.getEnPassantTargetSquare())) {
+                {
+                    if (newPos.equals(chessBoard.getEnPassantTargetSquare())) {
                         /*
                     To prevent pieces of similar colours trying to execute an
                     enPassant on a friendly piece, we must check if there is an enemy
@@ -142,6 +145,7 @@ public class Pawn extends ChessPiece {
                             }
                         }
                     }
+                }
             }
         }
         return moveDetails;
@@ -230,6 +234,7 @@ public class Pawn extends ChessPiece {
                         NormalMove normalMove = new NormalMove(this, singleStep);
                         initialMoves.add(normalMove);
                     }
+                    return initialMoves;
                 default:
                     return initialMoves;
             }
@@ -259,6 +264,8 @@ public class Pawn extends ChessPiece {
                 } else {
                     moveDetails.moves.addAll(getNonCaptureMoves());
                 }
+                break;
+            default:
                 break;
         }
         return moveDetails;

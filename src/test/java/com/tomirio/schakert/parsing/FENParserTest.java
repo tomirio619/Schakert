@@ -31,7 +31,7 @@ import org.junit.Test;
  */
 public class FENParserTest {
 
-    List<String> FENtestingStrings;
+    private final List<String> FENtestingStrings;
 
     public FENParserTest() {
         // see http://mathieupage.com/?p=65 for a FEN database
@@ -42,7 +42,7 @@ public class FENParserTest {
     }
 
     /**
-     * Checks whether castlig availability is correctly set for a given
+     * Checks whether castling availability is correctly set for a given
      * fenparser.
      *
      * @param fenParser The FEN parser.

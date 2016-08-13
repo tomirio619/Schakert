@@ -344,10 +344,8 @@ public abstract class ChessPiece {
     public boolean posCanBeCaptured(Position pos) {
         ArrayList<Move> moves = getRawPossibleMoves();
         for (Move move : moves) {
-            if (move instanceof NormalMove) {
-                if (move.getNewPos().equals(pos)) {
-                    return true;
-                }
+            if (move instanceof NormalMove && move.getNewPos().equals(pos)) {
+                return true;
             }
         }
         return false;

@@ -301,7 +301,7 @@ public class FENParser {
     }
 
     private void parseCastlingAvailability(String castlingAvailability) {
-        if (!castlingAvailability.equals("-")) {
+        if (!"-".equals(castlingAvailability)) {
             for (int i = 0; i < castlingAvailability.length(); i++) {
                 char c = castlingAvailability.charAt(i);
                 switch (c) {
@@ -325,6 +325,9 @@ public class FENParser {
                         chessBoard.getKing(Colour.Black).setCastlingPossible(true);
                         chessBoard.getQueenSideRook(Colour.Black).setCastlingPossible(true);
                         break;
+                    default:
+                        throw new IllegalArgumentException("The character " + c + " encountered while parsing castling availability is not valid!");
+
                 }
             }
         }
@@ -468,6 +471,8 @@ public class FENParser {
                 break;
             case "w":
                 this.hasTurn = Colour.White;
+                break;
+            default:
                 break;
         }
 

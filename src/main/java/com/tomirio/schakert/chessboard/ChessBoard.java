@@ -635,6 +635,8 @@ public class ChessBoard {
                         blackKing.setCheck(true);
                         blackKingChanged = true;
                     }
+                default:
+                    break;
             }
             if (!whiteKingChanged) {
                 whiteKing.setCheck(false);

@@ -26,10 +26,18 @@ import com.tomirio.schakert.chesspieces.Rook;
  */
 public class CastlingMove extends NormalMove {
 
-    Rook rook;
-
-    Position rookNewPos;
-    Position rookOrgPos;
+    /**
+     * The rook involved in the castling move.
+     */
+    private final Rook rook;
+    /**
+     * The new position of the rook after the move will be applied
+     */
+    private final Position rookNewPos;
+    /**
+     * The original position of the rook before the move was applied
+     */
+    private final Position rookOrgPos;
 
     /**
      *
@@ -77,15 +85,13 @@ public class CastlingMove extends NormalMove {
             }
 
         } else // Queen side rook, castling long.
-        {
-            if (this.movePutsEnemyKingInCheckmate()) {
+         if (this.movePutsEnemyKingInCheckmate()) {
                 return "O-O-O" + "#";
             } else if (this.movePutsEnemyKingInCheck()) {
                 return "O-O-O" + "+";
             } else {
                 return "O-O-O";
             }
-        }
     }
 
     @Override

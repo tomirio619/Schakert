@@ -226,10 +226,9 @@ public class Game {
      * the GUI.
      */
     public final void notifyPlayers() {
-        if (chessBoard.inStalemate() || chessBoard.inCheckmate(hasTurn)
-                || chessBoard.inCheckmate(hasTurn.getOpposite())) {
-            // The game has ended
-        } else {
+        if (!chessBoard.inStalemate() && !chessBoard.inCheckmate(hasTurn)
+                && !chessBoard.inCheckmate(hasTurn.getOpposite())) {
+            // Game is not in a terminal state
             switch (hasTurn) {
                 case Black:
                     if (blackPlayer instanceof AI) {
@@ -240,6 +239,8 @@ public class Game {
                     if (whitePlayer instanceof AI) {
                         agentPlay();
                     }
+                    break;
+                default:
                     break;
             }
         }

@@ -246,8 +246,6 @@ public final class View {
                     if (game.isValidFEN(FEN)) {
                         game.loadFEN(FEN);
                     }
-                } else {
-                    // user chose CANCEL or closed the dialog
                 }
             }
         });
@@ -410,18 +408,15 @@ public final class View {
     private void handleResize(double gridWidth, double gridHeight) {
         double gridMinWidthHeight = Math.min(gridWidth, gridHeight);
         double newSquareSize = Math.floor(gridMinWidthHeight / 9.0);
-        if (newSquareSize < visualBoard[0][0].getMinWidth()) {
-            // Debugging purposes.
-        } else {
-            for (VisualTile[] columns : visualBoard) {
-                for (VisualTile visualTile : columns) {
-                    visualTile.setPrefSize(newSquareSize, newSquareSize);
-                }
+        for (VisualTile[] columns : visualBoard) {
+            for (VisualTile visualTile : columns) {
+                visualTile.setPrefSize(newSquareSize, newSquareSize);
             }
-            labels.stream().forEach((l) -> {
-                l.setPrefSize(newSquareSize, newSquareSize);
-            });
         }
+        labels.stream().forEach((l) -> {
+            l.setPrefSize(newSquareSize, newSquareSize);
+        });
+
     }
 
     /**

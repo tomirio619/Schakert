@@ -99,20 +99,20 @@ public abstract class Move {
         }
         ArrayList<ChessPiece> friendlyPieces = chessBoard.getPieces(movedPiece.getColour());
         for (ChessPiece p : friendlyPieces) {
-            if (p.getType() == movedPiece.getType()) {
+            if (p.getType() == movedPiece.getType()
+                    && !p.getPos().equals(movedPiece.getPos())) {
                 // Both pieces are of the same type
-                if (!p.getPos().equals(movedPiece.getPos())) {
-                    // Other piece is not the same as the piece in this move.
-                    for (Move move : p.getPossibleMoves()) {
-                        if (move.getNewPos().equals(newPos)) {
-                            /*
+                // Other piece is not the same as the piece in this move.
+                for (Move move : p.getPossibleMoves()) {
+                    if (move.getNewPos().equals(newPos)) {
+                        /*
                             Other piece can move to the same position as
                             the piece that is involved in this move.
-                             */
-                            ambiguousPieces.add(p);
-                        }
+                         */
+                        ambiguousPieces.add(p);
                     }
                 }
+
             }
         }
         return ambiguousPieces;

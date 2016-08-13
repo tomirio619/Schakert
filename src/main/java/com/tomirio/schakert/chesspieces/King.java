@@ -109,12 +109,11 @@ public class King extends ChessPiece {
             return castlingMoves;
         } else {
             for (Rook rook : rooks) {
-                if (rook.getCastlingPossible() && rook.getRow() == getRow()) {
-                    if (chessBoard.isEmptySubRow(getPos(), rook.getPos())) {
-                        CastlingMove castlingMove = getCastlingMove(rook);
-                        if (castlingMove != null) {
-                            castlingMoves.add(castlingMove);
-                        }
+                if (rook.getCastlingPossible() && rook.getRow() == getRow()
+                        && chessBoard.isEmptySubRow(getPos(), rook.getPos())) {
+                    CastlingMove castlingMove = getCastlingMove(rook);
+                    if (castlingMove != null) {
+                        castlingMoves.add(castlingMove);
                     }
 
                 }

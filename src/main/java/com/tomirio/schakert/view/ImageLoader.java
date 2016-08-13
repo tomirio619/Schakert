@@ -27,9 +27,9 @@ public final class ImageLoader {
     /**
      * Path resources.
      */
-    static final String PATH = "images/chess_icons/png";
+    static private final String PATH = "images/chess_icons/png";
 
-    static final String IMAGETYPE = ".png";
+    static private final String IMAGETYPE = ".png";
 
     /**
      * application icon.
@@ -39,7 +39,7 @@ public final class ImageLoader {
     /**
      * black bishop image.
      */
-    protected static final Image BLACK_BISHOP = new Image(PATH + "/black/bishop" + IMAGETYPE);
+    public static final Image BLACK_BISHOP = new Image(PATH + "/black/bishop" + IMAGETYPE);
 
     /**
      * black king image.

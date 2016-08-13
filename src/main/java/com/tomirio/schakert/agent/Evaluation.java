@@ -111,7 +111,7 @@ public class Evaluation {
             for (int col = 0; col < COLS; col++) {
                 if (chessBoard.isOccupiedPosition(row, col)) {
                     ChessPiece p = chessBoard.getPiece(row, col);
-                    if (p.getColour() == colour) {
+                    if (p.getColour().equals(colour)) {
                         sum += this.getPieceValue(p, chessBoard);
                     }
                 }
@@ -135,7 +135,7 @@ public class Evaluation {
                 weight = PieceSquareTables.BISHOP_TABLE[7 - pos.getRow()][pos.getColumn()];
                 break;
             default:
-                throw new NoSuchElementException();
+                break;
         }
         return weight;
 
@@ -161,7 +161,7 @@ public class Evaluation {
                 weight = king_table[7 - pos.getRow()][pos.getColumn()];
                 break;
             default:
-                throw new NoSuchElementException();
+                break;
         }
         if (chessBoard.getKing(colour).inCheck()) {
             // If the king is in check, we substract a penalty of 100
@@ -181,7 +181,7 @@ public class Evaluation {
                 weight = PieceSquareTables.KNIGHT_TABLE[7 - pos.getRow()][pos.getColumn()];
                 break;
             default:
-                throw new NoSuchElementException();
+                break;
         }
         return weight;
     }
@@ -196,7 +196,7 @@ public class Evaluation {
                 weight = PieceSquareTables.PAWN_TABLE[7 - pos.getRow()][pos.getColumn()];
                 break;
             default:
-                throw new NoSuchElementException();
+                break;
         }
         return weight;
     }
@@ -238,7 +238,7 @@ public class Evaluation {
                 weight = PieceSquareTables.QUEEN_TABLE[7 - pos.getRow()][pos.getColumn()];
                 break;
             default:
-                throw new NoSuchElementException();
+                break;
         }
         return weight;
     }
@@ -254,7 +254,7 @@ public class Evaluation {
                 weight = PieceSquareTables.ROOK_TABLE[7 - pos.getRow()][pos.getColumn()];
                 break;
             default:
-                throw new NoSuchElementException();
+                break;
         }
         return weight;
     }

@@ -80,10 +80,6 @@ public class MoveDetails {
         moves.addAll(newMoves);
     }
 
-    private boolean isUniqueMove(Move move, ArrayList<Move> moveList) {
-        return moveList.indexOf(move) == moveList.lastIndexOf(move);
-    }
-
     @Override
     public String toString() {
         String movesString = "";
