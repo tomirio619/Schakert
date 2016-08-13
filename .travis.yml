@@ -3,10 +3,9 @@ language: java
 cache: bundler
 # Build command
 script: "mvn -DskipTests=false jfx:jar"
-# Version numbers
-jdk:
-- oraclejdk8
 
 # Use JDK 8u45. The above line just causes the use of a minor version of Java 8.
-packages:
-- oracle-java8-installer
+addons:
+  apt:
+    packages:
+      - oracle-java8-installer
